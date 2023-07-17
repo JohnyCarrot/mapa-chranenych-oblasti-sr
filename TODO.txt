@@ -1,0 +1,11 @@
+používatelia aktualizujuci vrstvy
+možnodť vlastného výletu na mape
+vlastný bod s popisom  a diskusiou
+výber užívatela, ktorému sa bod / trasa zobrazí
+vylepšiť menu (vnorené listy, možnosť rušiť ako celok etc)
+
+Zautomatizovať polygony, refaktorovať
+
+zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
+
+Na základe nastavení vytvoriť funkciu, ktorá vráti unikátne skupiny buďto objektov, alebo zdielaných objektov
