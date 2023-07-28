@@ -21,7 +21,7 @@
                 <h2><a href="/#">Mapa chránených území</a></h2>
 <form action="">
     <input type="text" name="search" placeholder="Zadajte meno užívateľa" value="{{request.GET.username}}">
-    <input type="submit" value="Hľadať užívateľa">
+    <input type="submit" value="Hľadať nového užívateľa">
 </form>
                   {% for i in user_search %}
                 {% if i.1 %}

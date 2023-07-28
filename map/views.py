@@ -39,12 +39,15 @@ def zdielat_objekt_html_list(uzivatel,objekt_id):
     html=""
     objekt = Objekty.objects.get(id=objekt_id)
     for priatel in Friend.objects.friends(uzivatel):
-        html+=f"""
-        {priatel.username} <a href="?object_share={objekt_id}&username={priatel.username}&objectname={objekt.meno}" target="_top" class="button">Zdieľať</a> <br> 
-        """
-
+        if objekt_id in [x.id for x in vrat_zdielane_objekty_s_uzivatelom(priatel.username)]:
+            html += f"""
+            {priatel.username} <a href="?object_unshare={objekt_id}&username={priatel.username}&objectname={objekt.meno}" target="_top" class="button">Zrušiť zdielanie</a> <br> 
+            """
+        else:
+            html+=f"""
+            {priatel.username} <a href="?object_share={objekt_id}&username={priatel.username}&objectname={objekt.meno}" target="_top" class="button">Zdieľať</a> <br> 
+            """
     return html
-
 
 
 def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape, uzivatel = None):
@@ -126,6 +129,15 @@ def vrat_skupinu_s_uzivatelom_zdielanych_objektov(username):
     if(k==None): return None
     return k[0]
 
+def vrat_zdielane_objekty_s_uzivatelom(username):
+    objekty_cele = []
+    for objekt in Objekty.objects.all():
+        if objekt.nastavenia != None:
+            nastavenia = json.loads(objekt.nastavenia)
+            if"shared_with" in nastavenia and username in nastavenia["shared_with"]:
+                objekty_cele.append(objekt)
+    return objekty_cele
+
 
 def index(requests):
     start_time = time.time()
@@ -166,6 +178,19 @@ def index(requests):
         zdielany_objekt.nastavenia = json.dumps(nastavenia)
         zdielany_objekt.save()
         return HttpResponseRedirect(requests.path_info)
+    # Zrušenie zdielania objektu
+
+    if (requests.user.is_authenticated and requests.GET.get('object_unshare') != None and requests.GET.get('username') != None and requests.GET.get('objectname') != None):
+        priatel = requests.GET.get('username')
+        zdielany_objekt = Objekty.objects.get(id=requests.GET.get('object_unshare'))
+        nastavenia = json.loads(zdielany_objekt.nastavenia)
+        Podskupiny.objects.get(id=nastavenia["shared_with"][priatel]).delete()
+        nastavenia["shared_with"].pop(priatel)
+        zdielany_objekt.nastavenia = json.dumps(nastavenia)
+        zdielany_objekt.save()
+        return HttpResponseRedirect(requests.path_info)
+
+    #Normálne načítanie
     m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                    zoom_start=9,
                    width=1000, height=800,
@@ -228,6 +253,8 @@ def friends_main_page(requests):
     if(requests.GET.get('search') != None):
         for i in get_user_model().objects.all():
             uz_odoslane = False  # kontrola, či už náhodou žiadosť nebola poslaná
+            if Friend.objects.are_friends(requests.user, i) == True:
+                continue #Ak sú priatelia nechcem ho vo vyhladávaní
             if (requests.user.get_username()==i.get_username()):
                 continue
             if str(i.get_username()).startswith(requests.GET.get('search')):
