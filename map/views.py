@@ -54,13 +54,15 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape, uzivatel = None):
     for objekt in Objekty.objects.all():
         nastavenia = None
         zdielane = False
+        html = objekt.html
         if(objekt.nastavenia != None and uzivatel!= None):
             nastavenia = json.loads(objekt.nastavenia)
             if"shared_with" in nastavenia and uzivatel.username in nastavenia["shared_with"] and nastavenia["shared_with"][uzivatel.username]==podskupina.id:
                 zdielane = True
+                html+=f"""<p style="white-space: nowrap">Zdieľané používateľom: <b>{objekt.podskupina.spravca}</b></p>"""
+                html += f"""<a href="?object_unshare={objekt.id}&username={uzivatel.username}&objectname={objekt.meno}" target="_top" class="button">Zrušiť zdielanie</a> <br> """
         if(objekt.podskupina_id!=podskupina.id and zdielane == False):
             continue
-        html = objekt.html
         if (objekt.diskusia == 1): html+=f"""<a href="forum/{objekt.id}" target="_blank" rel="noopener noreferrer">Diskusia</a>"""
         if(uzivatel!= None and zdielane == False and podskupina.spravca == uzivatel.username):
             html+= f"""<a href="spravuj?={objekt.id}" target="_blank" rel="noopener noreferrer">Upraviť</a><br>"""
@@ -106,7 +108,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape, uzivatel = None):
         folium.GeoJson(GEOSGeometry(objekt.geometry).json, style_function=lambda x, fillColor=objekt.fillcolor, color=objekt.color: {
         "fillColor": fillColor,
         "color": color,
-    }).add_to(podskupina_v_mape).add_child(
+    },name=objekt.meno).add_to(podskupina_v_mape).add_child(
             folium.Popup(folium.Html(html,script=True),lazy=False))
 
 def over_viditelnost(viditelnost,prihlaseny = False,username = ""):
@@ -184,10 +186,11 @@ def index(requests):
         priatel = requests.GET.get('username')
         zdielany_objekt = Objekty.objects.get(id=requests.GET.get('object_unshare'))
         nastavenia = json.loads(zdielany_objekt.nastavenia)
-        Podskupiny.objects.get(id=nastavenia["shared_with"][priatel]).delete()
-        nastavenia["shared_with"].pop(priatel)
-        zdielany_objekt.nastavenia = json.dumps(nastavenia)
-        zdielany_objekt.save()
+        if "shared_with" in nastavenia and (priatel in nastavenia["shared_with"]):
+            Podskupiny.objects.get(id=nastavenia["shared_with"][priatel]).delete()
+            nastavenia["shared_with"].pop(priatel)
+            zdielany_objekt.nastavenia = json.dumps(nastavenia)
+            zdielany_objekt.save()
         return HttpResponseRedirect(requests.path_info)
 
     #Normálne načítanie
