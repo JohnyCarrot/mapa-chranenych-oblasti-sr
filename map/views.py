@@ -7,6 +7,7 @@ import json
 from folium import plugins
 from django.db import connection
 from draw_custom import Draw as Draw_custom
+from geocoder_custom import Geocoder as Geocoder_custom
 from django.shortcuts import render, redirect
 from .forms import NewUserForm
 from django.contrib.auth import login
@@ -50,7 +51,7 @@ def zdielat_objekt_html_list(uzivatel,objekt_id):
     return html
 
 
-def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape, uzivatel = None):
+def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel = None):
     for objekt in Objekty.objects.all():
         nastavenia = None
         zdielane = False
@@ -105,11 +106,15 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape, uzivatel = None):
                 </html>'
             ></iframe>
             """ % (zdielat_objekt_html_list(uzivatel,objekt.id))
-        folium.GeoJson(GEOSGeometry(objekt.geometry).json, style_function=lambda x, fillColor=objekt.fillcolor, color=objekt.color: {
+        geometria = GEOSGeometry(objekt.geometry)
+        folium.GeoJson(geometria.json, style_function=lambda x, fillColor=objekt.fillcolor, color=objekt.color: {
         "fillColor": fillColor,
         "color": color,
     },name=objekt.meno).add_to(podskupina_v_mape).add_child(
             folium.Popup(folium.Html(html,script=True),lazy=False))
+        geocoder.append({"name":objekt.meno,"center":[geometria.centroid.coord_seq.getY(0),geometria.centroid.coord_seq.getX(0)]})
+
+
 
 def over_viditelnost(viditelnost,prihlaseny = False,username = ""):
     if viditelnost == None: return False
@@ -201,6 +206,7 @@ def index(requests):
                    # crs="EPSG3857",
 
                    )
+    geocoder_vlastne_vyhladanie = []
     skupiny_v_navigacii = dict()
     for skupina in Skupiny.objects.all():
         if over_viditelnost(skupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username)):
@@ -211,7 +217,7 @@ def index(requests):
                 if(skupina.id ==podskupina.skupina_id and over_viditelnost(podskupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username))):
                     _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
                     _podskupina_v_mape.add_to(m)
-                    pridaj_objekty_do_podskupiny(podskupina,_podskupina_v_mape,uzivatel=requests.user)
+                    pridaj_objekty_do_podskupiny(podskupina,_podskupina_v_mape,uzivatel=requests.user,geocoder=geocoder_vlastne_vyhladanie)
                     podskupiny_v_mape.append(_podskupina_v_mape)
             skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
     print(f"---Všetky objekty v db: %s seconds ---" % (time.time() - start_time_temp))
@@ -222,7 +228,7 @@ def index(requests):
 
     # mapa nastavenie
     folium.plugins.Fullscreen().add_to(m)
-    folium.plugins.Geocoder(collapsed=True, add_marker=True).add_to(m)
+    Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
     folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
     folium.plugins.LocateControl(auto_start=True).add_to(m)
     if(requests.user.is_authenticated):
