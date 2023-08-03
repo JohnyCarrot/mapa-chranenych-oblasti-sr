@@ -8,6 +8,7 @@ from folium import plugins
 from django.db import connection
 from draw_custom import Draw as Draw_custom
 from geocoder_custom import Geocoder as Geocoder_custom
+from easy_button_non_universal import EasyButton as EasyButton
 from django.shortcuts import render, redirect
 from .forms import NewUserForm
 from django.contrib.auth import login
@@ -227,6 +228,7 @@ def index(requests):
 
 
     # mapa nastavenie
+    EasyButton().add_to(m)
     folium.plugins.Fullscreen().add_to(m)
     Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
     folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
