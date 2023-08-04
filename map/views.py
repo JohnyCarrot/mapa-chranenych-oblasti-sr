@@ -4,6 +4,8 @@ import time
 import geocoder
 import random
 import json
+
+from django.views.decorators.csrf import csrf_exempt
 from folium import plugins
 from django.db import connection
 from draw_custom import Draw as Draw_custom
@@ -16,8 +18,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from friendship.models import Friend, Follow, Block, FriendshipRequest, FriendshipManager
-from django.http import HttpResponseRedirect
-from .models import Skupiny,Podskupiny,Objekty
+from django.http import HttpResponseRedirect, HttpResponse
+from .models import Skupiny,Podskupiny,Objekty, Profile
 from django.contrib.gis.geos import GEOSGeometry
 cur = connection.cursor()
 
@@ -228,12 +230,13 @@ def index(requests):
 
 
     # mapa nastavenie
-    EasyButton().add_to(m)
     folium.plugins.Fullscreen().add_to(m)
     Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
     folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
     folium.plugins.LocateControl(auto_start=True).add_to(m)
     if(requests.user.is_authenticated):
+        map_setting = Profile.objects.get(user_id=requests.user.id).map_settings
+        EasyButton(map_setting.stupen2,map_setting.stupen3,map_setting.stupen4,map_setting.stupen5).add_to(m)
         Draw_custom(export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
     print(f"---Pluginy: %s seconds ---" % (time.time() - start_time_temp))
     start_time_temp = time.time()
@@ -314,3 +317,23 @@ def register_request(request):
         messages.error(request, "Unsuccessful registration. Invalid information.")
     form = NewUserForm()
     return render(request=request, template_name="main/register.html", context={"register_form": form})
+
+@csrf_exempt
+def api_request(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            profil = Profile.objects.get(user_id=request.user.id)
+            if("stupen2" in body and "stupen3" in body and "stupen4" in body and "stupen5" in body):
+                print("Hello")
+                mapa_nastavenia = profil.map_settings
+                mapa_nastavenia.stupen2 = body['stupen2']
+                mapa_nastavenia.stupen3 = body['stupen3']
+                mapa_nastavenia.stupen4 = body['stupen4']
+                mapa_nastavenia.stupen5 = body['stupen5']
+                mapa_nastavenia.save()
+        except:
+            return HttpResponse(status=500)
+
+
+    return HttpResponse(status=204)
