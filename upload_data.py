@@ -34,6 +34,25 @@ def osetrenie_zon(text):  # keďže v db majú rôzne označenie pre zóny, treb
         return "IV. stupeň ochrany"
     return text  # tu by som sa nikdy nemal dostať
 
+def vratenie_zon_ako_cislo(text,text2):  # Do db sa teraz dava zona ako cislo
+
+
+    if text == "Neaplikuje sa":
+        return None
+    elif "4" in text or "4" in text2 or "IV." in text or "IV." in text2:
+        return 4
+    elif "5" in text or "5" in text2 or "V." in text or "V." in text2:
+        return 5
+    elif "3" in text or "3" in text2 or "III." in text or "III." in text2:
+        return 3
+    elif "2" in text or "2" in text2 or "II." in text or "II." in text2:
+        return 2
+    if "C" in text or "C" in text2:
+        return 3
+    if "B" in text or "B" in text2:
+        return 4
+    return None  # tu by som sa nikdy nemal dostať
+
 def pridaj_do_databazy(INSERT_STATEMENT,premenne):
     cur.execute(INSERT_STATEMENT, premenne)
     vysledok = cur.fetchone()[0]
@@ -49,9 +68,9 @@ def pridaj_podskupinu(meno,viditelnost,spravca,skupina = None):
     INSERT_STATEMENT = 'INSERT INTO podskupiny (meno,viditelnost,spravca,skupina) VALUES (%s, %s, %s,%s) RETURNING id;'
     return pridaj_do_databazy(INSERT_STATEMENT,(meno, viditelnost, spravca, skupina))
 
-def pridaj_objekt(meno, color, fillcolor,html,diskusia,podskupina,geometry):
-    INSERT_STATEMENT = 'INSERT INTO objekty (meno, color, fillcolor,html,diskusia,podskupina,geometry) VALUES (%s, %s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromText(%s), 4326)) RETURNING id;'
-    return pridaj_do_databazy(INSERT_STATEMENT, (meno, color, fillcolor,html,diskusia,podskupina,geometry))
+def pridaj_objekt(meno, color, fillcolor,html,diskusia,podskupina,geometry,stupen_ochrany):
+    INSERT_STATEMENT = 'INSERT INTO objekty (meno, color, fillcolor,html,diskusia,podskupina,geometry,stupen_ochrany) VALUES (%s, %s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromText(%s), 4326),%s) RETURNING id;'
+    return pridaj_do_databazy(INSERT_STATEMENT, (meno, color, fillcolor,html,diskusia,podskupina,geometry,stupen_ochrany))
 
 def stupne_ochrany():
     skupina = pridaj_skupinu("Chránené oblasti",None,["*"])
@@ -83,7 +102,8 @@ def stupne_ochrany():
                 """
             pridaj_objekt(osetrenie_zon(tuples[1]),color,fillcolor,html,1,podskupiny[osetrenie_zon(tuples[1])],str(polygon))
     return vysledok
-
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#Aktualne jedine používané
 def chranene_oblasti():
     shapefile = gpd.read_file("data/tk002_mchu_20221006.shp")
     shapefile = shapefile.to_crs(epsg=4326)
@@ -147,10 +167,10 @@ def chranene_oblasti():
         if ("MULTIPOLYGON" in str(tuples[13])):
             for polygon in tuples[13].geoms:
                 pridaj_objekt(osetrenie_zon(tuples[5]), color, fillcolor, html, 1, podskupiny[tuples[6]],
-                              str(polygon))
+                              str(polygon),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
         else:
             pridaj_objekt(osetrenie_zon(tuples[5]), color, fillcolor, html, 1, podskupiny[tuples[6]],
-                          str(tuples[13]))
+                          str(tuples[13]),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
     return True
 
 def uzemia_europskeho_vyznamu():

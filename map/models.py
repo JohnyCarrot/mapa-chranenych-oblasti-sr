@@ -43,6 +43,7 @@ class Objekty(models.Model):
     podskupina = models.ForeignKey(Podskupiny, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "podskupina")
     geometry = models.GeometryField()  #
     nastavenia = models.JSONField(blank=True, null=True)  #
+    stupen_ochrany = models.BigIntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

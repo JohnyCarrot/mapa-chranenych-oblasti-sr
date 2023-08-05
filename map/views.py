@@ -39,6 +39,15 @@ def pridaj_podskupinu(meno,viditelnost,spravca,skupina = None):
     INSERT_STATEMENT = 'INSERT INTO podskupiny (meno,viditelnost,spravca,skupina) VALUES (%s, %s, %s,%s) RETURNING id;'
     return pridaj_do_databazy(INSERT_STATEMENT,(meno, viditelnost, spravca, skupina))
 
+def sulad_s_nastavenim_mapy(nastavenie,objekt):
+    if(nastavenie == None):
+        return True
+    if(nastavenie.stupen2 == False and objekt.stupen_ochrany==2): return False
+    if (nastavenie.stupen3 == False and objekt.stupen_ochrany == 3): return False
+    if (nastavenie.stupen4 == False and objekt.stupen_ochrany == 4): return False
+    if (nastavenie.stupen5 == False and objekt.stupen_ochrany == 5): return False
+    return True
+
 def zdielat_objekt_html_list(uzivatel,objekt_id):
     html=""
     objekt = Objekty.objects.get(id=objekt_id)
@@ -55,9 +64,16 @@ def zdielat_objekt_html_list(uzivatel,objekt_id):
 
 
 def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel = None):
+    if(uzivatel == None or uzivatel.is_authenticated == False):
+        nastavenie_mapy = None
+    else:
+        profil = Profile.objects.get(user_id=uzivatel.id)
+        nastavenie_mapy = profil.map_settings
     for objekt in Objekty.objects.all():
         nastavenia = None
         zdielane = False
+        if(sulad_s_nastavenim_mapy(nastavenie_mapy,objekt)==False):
+            continue
         html = objekt.html
         if(objekt.nastavenia != None and uzivatel!= None):
             nastavenia = json.loads(objekt.nastavenia)
@@ -325,7 +341,6 @@ def api_request(request):
             body = json.loads(request.body)
             profil = Profile.objects.get(user_id=request.user.id)
             if("stupen2" in body and "stupen3" in body and "stupen4" in body and "stupen5" in body):
-                print("Hello")
                 mapa_nastavenia = profil.map_settings
                 mapa_nastavenia.stupen2 = body['stupen2']
                 mapa_nastavenia.stupen3 = body['stupen3']
