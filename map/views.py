@@ -354,6 +354,7 @@ def api_request(request):
                 skupina = Skupiny.objects.get(id=body['id'])
                 skupina.priorita = body['priorita']
                 skupina.save()
+                
         except:
             return HttpResponse(status=500)
 
