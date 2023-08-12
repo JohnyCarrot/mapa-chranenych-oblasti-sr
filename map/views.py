@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 import folium
 import time
@@ -227,7 +228,7 @@ def index(requests):
                    )
     geocoder_vlastne_vyhladanie = []
     skupiny_v_navigacii = dict()
-    for skupina in Skupiny.objects.all():
+    for skupina in Skupiny.objects.all().order_by('priorita'):
         if over_viditelnost(skupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username)):
             _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
             _skupina_v_mape.add_to(m)
@@ -347,8 +348,24 @@ def api_request(request):
                 mapa_nastavenia.stupen4 = body['stupen4']
                 mapa_nastavenia.stupen5 = body['stupen5']
                 mapa_nastavenia.save()
+                return HttpResponse(status=202)
+            ##########Administrácia##########
+            if(request.user.is_superuser and "id" in body and "priorita" in body):
+                skupina = Skupiny.objects.get(id=body['id'])
+                skupina.priorita = body['priorita']
+                skupina.save()
         except:
             return HttpResponse(status=500)
 
 
     return HttpResponse(status=204)
+
+@login_required
+def administracia(request):
+    context = {}
+    vsetky_systemove_skupiny = []
+    for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
+        vsetky_systemove_skupiny.append(skupina)
+    context['sys_skupiny_list'] = vsetky_systemove_skupiny
+
+    return render(request, 'administration/admin.html',context)

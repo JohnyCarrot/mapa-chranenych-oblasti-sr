@@ -144,3 +144,9 @@ INTERNAL_IPS = [
 
 GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal306'
 GEOS_LIBRARY_PATH = r'C:\OSGeo4W\bin\geos_c.dll'
+
+import os
+STATICFILES_DIRS = (
+  os.path.join(BASE_DIR, 'static'),
+)
+

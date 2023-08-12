@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Administrácia</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+      {% load static %}<link rel="stylesheet" href="{% static 'administration/admin.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  </head>
+  <body>
+    <!-- Boostrap -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+  <!-- Boostrap -->
+    <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- (A) SIDEBAR -->
+    <div id="pgside">
+      <!-- (A1) BRANDING OR USER -->
+      <!-- LINK TO DASHBOARD OR LOGOUT -->
+      <div id="pguser">
+        {% load static %}<img src="{% static 'administration/potato.png' %}">
+        <i class="txt">Administrácia</i>
+      </div>
+
+      <!-- (A2) MENU ITEMS -->
+      <a href="#" class="current">
+        <i class="ico">&#9733;</i>
+        <i class="txt">Vrstvy</i>
+      </a>
+      <a href="#">
+        <i class="ico">&#9728;</i>
+        <i class="txt">Niečo iné</i>
+      </a>
+    </div>
+
+    <!-- (B) MAIN -->
+    <main id="pgmain">
+      <ul id="simpleList" class="list-group">
+          {% for skupina in sys_skupiny_list %}
+        <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }}</li>
+          {% endfor %}
+      </ul>
+
+        <script>
+            // Simple list
+            Sortable.create(simpleList, { /* options */ });
+
+            async function skupina_priorita_update(id,index) {
+                  let user = {
+                  id: id,
+                  priorita: index
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+
+           return true;
+        }
+
+            function admin_skupiny_poradie_funkcia() {
+                    let navbar = document
+                      .getElementById('simpleList')
+                      .querySelectorAll('li');
+
+                    navbar.forEach((item, index) => {
+                        skupina_priorita_update(item.id,index)
+                    });
+                    alert("Poradie úspešne zmenené");
+                return null;
+            }
+
+        </script>
+    <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_poradie_funkcia()">Aktualizovať poradie</button>
+    </main>
+  </body>
+</html>

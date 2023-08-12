@@ -16,6 +16,7 @@ class Skupiny(models.Model):
     spravca = models.TextField(blank=True, null=True)
     viditelnost = ArrayField(models.TextField(), blank=True)  #
     nastavenia = models.JSONField(blank=True, null=True)  #
+    priorita = models.BigIntegerField(default=None, null=True)
 
     class Meta:
         managed = False

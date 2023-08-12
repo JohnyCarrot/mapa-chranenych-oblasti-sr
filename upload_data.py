@@ -166,10 +166,10 @@ def chranene_oblasti():
 
         if ("MULTIPOLYGON" in str(tuples[13])):
             for polygon in tuples[13].geoms:
-                pridaj_objekt(osetrenie_zon(tuples[5]), color, fillcolor, html, 1, podskupiny[tuples[6]],
+                pridaj_objekt(tuples[5], color, fillcolor, html, 1, podskupiny[tuples[6]],
                               str(polygon),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
         else:
-            pridaj_objekt(osetrenie_zon(tuples[5]), color, fillcolor, html, 1, podskupiny[tuples[6]],
+            pridaj_objekt(tuples[5], color, fillcolor, html, 1, podskupiny[tuples[6]],
                           str(tuples[13]),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
     return True
 

@@ -39,7 +39,7 @@ class EasyButton(JSCSSMixin, MacroElement):
            return true;
         }
             var content = `
-            <form id="settings-form">
+            <form id="settings-form" onsubmit="return false">
             <h3>Stupne ochrany</h3>
 <div class="form-check form-check-inline">
   <input class="form-check-input" type="checkbox" id="stupen2" value="option1" {{ 'checked' if this.stupen2 else '' }}>
