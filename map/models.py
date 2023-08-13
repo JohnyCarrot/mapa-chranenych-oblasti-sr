@@ -29,6 +29,7 @@ class Podskupiny(models.Model):
     spravca = models.TextField(blank=True, null=True)
     skupina = models.ForeignKey(Skupiny, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "skupina")
     nastavenia = models.JSONField(blank=True, null=True)   #
+    priorita = models.BigIntegerField(default=None, null=True)
 
     class Meta:
         managed = False

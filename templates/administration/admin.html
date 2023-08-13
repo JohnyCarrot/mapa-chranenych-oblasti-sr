@@ -39,7 +39,21 @@
     <main id="pgmain">
       <ul id="simpleList" class="list-group">
           {% for skupina in sys_skupiny_list %}
-        <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }}</li>
+              <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }}
+                 <dl id="simpleList{{ forloop.counter }}" class="list-group">
+                     {% for key,podskupiny in sys_podskupiny_dict.items %}
+                         {% if key == skupina.id %}
+                             {% for podskupina in podskupiny %}
+                                <dt id="{{ podskupina.id }}" class="list-group-item">{{ podskupina.meno }}</dt>
+                             {% endfor %}
+                         {% endif %}
+                     {% endfor %}
+                </dl>
+      <script>
+         Sortable.create(simpleList{{ forloop.counter }}, { /* options */ });
+      </script>
+              </li>
+
           {% endfor %}
       </ul>
 
@@ -50,7 +64,8 @@
             async function skupina_priorita_update(id,index) {
                   let user = {
                   id: id,
-                  priorita: index
+                  priorita: index,
+                  skupina: null
                 };
 
                 let response = await fetch('/api', {
@@ -72,12 +87,16 @@
                     navbar.forEach((item, index) => {
                         skupina_priorita_update(item.id,index)
                     });
-                    alert("Poradie úspešne zmenené");
+
                 return null;
+            }
+            function admin_skupiny_podskupiny_poradie_funkcia_tlacidlo(){
+               admin_skupiny_poradie_funkcia();
+               alert("Poradie úspešne zmenené");
             }
 
         </script>
-    <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_poradie_funkcia()">Aktualizovať poradie</button>
+    <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_podskupiny_poradie_funkcia_tlacidlo()">Aktualizovať poradie</button>
     </main>
   </body>
 </html>

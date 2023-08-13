@@ -233,7 +233,7 @@ def index(requests):
             _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
             _skupina_v_mape.add_to(m)
             podskupiny_v_mape = []
-            for podskupina in Podskupiny.objects.all():
+            for podskupina in Podskupiny.objects.all().order_by('priorita'):
                 if(skupina.id ==podskupina.skupina_id and over_viditelnost(podskupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username))):
                     _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
                     _podskupina_v_mape.add_to(m)
@@ -350,11 +350,11 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
             ##########Administrácia##########
-            if(request.user.is_superuser and "id" in body and "priorita" in body):
+            if(request.user.is_superuser and "skupina" in body and "id" in body and "priorita" in body):
                 skupina = Skupiny.objects.get(id=body['id'])
                 skupina.priorita = body['priorita']
                 skupina.save()
-                
+                return HttpResponse(status=202)
         except:
             return HttpResponse(status=500)
 
@@ -365,8 +365,14 @@ def api_request(request):
 def administracia(request):
     context = {}
     vsetky_systemove_skupiny = []
+    podskupiny_sys_skupin = dict()
     for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
         vsetky_systemove_skupiny.append(skupina)
+        podskupiny = []
+        for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
+            podskupiny.append(podskupina)
+        podskupiny_sys_skupin[skupina.id] = podskupiny
     context['sys_skupiny_list'] = vsetky_systemove_skupiny
+    context['sys_podskupiny_dict'] = podskupiny_sys_skupin
 
     return render(request, 'administration/admin.html',context)
