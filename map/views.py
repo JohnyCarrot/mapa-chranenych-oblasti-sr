@@ -1,3 +1,5 @@
+import traceback
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 import folium
@@ -350,12 +352,60 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
             ##########Administrácia##########
-            if(request.user.is_superuser and "skupina" in body and "id" in body and "priorita" in body):
+            if request.user.is_superuser and "podskupina" in body and "id" in body and "priorita" in body:
+                podskupina = Podskupiny.objects.get(id=body['id'])
+                podskupina.priorita = body['priorita']
+                podskupina.save()
+                return HttpResponse(status=202)
+            if request.user.is_superuser and "skupina" in body and "id" in body and "priorita" in body:
                 skupina = Skupiny.objects.get(id=body['id'])
                 skupina.priorita = body['priorita']
                 skupina.save()
                 return HttpResponse(status=202)
+            if request.user.is_superuser and "daj_mapu" in body and "id" in body and "skupina" in body:
+                m = folium.Map(location=[48.73044030054515, 19.456582270083356],
+                               zoom_start=9,
+                               width=1000, height=500,
+                               prefer_canvas=True,
+                               # crs="EPSG3857",
+
+                               )
+                if body["skupina"]:
+                    geocoder_vlastne_vyhladanie = []
+                    skupina_v_navigacii = dict()
+                    skupina = Skupiny.objects.get(id=body['id'])
+                    _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
+                    _skupina_v_mape.add_to(m)
+                    podskupiny_v_mape = []
+                    for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
+                        _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
+                        _podskupina_v_mape.add_to(m)
+                        pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
+                                                     geocoder=geocoder_vlastne_vyhladanie)
+                        podskupiny_v_mape.append(_podskupina_v_mape)
+                    skupina_v_navigacii[skupina.meno] = podskupiny_v_mape
+                else:
+                    podskupina = Podskupiny.objects.get(id=body['id'])
+                    geocoder_vlastne_vyhladanie = []
+                    skupina_v_navigacii = dict()
+                    skupina = podskupina.skupina
+                    _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
+                    _skupina_v_mape.add_to(m)
+                    podskupiny_v_mape = []
+                    _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
+                    _podskupina_v_mape.add_to(m)
+                    pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
+                                                 geocoder=geocoder_vlastne_vyhladanie)
+                    podskupiny_v_mape.append(_podskupina_v_mape)
+                    skupina_v_navigacii[skupina.meno] = podskupiny_v_mape
+                folium.plugins.Fullscreen().add_to(m)
+                Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
+                folium.plugins.GroupedLayerControl(skupina_v_navigacii, exclusive_groups=False).add_to(m)
+                folium.plugins.LocateControl(auto_start=True).add_to(m)
+
+                return HttpResponse(m._repr_html_(), content_type="text/plain")
         except:
+            traceback.print_exc()
             return HttpResponse(status=500)
 
 

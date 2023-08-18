@@ -39,12 +39,12 @@
     <main id="pgmain">
       <ul id="simpleList" class="list-group">
           {% for skupina in sys_skupiny_list %}
-              <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }}
+              <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }} <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ skupina.id }}',true)">Upraviť</button>
                  <dl id="simpleList{{ forloop.counter }}" class="list-group">
                      {% for key,podskupiny in sys_podskupiny_dict.items %}
                          {% if key == skupina.id %}
                              {% for podskupina in podskupiny %}
-                                <dt id="{{ podskupina.id }}" class="list-group-item">{{ podskupina.meno }}</dt>
+                                <dt id="{{ podskupina.id }}" class="list-group-item">{{ podskupina.meno }} <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ podskupina.id }}',false)">Upraviť</button></dt>
                              {% endfor %}
                          {% endif %}
                      {% endfor %}
@@ -79,7 +79,26 @@
            return true;
         }
 
+            async function podskupina_priorita_update(id,index) {
+                  let user = {
+                  id: id,
+                  priorita: index,
+                  podskupina: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+
+           return true;
+        }
+
             function admin_skupiny_poradie_funkcia() {
+
                     let navbar = document
                       .getElementById('simpleList')
                       .querySelectorAll('li');
@@ -90,13 +109,60 @@
 
                 return null;
             }
+
+            function admin_podskupiny_poradie_funkcia() {
+                let navbar = null;
+                {% for skupina in sys_skupiny_list %}
+                    navbar = document
+                      .getElementById('simpleList{{ forloop.counter }}')
+                      .querySelectorAll('dt');
+
+                    navbar.forEach((item, index) => {
+                        podskupina_priorita_update(item.id,index)
+                    });
+                {% endfor %}
+                return null;
+            }
             function admin_skupiny_podskupiny_poradie_funkcia_tlacidlo(){
                admin_skupiny_poradie_funkcia();
+               admin_podskupiny_poradie_funkcia();
                alert("Poradie úspešne zmenené");
             }
+        function map_preview_update(html){
+                let wrapper = document.getElementById('mapa-preview');
+                wrapper.innerHTML= html;
+        }
+        async function daj_mapu(id,skupina){
+                map_preview_update('Načítavanie');
+            let user = {
+                  id: id,
+                  skupina: skupina,
+                  daj_mapu: null
+                };
 
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+                response.text().then(function (text) {
+                  map_preview_update(text);
+                });
+
+        }
         </script>
     <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_podskupiny_poradie_funkcia_tlacidlo()">Aktualizovať poradie</button>
+
+
+        <div class="row lg-3">
+            <div class="col-lg-9 offset-lg-3">
+                      <div id="mapa-preview"></div>
+            </div>
+        </div>
+
+
     </main>
   </body>
 </html>
