@@ -7,14 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
       {% load static %}<link rel="stylesheet" href="{% static 'administration/admin.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   </head>
   <body>
     <!-- Boostrap -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
   <!-- Boostrap -->
     <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- (A) SIDEBAR -->
     <div id="pgside">
       <!-- (A1) BRANDING OR USER -->
@@ -149,11 +152,22 @@
                 });
                 response.text().then(function (text) {
                   map_preview_update(text);
+                  document.getElementById('mapa-preview').scrollIntoView({
+                          behavior: "smooth",
+                        });
                 });
+
+        }
+        function pridat_skupinu(){
+
+        }
+        function pridat_podskupinu(){
 
         }
         </script>
     <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_podskupiny_poradie_funkcia_tlacidlo()">Aktualizovať poradie</button>
+    <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_skupinuModal">Pridať skupinu</button>
+    <button class = "btn btn-primary btn-sm" onclick="pridat_podskupinu()">Pridať podskupinu</button>
 
 
         <div class="row lg-3">
@@ -164,5 +178,94 @@
 
 
     </main>
+<!-- Pridať skupinu -->
+<div class="modal fade" id="pridat_skupinuModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="pridat_skupinuModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pridat_skupinuModalLabel">Pridať skupinu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="pridaj_skupinuform" method="post" action="api">
+          <label for="nazov_skupiny">Názov skupiny:</label>
+          <input type="text" id="nazov_skupiny" name="nazov_skupiny"><br>
+          <label for="viditelnost">Viditeľnosť:</label>
+            <select id="viditelnost" name="viditelnost" class="form-control js-viditelnost-tags" multiple="multiple">
+              <option value="*" >Všetci</option>
+              <option value="-">Iba prihlásený</option>
+              <option value="empty"> </option>
+            </select>
+        </form>
+          <script>$('.js-viditelnost-tags').select2({
+                  tags: true,
+                  width: '100%'
+                });
+          </script>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="
+        let inputs_nova_skupina = document.getElementById('pridaj_skupinuform').elements;
+            let dejta_nova_skupina = {
+          viditelnost: $('.js-viditelnost-tags').val(),
+          nazov_skupiny: inputs_nova_skupina['nazov_skupiny'].value,
+          nova_skupina: null
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                304: function() {
+                  alert('Chyba: Skupina s týmto názvom už existuje');
+                },
+                201: function() {
+                {% if get_data.keys|length > 0 %}
+                    window.location = window.location.pathname+ '?openmodal_groupadd_sucess=1';
+                {% else %}
+                 window.location = window.location.href + '?openmodal_groupadd_sucess=1';
+                 {% endif %}
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for key,value in get_data.items %}
+    {% if key == 'openmodal_groupadd_sucess' and value == '1' %}
+        <!-- Modal -->
+        <div class="modal fade" id="skupina_vytvorena_Modal" tabindex="-1" role="dialog" aria-labelledby="skupina_vytvorena_ModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="skupina_vytvorena_ModalLabel">Správa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Skupina úspešne vytvorená
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript">
+        $(window).on('load', function() {
+            $('#skupina_vytvorena_Modal').modal('show');
+        });
+        </script>
+    {% endif %}
+{% endfor %}
+
   </body>
 </html>

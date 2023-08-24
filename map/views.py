@@ -404,6 +404,18 @@ def api_request(request):
                 folium.plugins.LocateControl(auto_start=True).add_to(m)
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
+            if request.user.is_superuser and "nova_skupina" in body and "nazov_skupiny" in body and "viditelnost" in body:
+                for skupina in Skupiny.objects.all():
+                    if skupina.meno.lower() == str(body['nazov_skupiny']).lower():
+                        return HttpResponse(status=304)
+                nova_skupina = Skupiny()
+                nova_skupina.meno = body['nazov_skupiny']
+                if body['viditelnost']==[]:
+                    body['viditelnost'] = ['*']
+                nova_skupina.viditelnost = body['viditelnost']
+                nova_skupina.spravca = None
+                nova_skupina.save()
+                return HttpResponse(status=201)
         except:
             traceback.print_exc()
             return HttpResponse(status=500)
@@ -424,5 +436,6 @@ def administracia(request):
         podskupiny_sys_skupin[skupina.id] = podskupiny
     context['sys_skupiny_list'] = vsetky_systemove_skupiny
     context['sys_podskupiny_dict'] = podskupiny_sys_skupin
+    context['get_data'] = dict(request.GET.items())
 
     return render(request, 'administration/admin.html',context)
