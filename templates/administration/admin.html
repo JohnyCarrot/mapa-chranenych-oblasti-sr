@@ -158,16 +158,11 @@
                 });
 
         }
-        function pridat_skupinu(){
 
-        }
-        function pridat_podskupinu(){
-
-        }
         </script>
     <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_podskupiny_poradie_funkcia_tlacidlo()">Aktualizovať poradie</button>
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_skupinuModal">Pridať skupinu</button>
-    <button class = "btn btn-primary btn-sm" onclick="pridat_podskupinu()">Pridať podskupinu</button>
+    <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_podskupinuModal">Pridať podskupinu</button>
 
 
         <div class="row lg-3">
@@ -191,7 +186,7 @@
       <div class="modal-body">
         <form id="pridaj_skupinuform" method="post" action="api">
           <label for="nazov_skupiny">Názov skupiny:</label>
-          <input type="text" id="nazov_skupiny" name="nazov_skupiny"><br>
+          <input type="text" id="nazov_skupiny" name="nazov_skupiny" required /><br>
           <label for="viditelnost">Viditeľnosť:</label>
             <select id="viditelnost" name="viditelnost" class="form-control js-viditelnost-tags" multiple="multiple">
               <option value="*" >Všetci</option>
@@ -237,7 +232,74 @@
     </div>
   </div>
 </div>
-
+<!-- Pridať skupinu koniec-->
+    <!-- Pridať podskupinu -->
+<div class="modal fade" id="pridat_podskupinuModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="pridat_podskupinuModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pridat_podskupinuModalLabel">Pridať podskupinu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="pridaj_podskupinuform" method="post" action="api">
+            <label for="skupina-pre-podskupinu">Vyber skupinu:</label>
+            <select id="skupina-pre-podskupinu" name="skupina-pre-podskupinu">
+                {% for skupina in sys_skupiny_list %}
+              <option value="{{ skupina.id }}" >{{ skupina.meno }}</option>
+                {% endfor %}
+            </select><br>
+          <label for="nazov_podskupiny">Názov podskupiny:</label>
+          <input type="text" id="nazov_podskupiny" name="nazov_podskupiny" required /><br>
+          <label for="viditelnost_podskupina">Viditeľnosť:</label>
+            <select id="viditelnost_podskupina" name="viditelnost_podskupina" class="form-control js-viditelnost-podskupiny-tags" multiple="multiple">
+              <option value="*" >Všetci</option>
+              <option value="-">Iba prihlásený</option>
+              <option value="empty"> </option>
+            </select>
+        </form>
+          <script>$('.js-viditelnost-podskupiny-tags').select2({
+                  tags: true,
+                  width: '100%'
+                });
+          </script>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="
+        let inputs_nova_skupina = document.getElementById('pridaj_podskupinuform').elements;
+            let dejta_nova_skupina = {
+          viditelnost: $('.js-viditelnost-podskupiny-tags').val(),
+          id_skupiny: inputs_nova_skupina['skupina-pre-podskupinu'].value,
+          nazov_podskupiny: inputs_nova_skupina['nazov_podskupiny'].value,
+          nova_podskupina: null
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                304: function() {
+                  alert('Chyba: V Skupine už podskupina s týmto názvom už existuje');
+                },
+                201: function() {
+                {% if get_data.keys|length > 0 %}
+                    window.location = window.location.pathname+ '?openmodal_subgroupadd_sucess=1';
+                {% else %}
+                 window.location = window.location.href + '?openmodal_subgroupadd_sucess=1';
+                 {% endif %}
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Pridať podskupinu koniec-->
 {% for key,value in get_data.items %}
     {% if key == 'openmodal_groupadd_sucess' and value == '1' %}
         <!-- Modal -->
@@ -262,6 +324,32 @@
         <script type="text/javascript">
         $(window).on('load', function() {
             $('#skupina_vytvorena_Modal').modal('show');
+        });
+        </script>
+    {% endif %}
+        {% if key == 'openmodal_subgroupadd_sucess' and value == '1' %}
+        <!-- Modal -->
+        <div class="modal fade" id="podskupina_vytvorena_Modal" tabindex="-1" role="dialog" aria-labelledby="podskupina_vytvorena_ModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="podskupina_vytvorena_ModalLabel">Správa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Podskupina úspešne vytvorená
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript">
+        $(window).on('load', function() {
+            $('#podskupina_vytvorena_Modal').modal('show');
         });
         </script>
     {% endif %}

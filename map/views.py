@@ -416,6 +416,20 @@ def api_request(request):
                 nova_skupina.spravca = None
                 nova_skupina.save()
                 return HttpResponse(status=201)
+            if request.user.is_superuser and "nova_podskupina" in body and "nazov_podskupiny" in body and "viditelnost" in body and "id_skupiny" in body:
+                skupina = Skupiny.objects.get(id=body['id_skupiny'])
+                for podskupina in Podskupiny.objects.filter(skupina=skupina):
+                    if podskupina.meno.lower() == str(body['nazov_podskupiny']).lower():
+                        return HttpResponse(status=304)
+                nova_podskupina = Podskupiny()
+                nova_podskupina.meno = body['nazov_podskupiny']
+                if body['viditelnost'] == []:
+                    body['viditelnost'] = ['*']
+                nova_podskupina.viditelnost = body['viditelnost']
+                nova_podskupina.spravca = None
+                nova_podskupina.skupina=skupina
+                nova_podskupina.save()
+                return HttpResponse(status=201)
         except:
             traceback.print_exc()
             return HttpResponse(status=500)
