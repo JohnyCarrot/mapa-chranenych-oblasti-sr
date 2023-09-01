@@ -162,7 +162,9 @@
         </script>
     <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_podskupiny_poradie_funkcia_tlacidlo()">Aktualizovať poradie</button>
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_skupinuModal">Pridať skupinu</button>
+    {% if sys_skupiny_list|length > 0 %}
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_podskupinuModal">Pridať podskupinu</button>
+    {% endif %}
 
 
         <div class="row lg-3">
@@ -216,6 +218,9 @@
             statusCode: {
                 304: function() {
                   alert('Chyba: Skupina s týmto názvom už existuje');
+                },
+                303: function() {
+                  alert('Chyba: Názov skupiny nemôže byť prázdny');
                 },
                 201: function() {
                 {% if get_data.keys|length > 0 %}
@@ -283,6 +288,9 @@
             statusCode: {
                 304: function() {
                   alert('Chyba: V Skupine už podskupina s týmto názvom už existuje');
+                },
+                303: function() {
+                  alert('Chyba: Názov podskupiny nemôže byť prázdny');
                 },
                 201: function() {
                 {% if get_data.keys|length > 0 %}

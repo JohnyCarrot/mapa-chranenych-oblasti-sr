@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from folium import plugins
 from django.db import connection
 from draw_custom import Draw as Draw_custom
+from geoman import Geoman as Geoman
 from geocoder_custom import Geocoder as Geocoder_custom
 from easy_button_non_universal import EasyButton as EasyButton
 from django.shortcuts import render, redirect
@@ -129,7 +130,9 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             ></iframe>
             """ % (zdielat_objekt_html_list(uzivatel,objekt.id))
         geometria = GEOSGeometry(objekt.geometry)
-        folium.GeoJson(geometria.json, style_function=lambda x, fillColor=objekt.fillcolor, color=objekt.color: {
+        geometria_cela = json.loads(geometria.json)
+        geometria_cela['serverID'] = objekt.id
+        folium.GeoJson(geometria_cela, style_function=lambda x, fillColor=objekt.fillcolor, color=objekt.color: {
         "fillColor": fillColor,
         "color": color,
     },name=objekt.meno).add_to(podskupina_v_mape).add_child(
@@ -402,9 +405,13 @@ def api_request(request):
                 Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
                 folium.plugins.GroupedLayerControl(skupina_v_navigacii, exclusive_groups=False).add_to(m)
                 folium.plugins.LocateControl(auto_start=True).add_to(m)
+                Geoman().add_to(m)
+
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
             if request.user.is_superuser and "nova_skupina" in body and "nazov_skupiny" in body and "viditelnost" in body:
+                if len(body["nazov_skupiny"]) ==0:
+                    return HttpResponse(status=303)
                 for skupina in Skupiny.objects.all():
                     if skupina.meno.lower() == str(body['nazov_skupiny']).lower():
                         return HttpResponse(status=304)
@@ -417,6 +424,8 @@ def api_request(request):
                 nova_skupina.save()
                 return HttpResponse(status=201)
             if request.user.is_superuser and "nova_podskupina" in body and "nazov_podskupiny" in body and "viditelnost" in body and "id_skupiny" in body:
+                if len(body["nazov_podskupiny"]) ==0:
+                    return HttpResponse(status=303)
                 skupina = Skupiny.objects.get(id=body['id_skupiny'])
                 for podskupina in Podskupiny.objects.filter(skupina=skupina):
                     if podskupina.meno.lower() == str(body['nazov_podskupiny']).lower():
@@ -429,6 +438,12 @@ def api_request(request):
                 nova_podskupina.spravca = None
                 nova_podskupina.skupina=skupina
                 nova_podskupina.save()
+                return HttpResponse(status=201)
+            if request.user.is_superuser and "admin_coord_update" in body and "geometry" in body and "id_objektu" and "update_pozicia" in body:
+                objekt = Objekty.objects.get(id=body['id_objektu'])
+                body['geometry']['coordinates'] = body['update_pozicia']
+                objekt.geometry = GEOSGeometry(json.dumps(body['geometry']))
+                objekt.save()
                 return HttpResponse(status=201)
         except:
             traceback.print_exc()

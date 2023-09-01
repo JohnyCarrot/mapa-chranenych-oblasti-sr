@@ -2,9 +2,8 @@ používatelia aktualizujuci vrstvy
 možnodť vlastného výletu na mape
 vlastný bod s popisom  a diskusiou
 vylepšiť menu (vnorené listy, možnosť rušiť ako celok etc)
-Do administrácie pridať overenie, či názov skupiny / podskupiny je väčší ako 0 a zároven, či v rovnakom čase už niekto takýto názov neposlal
-V administrácií zobraziž tlačidlo tvorby podskupiny, len ak existuje skupina
 Administrácia - Dorobiť "empty" možnosť viditelnosti - teda iba supervisor vidí
+
 Zautomatizovať polygony, refaktorovať
 
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
