@@ -368,7 +368,7 @@ def api_request(request):
             if request.user.is_superuser and "daj_mapu" in body and "id" in body and "skupina" in body:
                 m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                                zoom_start=9,
-                               width=1000, height=500,
+                               width=1280, height=720,
                                prefer_canvas=True,
                                # crs="EPSG3857",
 

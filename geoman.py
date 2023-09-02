@@ -33,22 +33,27 @@ class Geoman(JSCSSMixin, MacroElement):
         }
         
         
-        var geojsonFeature = {
-                "type": "Feature",
-                "properties": {
-                    "name": "Coors Field",
-                    "amenity": "Baseball Stadium",
-                    "popupContent": "This is where the Rockies play!"
-                },
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [[ [18.177428,48.563215],[18.197428,48.583215],[19.127428,48.533215] ]]
-                }
-            };
-        L.geoJSON(geojsonFeature).addTo({{ this._parent.get_name() }});
-
+        var StyleEditorContent = `
+        <b>Farba: </b> <br>
+        <div style="height:500px; width:300px;" class="content-hlavny">
+        <div id="zmena-farby">Click me</div>
+        </div>
+        `;
         
         
+        var StyleEditor = L.control.window({{ this._parent.get_name() }},{title:'',content:StyleEditorContent,
+        visible: false,
+        maxWidth: 650,
+        position: 'topRight',
+        prompt: {callback:function(){
+    alert('Chellou!');
+    
+        //koniec funkcie
+        }
+    ,buttonOK:'Aplikovať'}
+        });
+        
+        var picker;
          var stateChangingButton = L.easyButton({
                 states: [{
                         stateName: 'zoom-to-forest',        // name the state
@@ -56,11 +61,25 @@ class Geoman(JSCSSMixin, MacroElement):
                         title:     'Upraviť',      // like its title
                         onClick: function(btn, map) {       // and its callback
                             draggable.enable();
+                            StyleEditor.show();
+                            picker = new Picker({
+                                parent: document.querySelector('#zmena-farby'),
+                                alpha: false,
+                                popup: 'bottom',
+                                cancelButton: false,
+                                editor: false,
+                                onChange: function(color) {
+                                              document.querySelector('#zmena-farby').style.background = color.rgbaString;
+                                          },
+                            });
+
+                            
                                     {{ this._parent.get_name() }}.eachLayer(function (layer) { 
                                             if(layer.feature){
                                             if(map.getBounds().contains( layer.getBounds().getCenter() )) { 
                                                 layer.upraveny = true
                                                 draggable.enableForLayer(layer);
+                                                 
                                              }
                                              
                                             }
@@ -82,12 +101,16 @@ class Geoman(JSCSSMixin, MacroElement):
                                 }
                             });
                             draggable.disable();
+                            picker.destroy();
+                            StyleEditor.hide();
                             btn.state('zoom-to-forest');
                         }
                 }]
         });
 
 stateChangingButton.addTo( {{ this._parent.get_name() }} );
+        
+        
         
         {% endmacro %}
         """
@@ -105,12 +128,28 @@ stateChangingButton.addTo( {{ this._parent.get_name() }} );
         (
             "easy-button.js",
             "https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js",
-        )
+        ),
+        (
+            "L.Control.Window.js",
+            "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.js",
+        ),
+        (
+            "vanilla-picker.min.js",
+            "https://cdn.jsdelivr.net/npm/vanilla-picker@2.12.2/dist/vanilla-picker.min.js",
+        ),
     ]
     default_css = [
         (
             "easy-button.css",
             "https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css",
+        ),
+        (
+            "L.Control.Window.css",
+            "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.css",
+        ),
+        (
+            "vanilla-picker.csp.min.css",
+            "https://cdn.jsdelivr.net/npm/vanilla-picker@2.12.2/dist/vanilla-picker.csp.min.css",
         )
     ]
 
