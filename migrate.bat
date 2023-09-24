@@ -1,2 +1,2 @@
-C:\Users\webko\AppData\Local\Programs\Python\Python39\python.exe manage.py migrate
+venv\Scripts\python.exe manage.py migrate
 pause

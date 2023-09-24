@@ -1,0 +1,8 @@
+.idea/
+.idea/coursing-program-server.iml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/inspectionProfiles/profiles_settings.xml
+__pycache__/
+migrate.bat
