@@ -36,7 +36,16 @@ class Geoman(JSCSSMixin, MacroElement):
         var StyleEditorContent = `
         <b>Farba: </b> <br>
         <div style="height:500px; width:300px;" class="content-hlavny">
-        <div id="zmena-farby">Click me</div>
+        <div id="zmena-farby">Zmena farby</div>
+        <br>
+        <b>Viditeľnosť: </b> <br>
+        <label id="layer_opacity_label">-</label>
+        <input type="range" id="layer_opacity" min="0" max="100" />
+        
+                <br>
+        <b>Hrúbka: </b> <br>
+        <label id="layer_weight_label">-</label>
+        <input type="range" id="layer_weight" min="0" max="30" />
         </div>
         `;
         
@@ -50,7 +59,7 @@ class Geoman(JSCSSMixin, MacroElement):
     
         //koniec funkcie
         }
-    ,buttonOK:'Aplikovať'}
+    ,buttonOK:'Aplikovať'} //Po stlačení button OK zmizne celé okno, zrejme bude treba dorobiť iný button, zrejme ho treba prevytvoriť
         });
         
         var picker;
@@ -62,7 +71,21 @@ class Geoman(JSCSSMixin, MacroElement):
                         onClick: function(btn, map) {       // and its callback
                             draggable.enable();
                             StyleEditor.show();
-                            picker = new Picker({
+                            let selected_layers = [];                                    
+                                    {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
+                                            if(layer.feature){
+                                            if(map.getBounds().contains( layer.getBounds().getCenter() )) { 
+                                                layer.upraveny = true
+                                                draggable.enableForLayer(layer);
+                                                selected_layers.push(layer);
+                                                layer.previous_options = layer.options; //ked sa bude robit nas5 tlacidlo
+                                                console.log(layer); //do budúcna ZMAZAŤ
+                                                 
+                                             }
+                                             
+                                            }                             
+                                    }); //Koniec označenia vrsiev
+                            picker = new Picker({ //Zaciatok pickera
                                 parent: document.querySelector('#zmena-farby'),
                                 alpha: false,
                                 popup: 'bottom',
@@ -70,22 +93,32 @@ class Geoman(JSCSSMixin, MacroElement):
                                 editor: false,
                                 onChange: function(color) {
                                               document.querySelector('#zmena-farby').style.background = color.rgbaString;
-                                          },
-                            });
-
-                            
-                                    {{ this._parent.get_name() }}.eachLayer(function (layer) { 
-                                            if(layer.feature){
-                                            if(map.getBounds().contains( layer.getBounds().getCenter() )) { 
-                                                layer.upraveny = true
-                                                draggable.enableForLayer(layer);
-                                                 
-                                             }
-                                             
-                                            }
-                                            
+                                              selected_layers.forEach(function (layer, index) {
+                                                  layer.options.fillColor = color.rgbaString;
+                                                  layer.redraw();
+                                                });
                                               
+                                          },
+                            }); //Koniec pickera
+                            document.getElementById('layer_opacity').outerHTML = document.getElementById('layer_opacity').outerHTML;
+                            document.getElementById('layer_opacity_label').innerHTML = "-";
+                            document.getElementById('layer_opacity').addEventListener('input', function (event) {
+                                    selected_layers.forEach(function (layer, index) {
+                                    layer.options.opacity = parseInt( document.getElementById('layer_opacity').value )/100;
+                                    document.getElementById('layer_opacity_label').innerHTML = document.getElementById('layer_opacity').value;
+                                    layer.redraw();
                                     });
+                            });
+                            document.getElementById('layer_weight').outerHTML = document.getElementById('layer_weight').outerHTML;
+                            document.getElementById('layer_weight_label').innerHTML = "-";
+                            document.getElementById('layer_weight').addEventListener('input', function (event) {
+                                    selected_layers.forEach(function (layer, index) {
+                                    layer.options.weight = parseInt( document.getElementById('layer_weight').value );
+                                    document.getElementById('layer_weight_label').innerHTML = document.getElementById('layer_weight').value;
+                                    layer.redraw();
+                                    });
+                            });
+                            
                             btn.state('zoom-to-school');    // change state on click!
                         }
                     }, {

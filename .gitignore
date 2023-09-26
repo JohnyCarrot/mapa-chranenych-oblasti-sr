@@ -6,3 +6,5 @@
 .idea/inspectionProfiles/profiles_settings.xml
 __pycache__/
 migrate.bat
+map/migrations/__pycache__/
+*.pyc
