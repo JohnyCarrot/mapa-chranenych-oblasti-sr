@@ -132,10 +132,12 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria = GEOSGeometry(objekt.geometry)
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
-        folium.GeoJson(geometria_cela, style_function=lambda x, fillColor=objekt.fillcolor, color=objekt.color: {
-        "fillColor": fillColor,
-        "color": color,
-    },name=objekt.meno).add_to(podskupina_v_mape).add_child(
+        styl={}
+        if objekt.style== None:
+            styl = {}
+        else:
+            styl = objekt.style
+        folium.GeoJson(geometria_cela, style_function=lambda x: styl,name=objekt.meno).add_to(podskupina_v_mape).add_child(
             folium.Popup(folium.Html(html,script=True),lazy=False))
         geocoder.append({"name":objekt.meno,"center":[geometria.centroid.coord_seq.getY(0),geometria.centroid.coord_seq.getX(0)]})
 
@@ -188,8 +190,8 @@ def index(requests):
         podskupina_noveho_objektu.spravca = requests.user.username
         podskupina_noveho_objektu.skupina = Skupiny.objects.get(id=vrat_skupinu_vlastnych_objektov_uzivatela(requests.user.username))
         podskupina_noveho_objektu.save()
-        INSERT_STATEMENT = 'INSERT INTO objekty (meno, color, fillcolor,html,diskusia,podskupina,geometry) VALUES (%s, %s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
-        cur.execute(INSERT_STATEMENT, (requests.GET.get('new_object_name'),"white","white","",0,podskupina_noveho_objektu.id,str(dictData['geometry'])   )  )
+        INSERT_STATEMENT = 'INSERT INTO objekty (meno, style,html,diskusia,podskupina,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
+        cur.execute(INSERT_STATEMENT, (requests.GET.get('new_object_name'),None,"",0,podskupina_noveho_objektu.id,str(dictData['geometry'])   )  )
         return HttpResponseRedirect(requests.path_info)
     #Zdielanie objektu
     if (requests.user.is_authenticated and requests.GET.get('object_share') != None and requests.GET.get('username') != None and requests.GET.get('objectname')!= None):

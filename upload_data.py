@@ -68,9 +68,9 @@ def pridaj_podskupinu(meno,viditelnost,spravca,skupina = None):
     INSERT_STATEMENT = 'INSERT INTO podskupiny (meno,viditelnost,spravca,skupina) VALUES (%s, %s, %s,%s) RETURNING id;'
     return pridaj_do_databazy(INSERT_STATEMENT,(meno, viditelnost, spravca, skupina))
 
-def pridaj_objekt(meno, color, fillcolor,html,diskusia,podskupina,geometry,stupen_ochrany):
-    INSERT_STATEMENT = 'INSERT INTO objekty (meno, color, fillcolor,html,diskusia,podskupina,geometry,stupen_ochrany) VALUES (%s, %s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromText(%s), 4326),%s) RETURNING id;'
-    return pridaj_do_databazy(INSERT_STATEMENT, (meno, color, fillcolor,html,diskusia,podskupina,geometry,stupen_ochrany))
+def pridaj_objekt(meno, style,html,diskusia,podskupina,geometry,stupen_ochrany):
+    INSERT_STATEMENT = 'INSERT INTO objekty (meno, style,html,diskusia,podskupina,geometry,stupen_ochrany) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromText(%s), 4326),%s) RETURNING id;'
+    return pridaj_do_databazy(INSERT_STATEMENT, (meno, style,html,diskusia,podskupina,geometry,stupen_ochrany))
 
 def stupne_ochrany():
     skupina = pridaj_skupinu("Chránené oblasti",None,["*"])
@@ -163,13 +163,16 @@ def chranene_oblasti():
                 <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
                 <br> 
             """
-
+        style = {}
+        style['fillColor'] = fillcolor
+        style['color'] = color
+        style = json.dumps(style)
         if ("MULTIPOLYGON" in str(tuples[13])):
             for polygon in tuples[13].geoms:
-                pridaj_objekt(tuples[5], color, fillcolor, html, 1, podskupiny[tuples[6]],
+                pridaj_objekt(tuples[5], style, html, 1, podskupiny[tuples[6]],
                               str(polygon),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
         else:
-            pridaj_objekt(tuples[5], color, fillcolor, html, 1, podskupiny[tuples[6]],
+            pridaj_objekt(tuples[5], style, html, 1, podskupiny[tuples[6]],
                           str(tuples[13]),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
     return True
 

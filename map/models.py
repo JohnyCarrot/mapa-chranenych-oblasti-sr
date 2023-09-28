@@ -38,8 +38,7 @@ class Podskupiny(models.Model):
 class Objekty(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
     meno = models.TextField(blank=True, null=True)
-    color = models.TextField(blank=True, null=True)
-    fillcolor = models.TextField(blank=True, null=True)
+    style = models.JSONField(blank=True, null=True)
     html = models.TextField(blank=True, null=True)
     diskusia = models.BigIntegerField(blank=True, null=True)
     podskupina = models.ForeignKey(Podskupiny, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "podskupina")
