@@ -34,6 +34,9 @@ class Geoman(JSCSSMixin, MacroElement):
         
         
         var StyleEditorContent = `
+        <label id="draggable_checkbox_label">Editor tvaru</label>
+        <input type="checkbox" id="draggable_checkbox" min="0" max="100" />
+        <br>
         <b>Farba: </b> <br>
         <div style="height:500px; width:300px;" class="content-hlavny">
         <div id="zmena-farby">Zmena farby</div>
@@ -69,14 +72,14 @@ class Geoman(JSCSSMixin, MacroElement):
                         icon:      'fa-pen-to-square',               // and define its properties
                         title:     'Upraviť',      // like its title
                         onClick: function(btn, map) {       // and its callback
-                            draggable.enable();
+                            draggable.disable();
                             StyleEditor.show();
                             let selected_layers = [];                                    
                                     {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
                                             if(layer.feature){
                                             if(map.getBounds().contains( layer.getBounds().getCenter() )) { 
                                                 layer.upraveny = true
-                                                draggable.enableForLayer(layer);
+                                                //draggable.enableForLayer(layer);
                                                 selected_layers.push(layer);
                                                 layer.previous_options = layer.options; //ked sa bude robit nas5 tlacidlo
                                                 console.log(layer); //do budúcna ZMAZAŤ
@@ -100,6 +103,21 @@ class Geoman(JSCSSMixin, MacroElement):
                                               
                                           },
                             }); //Koniec pickera
+                            document.getElementById('draggable_checkbox').outerHTML = document.getElementById('draggable_checkbox').outerHTML;
+                            document.getElementById('draggable_checkbox').addEventListener('change', function () {
+                            
+                              if (this.checked) {
+                                    draggable.enable();
+                                   selected_layers.forEach(function (layer, index) {
+                                   draggable.enableForLayer(layer);
+                                    });
+                                  } else {
+                                    draggable.disable();
+                                  }
+
+                            });
+                            
+                            
                             document.getElementById('layer_opacity').outerHTML = document.getElementById('layer_opacity').outerHTML;
                             document.getElementById('layer_opacity_label').innerHTML = "-";
                             document.getElementById('layer_opacity').addEventListener('input', function (event) {
@@ -118,6 +136,7 @@ class Geoman(JSCSSMixin, MacroElement):
                                     layer.redraw();
                                     });
                             });
+                            
                             
                             btn.state('zoom-to-school');    // change state on click!
                         }
