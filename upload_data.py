@@ -106,6 +106,7 @@ def stupne_ochrany():
 #Aktualne jedine používané
 def chranene_oblasti():
     shapefile = gpd.read_file("data/tk002_mchu_20221006.shp")
+    shapefile['geometry'] = shapefile['geometry'].simplify(10)
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
     podskupiny = dict()
