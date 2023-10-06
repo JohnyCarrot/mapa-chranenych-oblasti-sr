@@ -229,7 +229,7 @@ def index(requests):
     m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                    zoom_start=9,
                    width=1000, height=800,
-                   prefer_canvas=True,
+                   prefer_canvas=False,
                    # crs="EPSG3857",
 
                    )
@@ -371,7 +371,7 @@ def api_request(request):
                 m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                                zoom_start=9,
                                width=1280, height=720,
-                               prefer_canvas=True,
+                               prefer_canvas=False,
                                # crs="EPSG3857",
 
                                )

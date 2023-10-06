@@ -34,21 +34,52 @@ class Geoman(JSCSSMixin, MacroElement):
         
         
         var StyleEditorContent = `
+        <style>
+            .leaflet-styleeditor-stroke {
+                height: 20px;
+                width: 150px;
+                background-repeat: no-repeat;
+                border: 1px solid white;
+                background-image: url("static/administration/dash_array.png");
+                cursor: pointer;
+            }
+            .leaflet-styleeditor-stroke:hover {
+                border: 1px solid black;
+            }
+
+        </style>
+        
+        <div style="height:500px; width:300px;" class="content-hlavny">
+        
         <label id="draggable_checkbox_label">Editor tvaru</label>
         <input type="checkbox" id="draggable_checkbox" min="0" max="100" />
         <br>
-        <b>Farba: </b> <br>
-        <div style="height:500px; width:300px;" class="content-hlavny">
-        <div id="zmena-farby">Zmena farby</div>
+        
+        <b>Farba hrany: </b> <div id="zmena-farby" style="width:25px;height:25px;border: 1px solid black;"></div>
         <br>
-        <b>Viditeľnosť: </b> <br>
+        
+        <b>Viditeľnosť hrany: </b> <br>
         <label id="layer_opacity_label">-</label>
         <input type="range" id="layer_opacity" min="0" max="100" />
         
                 <br>
-        <b>Hrúbka: </b> <br>
+        <b>Hrúbka hrany: </b> <br>
         <label id="layer_weight_label">-</label>
         <input type="range" id="layer_weight" min="0" max="30" />
+                        <br>
+        <b>Orámovanie hrany: </b> <br>
+        <div id="layer_dash_array_1" class="leaflet-styleeditor-stroke" style="background-position: 0px -75px;"></div>
+        <div id="layer_dash_array_2" class="leaflet-styleeditor-stroke" style="background-position: 0px -95px;"></div>
+        <div id="layer_dash_array_3" class="leaflet-styleeditor-stroke" style="background-position: 0px -115px;"></div>
+        <br>
+        
+        <b>Farba pozadia: </b> <div id="zmena-pozadie" style="width:25px;height:25px;border: 1px solid black;"></div>
+        <br>
+        
+        <b>Viditeľnosť pozadia: </b> <br>
+        <label id="layer_opacity_label_fill">-</label>
+        <input type="range" id="layer_opacity_fill" min="0" max="100" />
+        
         </div>
         `;
         
@@ -66,6 +97,7 @@ class Geoman(JSCSSMixin, MacroElement):
         });
         
         var picker;
+        var picker_pozadie;
          var stateChangingButton = L.easyButton({
                 states: [{
                         stateName: 'zoom-to-forest',        // name the state
@@ -74,6 +106,7 @@ class Geoman(JSCSSMixin, MacroElement):
                         onClick: function(btn, map) {       // and its callback
                             draggable.disable();
                             StyleEditor.show();
+                            let layer_previous_options;
                             let selected_layers = [];                                    
                                     {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
                                             if(layer.feature){
@@ -82,6 +115,7 @@ class Geoman(JSCSSMixin, MacroElement):
                                                 //draggable.enableForLayer(layer);
                                                 selected_layers.push(layer);
                                                 layer.previous_options = layer.options; //ked sa bude robit nas5 tlacidlo
+                                                layer_previous_options = layer.options;
                                                 console.log(layer); //do budúcna ZMAZAŤ
                                                  
                                              }
@@ -94,11 +128,12 @@ class Geoman(JSCSSMixin, MacroElement):
                                 popup: 'bottom',
                                 cancelButton: false,
                                 editor: false,
+                                defaultColor: layer_previous_options.color,
                                 onChange: function(color) {
                                               document.querySelector('#zmena-farby').style.background = color.rgbaString;
                                               selected_layers.forEach(function (layer, index) {
-                                                  layer.options.fillColor = color.rgbaString;
-                                                  layer.redraw();
+                                                  layer.options.color = color.rgbaString;
+                                                  layer.setStyle(layer.options);
                                                 });
                                               
                                           },
@@ -124,7 +159,7 @@ class Geoman(JSCSSMixin, MacroElement):
                                     selected_layers.forEach(function (layer, index) {
                                     layer.options.opacity = parseInt( document.getElementById('layer_opacity').value )/100;
                                     document.getElementById('layer_opacity_label').innerHTML = document.getElementById('layer_opacity').value;
-                                    layer.redraw();
+                                    layer.setStyle(layer.options);
                                     });
                             });
                             document.getElementById('layer_weight').outerHTML = document.getElementById('layer_weight').outerHTML;
@@ -133,7 +168,55 @@ class Geoman(JSCSSMixin, MacroElement):
                                     selected_layers.forEach(function (layer, index) {
                                     layer.options.weight = parseInt( document.getElementById('layer_weight').value );
                                     document.getElementById('layer_weight_label').innerHTML = document.getElementById('layer_weight').value;
-                                    layer.redraw();
+                                    layer.setStyle(layer.options);
+                                    });
+                            });
+                            
+                            document.getElementById('layer_dash_array_1').addEventListener('click', function (event) {
+                                    selected_layers.forEach(function (layer, index) {
+                                    layer.options.dashArray = "1";
+                                    layer.setStyle(layer.options);
+                                    });
+                            });
+                            
+                            document.getElementById('layer_dash_array_2').addEventListener('click', function (event) {
+                                    selected_layers.forEach(function (layer, index) {
+                                    layer.options.dashArray = '10';
+                                    layer.setStyle(layer.options);
+                                    });
+                            });
+                            
+                            document.getElementById('layer_dash_array_3').addEventListener('click', function (event) {
+                                    selected_layers.forEach(function (layer, index) {
+                                    layer.options.dashArray = "15, 10, 1, 10";
+                                    layer.setStyle(layer.options);
+                                    });
+                            });
+                            
+                            picker_pozadie = new Picker({ //Zaciatok pickera
+                                parent: document.querySelector('#zmena-pozadie'),
+                                alpha: false,
+                                popup: 'bottom',
+                                cancelButton: false,
+                                editor: false,
+                                defaultColor: layer_previous_options.fillColor,
+                                onChange: function(color) {
+                                              document.querySelector('#zmena-pozadie').style.background = color.rgbaString;
+                                              selected_layers.forEach(function (layer, index) {
+                                                  layer.options.fillColor = color.rgbaString;
+                                                  layer.setStyle(layer.options);
+                                                });
+                                              
+                                          },
+                            }); //Koniec pickera
+                            
+                            document.getElementById('layer_opacity_fill').outerHTML = document.getElementById('layer_opacity_fill').outerHTML;
+                            document.getElementById('layer_opacity_label_fill').innerHTML = "-";
+                            document.getElementById('layer_opacity_fill').addEventListener('input', function (event) {
+                                    selected_layers.forEach(function (layer, index) {
+                                    layer.options.fillOpacity = parseInt( document.getElementById('layer_opacity_fill').value )/100;
+                                    document.getElementById('layer_opacity_label_fill').innerHTML = document.getElementById('layer_opacity_fill').value;
+                                    layer.setStyle(layer.options);
                                     });
                             });
                             
@@ -152,10 +235,21 @@ class Geoman(JSCSSMixin, MacroElement):
                                     coord_update(layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates);
                                 }
                             });
+                            picker_pozadie.destroy();
                             draggable.disable();
                             picker.destroy();
                             StyleEditor.hide();
                             btn.state('zoom-to-forest');
+                            //vratit html elementy do povodneho stavu
+                            document.getElementById('draggable_checkbox').outerHTML = document.getElementById('draggable_checkbox').outerHTML;
+                            document.getElementById('layer_opacity').outerHTML = document.getElementById('layer_opacity').outerHTML;
+                            document.getElementById('layer_opacity_label').innerHTML = "-";
+                            document.getElementById('layer_weight').outerHTML = document.getElementById('layer_weight').outerHTML;
+                            document.getElementById('layer_weight_label').innerHTML = "-";
+                            document.getElementById('zmena-farby').style.backgroundColor = "white";
+                            document.getElementById('zmena-pozadie').style.backgroundColor = "white";
+                            document.getElementById('layer_opacity_fill').outerHTML = document.getElementById('layer_opacity_fill').outerHTML;
+                            document.getElementById('layer_opacity_label_fill').innerHTML = "-";
                         }
                 }]
         });
