@@ -441,10 +441,11 @@ def api_request(request):
                 nova_podskupina.skupina=skupina
                 nova_podskupina.save()
                 return HttpResponse(status=201)
-            if request.user.is_superuser and "admin_coord_update" in body and "geometry" in body and "id_objektu" and "update_pozicia" in body:
+            if request.user.is_superuser and "admin_coord_update" in body and "geometry" in body and "id_objektu" in body and "style" in body and "update_pozicia" in body:
                 objekt = Objekty.objects.get(id=body['id_objektu'])
                 body['geometry']['coordinates'] = body['update_pozicia']
                 objekt.geometry = GEOSGeometry(json.dumps(body['geometry']))
+                objekt.style = body['style']
                 objekt.save()
                 return HttpResponse(status=201)
         except:

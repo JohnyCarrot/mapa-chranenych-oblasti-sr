@@ -9,3 +9,7 @@ Zautomatizovať polygony, refaktorovať
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
 
 Na základe nastavení vytvoriť funkciu, ktorá vráti unikátne skupiny buďto objektov, alebo zdielaných objektov
+
+Systém viditelnosti
+
+Ak otvorím style a nieje žiadna vrstva, mám dostať upozornenie a neotvárať okno

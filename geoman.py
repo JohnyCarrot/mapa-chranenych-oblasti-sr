@@ -14,12 +14,13 @@ class Geoman(JSCSSMixin, MacroElement):
             {
 	        enableForLayer: false
             });
-        async function coord_update(geometry,id,update_pozicia) {
+        async function coord_update(geometry,id,update_pozicia,style) {
                   let user = {
                   id_objektu: id,
                   geometry: geometry,
                   update_pozicia: update_pozicia,
-                  admin_coord_update: null
+                  admin_coord_update: null,
+                  style: style
                 };
 
                 let response = await fetch('/api', {
@@ -79,6 +80,8 @@ class Geoman(JSCSSMixin, MacroElement):
         <b>Viditeľnosť pozadia: </b> <br>
         <label id="layer_opacity_label_fill">-</label>
         <input type="range" id="layer_opacity_fill" min="0" max="100" />
+        <br>
+        <button id="style_reset_button"type="button">Resetovať</button>
         
         </div>
         `;
@@ -89,13 +92,13 @@ class Geoman(JSCSSMixin, MacroElement):
         maxWidth: 650,
         position: 'topRight',
         prompt: {callback:function(){
-    alert('Chellou!');
+    //alert('Chellou!');
     
         //koniec funkcie
         }
-    ,buttonOK:'Aplikovať'} //Po stlačení button OK zmizne celé okno, zrejme bude treba dorobiť iný button, zrejme ho treba prevytvoriť
+    ,buttonOK:'  '} //Po stlačení button OK zmizne celé okno, zrejme bude treba dorobiť iný button, zrejme ho treba prevytvoriť
         });
-        
+        StyleEditor.disableBtn();
         var picker;
         var picker_pozadie;
          var stateChangingButton = L.easyButton({
@@ -114,8 +117,8 @@ class Geoman(JSCSSMixin, MacroElement):
                                                 layer.upraveny = true
                                                 //draggable.enableForLayer(layer);
                                                 selected_layers.push(layer);
-                                                layer.previous_options = layer.options; //ked sa bude robit nas5 tlacidlo
-                                                layer_previous_options = layer.options;
+                                                layer.previous_options = JSON.parse(JSON.stringify(layer.options)); //ked sa bude robit nas5 tlacidlo
+                                                layer_previous_options = JSON.parse(JSON.stringify(layer.options));
                                                 console.log(layer); //do budúcna ZMAZAŤ
                                                  
                                              }
@@ -193,6 +196,8 @@ class Geoman(JSCSSMixin, MacroElement):
                                     });
                             });
                             
+                            
+                            
                             picker_pozadie = new Picker({ //Zaciatok pickera
                                 parent: document.querySelector('#zmena-pozadie'),
                                 alpha: false,
@@ -220,6 +225,19 @@ class Geoman(JSCSSMixin, MacroElement):
                                     });
                             });
                             
+                            document.getElementById('style_reset_button').outerHTML = document.getElementById('style_reset_button').outerHTML;
+                            document.getElementById('style_reset_button').addEventListener('click', function (event) {
+                                    selected_layers.forEach(function (layer, index) {                                 
+                                    layer.setStyle(layer.previous_options);
+                                    
+                            document.getElementById('layer_opacity_label').innerHTML = "-";
+                            document.getElementById('layer_weight_label').innerHTML = "-";
+                            document.getElementById('zmena-farby').style.backgroundColor = "white";
+                            document.getElementById('zmena-pozadie').style.backgroundColor = "white";
+                            document.getElementById('layer_opacity_label_fill').innerHTML = "-";
+                                    });
+                            });
+                            
                             
                             btn.state('zoom-to-school');    // change state on click!
                         }
@@ -232,7 +250,7 @@ class Geoman(JSCSSMixin, MacroElement):
                             if(layer.upraveny && layer.upraveny==true){
                                     let layer2 = L.polygon(layer.getLatLngs());
                                     layer.upraveny=false;
-                                    coord_update(layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates);
+                                    coord_update(layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
                                 }
                             });
                             picker_pozadie.destroy();
