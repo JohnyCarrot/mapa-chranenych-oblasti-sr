@@ -1,3 +1,5 @@
+import uuid
+
 import geopandas as gpd
 import random
 import psycopg2
@@ -10,6 +12,7 @@ conn = psycopg2.connect(
     user="postgres",
     password="123456789",
     options="-c search_path=public")
+conn.set_isolation_level(3)
 cur = conn.cursor()
 # mini funkcie
 def osetrenie_zon(text):  # keďže v db majú rôzne označenie pre zóny, treba to akosi zúhľadniť
@@ -64,13 +67,17 @@ def pridaj_skupinu(meno,spravca,viditelnost):
     INSERT_STATEMENT = 'INSERT INTO skupiny (meno,viditelnost,spravca) VALUES (%s, %s, %s) RETURNING id;'
     return pridaj_do_databazy(INSERT_STATEMENT, (meno, viditelnost, spravca))
 
-def pridaj_podskupinu(meno,viditelnost,spravca,skupina = None):
+def pridaj_podskupinu(meno,spravca,skupina = None):
     INSERT_STATEMENT = 'INSERT INTO podskupiny (meno,viditelnost,spravca,skupina) VALUES (%s, %s, %s,%s) RETURNING id;'
-    return pridaj_do_databazy(INSERT_STATEMENT,(meno, viditelnost, spravca, skupina))
+    return pridaj_do_databazy(INSERT_STATEMENT,(meno, vytvor_viditelnost(), spravca, skupina))
 
 def pridaj_objekt(meno, style,html,diskusia,podskupina,geometry,stupen_ochrany):
     INSERT_STATEMENT = 'INSERT INTO objekty (meno, style,html,diskusia,podskupina,geometry,stupen_ochrany) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromText(%s), 4326),%s) RETURNING id;'
     return pridaj_do_databazy(INSERT_STATEMENT, (meno, style,html,diskusia,podskupina,geometry,stupen_ochrany))
+
+def vytvor_viditelnost():
+    INSERT_STATEMENT = 'INSERT INTO map_viditelnost_mapa (id,globalne) VALUES (%s,%s) RETURNING id;'
+    return pridaj_do_databazy(INSERT_STATEMENT, (uuid.uuid4().__str__(),"r"))
 
 def stupne_ochrany():
     skupina = pridaj_skupinu("Chránené oblasti",None,["*"])
@@ -110,17 +117,17 @@ def chranene_oblasti():
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
     podskupiny = dict()
-    pamiatky = pridaj_skupinu("Pamiatky",None,["*"])
-    rezervacie = pridaj_skupinu("Rezervácie", None, ["*"])
-    ine = pridaj_skupinu("Iné chránené oblasti", None, ["*"])
+    pamiatky = pridaj_skupinu("Pamiatky",None,vytvor_viditelnost())
+    rezervacie = pridaj_skupinu("Rezervácie", None, vytvor_viditelnost())
+    ine = pridaj_skupinu("Iné chránené oblasti", None, vytvor_viditelnost())
     for tuples in shapefile.itertuples():
         if podskupiny.get(tuples[6]) is None:
             if("pamiat" in tuples[6]):
-                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],["*"],None,pamiatky)
+                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],None,pamiatky)
             elif("rezerv" in tuples[6]):
-                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],["*"],None,rezervacie)
+                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],None,rezervacie)
             else:
-                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6], ["*"], None, ine)
+                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6], None, ine)
     for tuples in shapefile.itertuples():
         color = ""
         fillcolor = ""

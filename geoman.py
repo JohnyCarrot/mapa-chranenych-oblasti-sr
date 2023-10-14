@@ -108,7 +108,6 @@ class Geoman(JSCSSMixin, MacroElement):
                         title:     'Upraviť',      // like its title
                         onClick: function(btn, map) {       // and its callback
                             draggable.disable();
-                            StyleEditor.show();
                             let layer_previous_options;
                             let selected_layers = [];                                    
                                     {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
@@ -125,6 +124,12 @@ class Geoman(JSCSSMixin, MacroElement):
                                              
                                             }                             
                                     }); //Koniec označenia vrsiev
+                            
+                            if(selected_layers.length == 0){
+                                alert("Neboli vybrané žiadne vrstvy");
+                                return null;
+                            }                            
+                            StyleEditor.show();
                             picker = new Picker({ //Zaciatok pickera
                                 parent: document.querySelector('#zmena-farby'),
                                 alpha: false,

@@ -1,15 +1,11 @@
 používatelia aktualizujuci vrstvy
 možnodť vlastného výletu na mape
 vlastný bod s popisom  a diskusiou
-vylepšiť menu (vnorené listy, možnosť rušiť ako celok etc)
-Administrácia - Dorobiť "empty" možnosť viditelnosti - teda iba supervisor vidí
-
-Zautomatizovať polygony, refaktorovať
-
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
 
 Na základe nastavení vytvoriť funkciu, ktorá vráti unikátne skupiny buďto objektov, alebo zdielaných objektov
 
 Systém viditelnosti
 
-Ak otvorím style a nieje žiadna vrstva, mám dostať upozornenie a neotvárať okno
+Ak otvorím style a nieje žiadna vrstva, mám dostať upozornenie a neotvárať okno - hotovo
+

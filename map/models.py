@@ -10,11 +10,18 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+class Viditelnost_mapa(models.Model):
+    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    globalne = models.TextField(blank=True, null=True, default="")
+    prihlaseny = models.TextField(blank=True, null=True, default="") #Ak je prázdne alebo None tak sa díva na global
+    uzivatelia = models.JSONField(blank=True, null=True, default=dict)
+
+
 class Skupiny(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
     meno = models.TextField(blank=True, null=True)
     spravca = models.TextField(blank=True, null=True)
-    viditelnost = ArrayField(models.TextField(), blank=True)  #
+    viditelnost = models.ForeignKey(Viditelnost_mapa, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "viditelnost")  #
     nastavenia = models.JSONField(blank=True, null=True)  #
     priorita = models.BigIntegerField(default=None, null=True)
 
@@ -25,7 +32,7 @@ class Skupiny(models.Model):
 class Podskupiny(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
     meno = models.TextField(blank=True, null=True)
-    viditelnost = ArrayField(models.TextField(), blank=True)  #
+    viditelnost = models.ForeignKey(Viditelnost_mapa, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "viditelnost")  #
     spravca = models.TextField(blank=True, null=True)
     skupina = models.ForeignKey(Skupiny, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "skupina")
     nastavenia = models.JSONField(blank=True, null=True)   #

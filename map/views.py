@@ -23,7 +23,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from friendship.models import Friend, Follow, Block, FriendshipRequest, FriendshipManager
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Skupiny,Podskupiny,Objekty, Profile
+from .models import Skupiny,Podskupiny,Objekty, Profile, Viditelnost_mapa
 from django.contrib.gis.geos import GEOSGeometry
 cur = connection.cursor()
 
@@ -145,10 +145,19 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 
 def over_viditelnost(viditelnost,prihlaseny = False,username = ""):
     if viditelnost == None: return False
-    if("*" in viditelnost): return True
-    if("+" in viditelnost and prihlaseny):return True
-    if(prihlaseny and username in viditelnost):
-        return True
+
+    if viditelnost.prihlaseny== "" or viditelnost.prihlaseny==None:
+        if "r" in viditelnost.globalne: return True
+        else: return False
+
+    elif prihlaseny:
+        if "r" in viditelnost.prihlaseny: return True
+        else : return False
+
+    elif prihlaseny and username in viditelnost.uzivatelia:
+        if "r" in viditelnost.uzivatelia[username]: return True
+        else: return False
+
     return False
 
 def vrat_skupinu_vlastnych_objektov_uzivatela(username):
@@ -178,9 +187,15 @@ def index(requests):
     start_time_temp = time.time()
     if requests.user.is_authenticated:
         if vrat_skupinu_vlastnych_objektov_uzivatela(username=requests.user.username) == None:
-            pridaj_skupinu("Vlastné objekty",requests.user.username,[requests.user.username],nastavenia = json.dumps({'own': None,}))
+            viditelnost = Viditelnost_mapa()
+            viditelnost.uzivatelia[requests.user.username] = "rw"
+            viditelnost.save()
+            pridaj_skupinu("Vlastné objekty",requests.user.username,viditelnost.id,nastavenia = json.dumps({'own': None,}))
         if vrat_skupinu_s_uzivatelom_zdielanych_objektov(requests.user.username) == None:
-            pridaj_skupinu("So mnou zdieľané objekty",requests.user.username,[requests.user.username],nastavenia = json.dumps({'shared': None,}))
+            viditelnost = Viditelnost_mapa()
+            viditelnost.uzivatelia[requests.user.username] = "rw"
+            viditelnost.save()
+            pridaj_skupinu("So mnou zdieľané objekty",requests.user.username,viditelnost.id,nastavenia = json.dumps({'shared': None,}))
     #Pridanie objektu užívateľom:
     if (requests.user.is_authenticated and requests.GET.get('new_object') != None and requests.GET.get('new_object_name')!=None):
         dictData = json.loads(requests.GET.get('new_object'))
@@ -335,8 +350,11 @@ def register_request(request):
             user = form.save()
             login(request, user)
             messages.success(request, "Registration successful.")
-            vlastne_objekty_skupina = pridaj_skupinu("Vlastné objekty",user.username,[user.username],nastavenia = json.dumps({'own': None,}))
-            zdielane_objekty_podskupina = pridaj_skupinu("So mnou zdieľané objekty",user.username,[user.username],nastavenia = json.dumps({'shared': None,}))
+            viditelnost = Viditelnost_mapa()
+            viditelnost.uzivatelia[user.username] = "rw"
+            viditelnost.save()
+            vlastne_objekty_skupina = pridaj_skupinu("Vlastné objekty",user.username,viditelnost.id,nastavenia = json.dumps({'own': None,}))
+            zdielane_objekty_podskupina = pridaj_skupinu("So mnou zdieľané objekty",user.username,viditelnost.id,nastavenia = json.dumps({'shared': None,}))
             return redirect('/')
         messages.error(request, "Unsuccessful registration. Invalid information.")
     form = NewUserForm()
