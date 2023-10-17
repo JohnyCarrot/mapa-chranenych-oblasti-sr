@@ -76,8 +76,8 @@ def pridaj_objekt(meno, style,html,diskusia,podskupina,geometry,stupen_ochrany):
     return pridaj_do_databazy(INSERT_STATEMENT, (meno, style,html,diskusia,podskupina,geometry,stupen_ochrany))
 
 def vytvor_viditelnost():
-    INSERT_STATEMENT = 'INSERT INTO map_viditelnost_mapa (id,globalne) VALUES (%s,%s) RETURNING id;'
-    return pridaj_do_databazy(INSERT_STATEMENT, (uuid.uuid4().__str__(),"r"))
+    INSERT_STATEMENT = 'INSERT INTO map_viditelnost_mapa (id,globalne,prihlaseny,uzivatelia) VALUES (%s,%s,%s,%s) RETURNING id;'
+    return pridaj_do_databazy(INSERT_STATEMENT, (uuid.uuid4().__str__(),"r","",json.dumps({})))
 
 def stupne_ochrany():
     skupina = pridaj_skupinu("Chránené oblasti",None,["*"])

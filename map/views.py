@@ -146,17 +146,19 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 def over_viditelnost(viditelnost,prihlaseny = False,username = ""):
     if viditelnost == None: return False
 
-    if viditelnost.prihlaseny== "" or viditelnost.prihlaseny==None:
-        if "r" in viditelnost.globalne: return True
-        else: return False
+    if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and "r" not in viditelnost.uzivatelia[username]:
+        return False
 
-    elif prihlaseny:
-        if "r" in viditelnost.prihlaseny: return True
-        else : return False
+    if viditelnost.globalne is not None and "r" in viditelnost.globalne:
+        if prihlaseny and username != "" and viditelnost.prihlaseny is not None and viditelnost.prihlaseny !="" and "r" not in viditelnost.prihlaseny:
+            return False
+        return True
 
-    elif prihlaseny and username in viditelnost.uzivatelia:
-        if "r" in viditelnost.uzivatelia[username]: return True
-        else: return False
+    if prihlaseny and viditelnost.prihlaseny is not None and "r" in viditelnost.prihlaseny: return True
+
+    if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and "r" in viditelnost.uzivatelia[username]:
+        return True
+
 
     return False
 
@@ -199,9 +201,12 @@ def index(requests):
     #Pridanie objektu užívateľom:
     if (requests.user.is_authenticated and requests.GET.get('new_object') != None and requests.GET.get('new_object_name')!=None):
         dictData = json.loads(requests.GET.get('new_object'))
+        viditelnost = Viditelnost_mapa()
+        viditelnost.uzivatelia[requests.user.username] = "rw"
+        viditelnost.save()
         podskupina_noveho_objektu = Podskupiny()
         podskupina_noveho_objektu.meno = requests.GET.get('new_object_name')
-        podskupina_noveho_objektu.viditelnost = [requests.user.username]
+        podskupina_noveho_objektu.viditelnost = viditelnost
         podskupina_noveho_objektu.spravca = requests.user.username
         podskupina_noveho_objektu.skupina = Skupiny.objects.get(id=vrat_skupinu_vlastnych_objektov_uzivatela(requests.user.username))
         podskupina_noveho_objektu.save()
