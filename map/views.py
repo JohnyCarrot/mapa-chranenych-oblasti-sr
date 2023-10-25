@@ -7,7 +7,7 @@ import time
 import geocoder
 import random
 import json
-
+from django.core.serializers import json as json_ser
 from django.views.decorators.csrf import csrf_exempt
 from folium import plugins
 from django.db import connection
@@ -471,6 +471,37 @@ def api_request(request):
                 objekt.style = body['style']
                 objekt.save()
                 return HttpResponse(status=201)
+            ##########Json upload / download vrstiev##########
+            if request.user.is_superuser and "json_download" in body and "idcka_list" in body:
+                zoznam_idcok_podskupiny =  body.get("idcka_list")
+                zoznam_podskupin = []
+                zoznam_skupin = []
+                zoznam_viditelnost_skupiny = []
+                zoznam_viditelnost_podskupiny = []
+                zoznam_objekty = []
+                for idcko in zoznam_idcok_podskupiny:
+                    podskupina = Podskupiny.objects.get(id=idcko)
+                    zoznam_podskupin.append(podskupina.id)
+                    zoznam_viditelnost_podskupiny.append(podskupina.viditelnost.id)
+                    if podskupina.skupina not in zoznam_skupin:
+                        zoznam_skupin.append(podskupina.skupina.id)
+                        zoznam_viditelnost_skupiny.append(podskupina.skupina.viditelnost.id)
+                    for objekt in Objekty.objects.filter(podskupina_id=podskupina.id):
+                        zoznam_objekty.append(objekt.id)
+                vysledny_json = dict()
+
+                json_serializer = json_ser.Serializer()
+                vysledny_json['skupiny'] = json_serializer.serialize(Skupiny.objects.filter(id__in=zoznam_skupin))
+                vysledny_json['skupiny_viditelnost'] = json_serializer.serialize(Viditelnost_mapa.objects.filter(id__in=zoznam_viditelnost_skupiny))
+                vysledny_json['podskupiny'] = json_serializer.serialize(Podskupiny.objects.filter(id__in=zoznam_podskupin))
+                vysledny_json['podskupiny_viditelnost'] = json_serializer.serialize(Viditelnost_mapa.objects.filter(id__in=zoznam_viditelnost_podskupiny))
+                vysledny_json['objekty'] = json_serializer.serialize(Objekty.objects.filter(id__in=zoznam_objekty))
+
+                response = HttpResponse(json.dumps(vysledny_json,sort_keys=True, indent=4), content_type='application/json')
+                response['Content-Disposition'] = 'attachment; filename=export.json'
+                return response
+
+
         except:
             traceback.print_exc()
             return HttpResponse(status=500)
@@ -494,3 +525,18 @@ def administracia(request):
     context['get_data'] = dict(request.GET.items())
 
     return render(request, 'administration/admin.html',context)
+
+@login_required
+def administracia_json(request):
+    context = {}
+    vsetky_systemove_skupiny = []
+    podskupiny_sys_skupin = dict()
+    for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
+        vsetky_systemove_skupiny.append(skupina)
+        podskupiny = []
+        for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
+            podskupiny.append(podskupina)
+        podskupiny_sys_skupin[skupina.id] = podskupiny
+    context['sys_skupiny_list'] = vsetky_systemove_skupiny
+    context['sys_podskupiny_dict'] = podskupiny_sys_skupin
+    return render(request, 'administration/json.html',context)

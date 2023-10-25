@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Administrácia</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+      {% load static %}<link rel="stylesheet" href="{% static 'administration/admin.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Boostrap -->
+   <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+  <!-- Boostrap -->
+    <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- (A) SIDEBAR -->
+    <div id="pgside">
+      <!-- (A1) BRANDING OR USER -->
+      <!-- LINK TO DASHBOARD OR LOGOUT -->
+      <div id="pguser">
+        {% load static %}<img src="{% static 'administration/potato.png' %}">
+        <i class="txt">Administrácia</i>
+      </div>
+
+      <!-- (A2) MENU ITEMS -->
+      <a href="/administracia">
+        <i class="ico">&#9733;</i>
+        <i class="txt">Vrstvy</i>
+      </a>
+      <a href="#" class="current">
+        <i class="ico">&#9728;</i>
+        <i class="txt">Nahrať / stiahnuť vrstvy</i>
+      </a>
+    </div>
+
+    <!-- (B) MAIN -->
+    <main id="pgmain">
+        <h3>Stiahnúť vrstvy:</h3>
+
+
+
+        <div class="container">
+          <ul>
+              {% for skupina in sys_skupiny_list %}
+            <li>
+              <input type="checkbox"  id="{{ skupina.id }}"><label for="{{ skupina.id }}"> {{ skupina.meno }}</label>
+              <ul>
+                  {% for key,podskupiny in sys_podskupiny_dict.items %}
+                         {% if key == skupina.id %}
+                             {% for podskupina in podskupiny %}
+                        <li><label><input type="checkbox" id="{{ podskupina.id }}" class="subOption{{ skupina.id }}">{{ podskupina.meno }}</label></li>
+                            {% endfor %}
+                        {% endif %}
+                  {% endfor %}
+              </ul>
+            </li>
+             {% endfor %}
+          </ul>
+        </div>
+                <script>
+                    {% for skupina in sys_skupiny_list %}
+            var checkboxes{{ skupina.id|cut:"-" }} = document.querySelectorAll('input.subOption{{ skupina.id }}'),
+            checkall{{ skupina.id|cut:"-" }} = document.getElementById('{{ skupina.id }}');
+
+            for(var i=0; i<checkboxes{{ skupina.id|cut:"-" }}.length; i++) {
+              checkboxes{{ skupina.id|cut:"-" }}[i].onclick = function() {
+                var checkedCount = document.querySelectorAll('input.subOption{{ skupina.id }}:checked').length;
+
+                checkall{{ skupina.id|cut:"-" }}.checked = checkedCount > 0;
+                checkall{{ skupina.id|cut:"-" }}.indeterminate = checkedCount > 0 && checkedCount < checkboxes{{ skupina.id|cut:"-" }}.length;
+              }
+            }
+
+            checkall{{ skupina.id|cut:"-" }}.onclick = function() {
+              for(var i=0; i<checkboxes{{ skupina.id|cut:"-" }}.length; i++) {
+                checkboxes{{ skupina.id|cut:"-" }}[i].checked = this.checked;
+              }
+            }
+            {% endfor %}
+        </script>
+
+    <button id="download-button" type="button">Stiahnuť</button>
+
+    <script>
+        async function posli_podskupiny_na_stiahnutie(idcka) {
+                  let user = {
+                  idcka_list: idcka,
+                  json_download: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                }).then(resp => resp.status === 200 ? resp.blob() : Promise.reject('Niekde nastala chyba....'))
+  .then(blob => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    // the filename you want
+    a.download = 'download.txt';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    // or you know, something with better UX...
+    //alert('your file has downloaded!');
+  })
+  .catch(() => alert('oh no!'));
+
+           return true;
+        }
+        document.getElementById('download-button').onclick = function() {
+                var vsetky_pod_moznosti = document.querySelectorAll('[class^=subOption]')
+                var zaskrtnute = [].filter.call( vsetky_pod_moznosti, function( el ) {
+                return el.checked
+                    });
+                var iba_id = []
+                zaskrtnute.forEach(function (item) {
+                          iba_id.push(item.id)
+                        });
+                posli_podskupiny_na_stiahnutie(iba_id);
+        };
+    </script>
+
+
+    </main>
+
+
+  </body>
+</html>

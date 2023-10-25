@@ -25,6 +25,7 @@ urlpatterns = [
     path('forum/',map_views.forum,name='forum'),
     path('api',map_views.api_request),
     path('administracia',map_views.administracia),
+    path('administracia/json', map_views.administracia_json),
     path('spravuj',map_views.subgroup_edit),
     path('accounts/',include('django.contrib.auth.urls'),name = "accounts"),
     path("register", map_views.register_request, name="register"),

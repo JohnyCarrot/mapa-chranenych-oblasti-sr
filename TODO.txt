@@ -7,5 +7,7 @@ Na základe nastavení vytvoriť funkciu, ktorá vráti unikátne skupiny buďto
 
 Systém viditelnosti
 
-Ak otvorím style a nieje žiadna vrstva, mám dostať upozornenie a neotvárať okno - hotovo
+spraviť load / restore na json
+
+views spraviť do zložiek
 
