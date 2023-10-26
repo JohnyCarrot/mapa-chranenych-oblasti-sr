@@ -11,3 +11,5 @@ spraviť load / restore na json
 
 views spraviť do zložiek
 
+pridat VSETKO do json downloadu
+
