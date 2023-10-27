@@ -491,13 +491,12 @@ def api_request(request):
                 vysledny_json = dict()
 
                 json_serializer = json_ser.Serializer()
-                vysledny_json['skupiny'] = json_serializer.serialize(Skupiny.objects.filter(id__in=zoznam_skupin))
-                vysledny_json['skupiny_viditelnost'] = json_serializer.serialize(Viditelnost_mapa.objects.filter(id__in=zoznam_viditelnost_skupiny))
-                vysledny_json['podskupiny'] = json_serializer.serialize(Podskupiny.objects.filter(id__in=zoznam_podskupin))
-                vysledny_json['podskupiny_viditelnost'] = json_serializer.serialize(Viditelnost_mapa.objects.filter(id__in=zoznam_viditelnost_podskupiny))
-                vysledny_json['objekty'] = json_serializer.serialize(Objekty.objects.filter(id__in=zoznam_objekty))
-
-                response = HttpResponse(json.dumps(vysledny_json,sort_keys=True, indent=4), content_type='application/json')
+                vysledny_json['skupiny'] = json_serializer.serialize(Skupiny.objects.filter(id__in=zoznam_skupin),ensure_ascii=False)
+                vysledny_json['skupiny_viditelnost'] = json_serializer.serialize(Viditelnost_mapa.objects.filter(id__in=zoznam_viditelnost_skupiny),ensure_ascii=False)
+                vysledny_json['podskupiny'] = json_serializer.serialize(Podskupiny.objects.filter(id__in=zoznam_podskupin),ensure_ascii=False)
+                vysledny_json['podskupiny_viditelnost'] = json_serializer.serialize(Viditelnost_mapa.objects.filter(id__in=zoznam_viditelnost_podskupiny),ensure_ascii=False)
+                vysledny_json['objekty'] = json_serializer.serialize(Objekty.objects.filter(id__in=zoznam_objekty),ensure_ascii=False)
+                response = HttpResponse(json.dumps(vysledny_json,ensure_ascii=False), content_type='application/json')
                 response['Content-Disposition'] = 'attachment; filename=export.json'
                 return response
 
@@ -506,6 +505,41 @@ def api_request(request):
             traceback.print_exc()
             return HttpResponse(status=500)
 
+
+    return HttpResponse(status=204)
+
+
+@csrf_exempt
+def api_request_file(request):
+    if request.method == 'POST':
+        try:
+                file = request.FILES['file']
+                data = file.read()
+                json_data = json.dumps(data.decode(),ensure_ascii=False)
+                hotovy_json = json.loads(json.loads(json_data))
+                skupiny =  json_ser.Deserializer(hotovy_json['skupiny'])
+                skupiny_viditelnost = json_ser.Deserializer(hotovy_json['skupiny_viditelnost'])
+                podskupiny = json_ser.Deserializer(hotovy_json['podskupiny'])
+                podskupiny_viditelnost = json_ser.Deserializer(hotovy_json['podskupiny_viditelnost'])
+                objekty = json_ser.Deserializer(hotovy_json['objekty'])
+
+                for viditelnost_pre_skupinu in skupiny_viditelnost:
+                    viditelnost_pre_skupinu.save()
+
+                for skupina in skupiny:
+                    skupina.save()
+
+                for viditelnost_pre_podskupinu in podskupiny_viditelnost:
+                    viditelnost_pre_podskupinu.save()
+
+                for podskupina in podskupiny:
+                    podskupina.save()
+
+                for objekt in objekty:
+                    objekt.save()
+        except:
+            traceback.print_exc()
+            return HttpResponse(status=500)
 
     return HttpResponse(status=204)
 

@@ -24,6 +24,7 @@ urlpatterns = [
     path('',map_views.index,name='index'),
     path('forum/',map_views.forum,name='forum'),
     path('api',map_views.api_request),
+    path('api_file',map_views.api_request_file),
     path('administracia',map_views.administracia),
     path('administracia/json', map_views.administracia_json),
     path('spravuj',map_views.subgroup_edit),

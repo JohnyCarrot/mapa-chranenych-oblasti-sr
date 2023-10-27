@@ -1,7 +1,7 @@
 /* Split the screen in half */
 .split {
   height: 100%;
-  width: 50%;
+  width: 40%;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -11,7 +11,8 @@
 
 /* Control the left side */
 .left {
-  left: 0;
+/* left: 0; */
+  
 }
 
 /* Control the right side */
@@ -22,7 +23,7 @@
 /* If you want the content centered horizontally and vertically */
 .centered {
   position: absolute;
-  left: 25%;
+  left: 5%;
 }
 
 /* Style the image inside the centered container, if needed */

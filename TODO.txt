@@ -13,3 +13,7 @@ views spraviť do zložiek
 
 pridat VSETKO do json downloadu
 
+dorobit viditelnost do api
+
+dorobit api_file aby mohol len ten čo má oprávnenie
+
