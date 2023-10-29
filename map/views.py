@@ -143,20 +143,20 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 
 
 
-def over_viditelnost(viditelnost,prihlaseny = False,username = ""):
+def over_viditelnost(viditelnost,prihlaseny = False,username = "",permisia="r"):
     if viditelnost == None: return False
 
-    if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and "r" not in viditelnost.uzivatelia[username]:
+    if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and permisia not in viditelnost.uzivatelia[username]:
         return False
 
-    if viditelnost.globalne is not None and "r" in viditelnost.globalne:
-        if prihlaseny and username != "" and viditelnost.prihlaseny is not None and viditelnost.prihlaseny !="" and "r" not in viditelnost.prihlaseny:
+    if viditelnost.globalne is not None and permisia in viditelnost.globalne:
+        if prihlaseny and username != "" and viditelnost.prihlaseny is not None and viditelnost.prihlaseny !="" and permisia not in viditelnost.prihlaseny:
             return False
         return True
 
-    if prihlaseny and viditelnost.prihlaseny is not None and "r" in viditelnost.prihlaseny: return True
+    if prihlaseny and viditelnost.prihlaseny is not None and permisia in viditelnost.prihlaseny: return True
 
-    if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and "r" in viditelnost.uzivatelia[username]:
+    if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and permisia in viditelnost.uzivatelia[username]:
         return True
 
 
@@ -380,17 +380,17 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
             ##########Administrácia##########
-            if request.user.is_superuser and "podskupina" in body and "id" in body and "priorita" in body:
+            if "podskupina" in body and "id" in body and "priorita" in body:
                 podskupina = Podskupiny.objects.get(id=body['id'])
                 podskupina.priorita = body['priorita']
                 podskupina.save()
                 return HttpResponse(status=202)
-            if request.user.is_superuser and "skupina" in body and "id" in body and "priorita" in body:
+            if "skupina" in body and "id" in body and "priorita" in body:
                 skupina = Skupiny.objects.get(id=body['id'])
                 skupina.priorita = body['priorita']
                 skupina.save()
                 return HttpResponse(status=202)
-            if request.user.is_superuser and "daj_mapu" in body and "id" in body and "skupina" in body:
+            if "daj_mapu" in body and "id" in body and "skupina" in body:
                 m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                                zoom_start=9,
                                width=1280, height=720,
@@ -434,7 +434,7 @@ def api_request(request):
 
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
-            if request.user.is_superuser and "nova_skupina" in body and "nazov_skupiny" in body and "viditelnost" in body:
+            if "nova_skupina" in body and "nazov_skupiny" in body and "viditelnost" in body:
                 if len(body["nazov_skupiny"]) ==0:
                     return HttpResponse(status=303)
                 for skupina in Skupiny.objects.all():
@@ -448,7 +448,7 @@ def api_request(request):
                 nova_skupina.spravca = None
                 nova_skupina.save()
                 return HttpResponse(status=201)
-            if request.user.is_superuser and "nova_podskupina" in body and "nazov_podskupiny" in body and "viditelnost" in body and "id_skupiny" in body:
+            if "nova_podskupina" in body and "nazov_podskupiny" in body and "viditelnost" in body and "id_skupiny" in body:
                 if len(body["nazov_podskupiny"]) ==0:
                     return HttpResponse(status=303)
                 skupina = Skupiny.objects.get(id=body['id_skupiny'])
@@ -464,7 +464,7 @@ def api_request(request):
                 nova_podskupina.skupina=skupina
                 nova_podskupina.save()
                 return HttpResponse(status=201)
-            if request.user.is_superuser and "admin_coord_update" in body and "geometry" in body and "id_objektu" in body and "style" in body and "update_pozicia" in body:
+            if "admin_coord_update" in body and "geometry" in body and "id_objektu" in body and "style" in body and "update_pozicia" in body:
                 objekt = Objekty.objects.get(id=body['id_objektu'])
                 body['geometry']['coordinates'] = body['update_pozicia']
                 objekt.geometry = GEOSGeometry(json.dumps(body['geometry']))
@@ -472,7 +472,7 @@ def api_request(request):
                 objekt.save()
                 return HttpResponse(status=201)
             ##########Json upload / download vrstiev##########
-            if request.user.is_superuser and "json_download" in body and "idcka_list" in body:
+            if "json_download" in body and "idcka_list" in body:
                 zoznam_idcok_podskupiny =  body.get("idcka_list")
                 zoznam_podskupin = []
                 zoznam_skupin = []

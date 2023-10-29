@@ -37,12 +37,53 @@
         <i class="txt">Nahrať / stiahnuť vrstvy</i>
       </a>
     </div>
+    {% if user.is_superuser %}
+        {% for skupina in sys_skupiny_list %}
+    <!-- Viditelnost modal - skupina -->
+<div id="viditelnost_skupina{{ skupina.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
 
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ skupina.meno }}</h4>
+      </div>
+      <div class="modal-body">
+          Globálne :
+          <label for="viditelnost_skupinaR{{ skupina.id }}">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR{{ skupina.id }}" name="viditelnost_skupinaR{{ skupina.id }}" value="" {% if 'r' in skupina.viditelnost.globalne %}checked{% endif %}>
+          <label for="viditelnost_skupinaW{{ skupina.id }}">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW{{ skupina.id }}" name="viditelnost_skupinaW{{ skupina.id }}" value="" {% if 'w' in skupina.viditelnost.globalne %}checked{% endif %}>
+          <br>
+                Prihlásený :
+          <label for="viditelnost_skupinaR_prihlaseny{{ skupina.id }}">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR_prihlaseny{{ skupina.id }}" name="viditelnost_skupinaR_prihlaseny{{ skupina.id }}" value="" {% if 'r' in skupina.viditelnost.prihlaseny %}checked{% endif %}>
+          <label for="viditelnost_skupinaW_prihlaseny{{ skupina.id }}">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW_prihlaseny{{ skupina.id }}" name="viditelnost_skupinaW_prihlaseny{{ skupina.id }}" value="" {% if 'w' in skupina.viditelnost.prihlaseny %}checked{% endif %}>
+
+
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+        {% endfor %}
+    {% endif %}
     <!-- (B) MAIN -->
     <main id="pgmain">
       <ul id="simpleList" class="list-group">
           {% for skupina in sys_skupiny_list %}
-              <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }} <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ skupina.id }}',true)">Upraviť</button>
+              <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }}
+                  <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ skupina.id }}',true)">Upraviť</button>
+              {% if user.is_superuser %}
+              <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-target="#viditelnost_skupina{{ skupina.id }}">Viditelnosť</button>
+              {% endif %}
                  <dl id="simpleList{{ forloop.counter }}" class="list-group">
                      {% for key,podskupiny in sys_podskupiny_dict.items %}
                          {% if key == skupina.id %}
