@@ -61,6 +61,91 @@
           <label for="viditelnost_skupinaW_prihlaseny{{ skupina.id }}">W</label>
         <input type="checkbox" id="viditelnost_skupinaW_prihlaseny{{ skupina.id }}" name="viditelnost_skupinaW_prihlaseny{{ skupina.id }}" value="" {% if 'w' in skupina.viditelnost.prihlaseny %}checked{% endif %}>
 
+          <label for="viditelnost_skupinaIgnore_prihlaseny{{ skupina.id }}">Ignorovať</label>
+        <input type="checkbox" id="viditelnost_skupinaIgnore_prihlaseny{{ skupina.id }}" name="viditelnost_skupinaIgnore_prihlaseny{{ skupina.id }}" value="" {% if skupina.viditelnost.prihlaseny == '' %}checked{% endif %}>
+        <br>
+        Užívatelia :
+      <br>
+      {% for uzivatel,permisie in skupina.viditelnost.uzivatelia.items %}
+          {{ uzivatel }}:
+          <label for="viditelnost_skupinaR{{ uzivatel }}{{ skupina.id }}">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR{{ uzivatel }}{{ skupina.id }}" name="viditelnost_skupinaR{{ uzivatel }}{{ skupina.id }}" value="" {% if 'r' in permisie %}checked{% endif %}>
+          <label for="viditelnost_skupinaW{{ uzivatel }}{{ skupina.id }}">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW{{ uzivatel }}{{ skupina.id }}" name="viditelnost_skupinaW{{ uzivatel }}{{ skupina.id }}" value="" {% if 'w' in permisie %}checked{% endif %}>
+          <br>
+          {% endfor %}
+      <div id="div_uzivatelia_novy_skupina_{{ skupina.id }}">
+      </div>
+      <button type="button" onclick="pridaj_riadok_viditelnost_uzivatelia('div_uzivatelia_novy_skupina_{{ skupina.id }}')" class="btn btn-info btn-sm">+</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+         <script>
+         function pridaj_riadok_viditelnost_uzivatelia (id_divu) {
+
+             var html = `<div class="row" style="margin: 3px;">
+          <select class="js-example-basic-single" name="state" style="width: auto;">
+                    {% for user_username in vsetci_uzivatelia %}
+                  <option style="margin: 3px;" value="{{ user_username.username }}_{{ skupina_pocet_pridanych }}">{{ user_username.username }}</option>
+                    {% endfor %}
+            </select>
+
+              <label style="margin: 3px;" for="viditelnost_skupinaR_{{ forloop.counter }}_{{ skupina.id }}">R</label>
+        <input style="margin: 3px;" type="checkbox" id="viditelnost_skupinaR_{{ forloop.counter }}_{{ skupina.id }}" name="viditelnost_skupinaR_{{ forloop.counter }}_{{ skupina.id }}">
+          <label style="margin: 3px;" for="viditelnost_skupinaW_{{ forloop.counter }}_{{ skupina.id }}">W</label>
+        <input style="margin: 3px;" type="checkbox" id="viditelnost_skupinaW_{{ forloop.counter }}_{{ skupina.id }}" name="viditelnost_skupinaW_{{ forloop.counter }}_{{ skupina.id }}">
+
+      <input style="margin: 3px;" type="button" value="-" onclick="odstran_riadok_viditelnost_uzivatelia(this)">
+    </div>`;
+
+  document.querySelector('#'+id_divu).insertAdjacentHTML(
+    'afterbegin',
+    html
+  )
+         $(document).ready(function() {
+    $('.js-example-basic-single').select2();
+});
+}
+function odstran_riadok_viditelnost_uzivatelia (input) {
+  input.parentNode.remove()
+}
+         </script>
+
+            {% for key,podskupiny in sys_podskupiny_dict.items %}
+                {% if key == skupina.id %}
+                    {% for podskupina in podskupiny %}
+
+    <!-- Viditelnost modal - podskupina -->
+<div id="viditelnost_podskupina{{ podskupina.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ podskupina.meno }}</h4>
+      </div>
+      <div class="modal-body">
+          Globálne :
+          <label for="viditelnost_podskupinaR{{ podskupina.id }}">R</label>
+        <input type="checkbox" id="viditelnost_podskupinaR{{ podskupina.id }}" name="viditelnost_podskupinaR{{ podskupina.id }}" value="" {% if 'r' in podskupina.viditelnost.globalne %}checked{% endif %}>
+          <label for="viditelnost_podskupinaW{{ podskupina.id }}">W</label>
+        <input type="checkbox" id="viditelnost_podskupinaW{{ podskupina.id }}" name="viditelnost_podskupinaW{{ podskupina.id }}" value="" {% if 'w' in podskupina.viditelnost.globalne %}checked{% endif %}>
+          <br>
+                Prihlásený :
+          <label for="viditelnost_podskupinaR_prihlaseny{{ podskupina.id }}">R</label>
+        <input type="checkbox" id="viditelnost_podskupinaR_prihlaseny{{ podskupina.id }}" name="viditelnost_podskupinaR_prihlaseny{{ podskupina.id }}" value="" {% if 'r' in podskupina.viditelnost.prihlaseny %}checked{% endif %}>
+          <label for="viditelnost_podskupinaW_prihlaseny{{ podskupina.id }}">W</label>
+        <input type="checkbox" id="viditelnost_podskupinaW_prihlaseny{{ podskupina.id }}" name="viditelnost_podskupinaW_prihlaseny{{ podskupina.id }}" value="" {% if 'w' in podskupina.viditelnost.prihlaseny %}checked{% endif %}>
+
+                <label for="viditelnost_podskupinaIgnore_prihlaseny{{ podskupina.id }}">Ignorovať</label>
+        <input type="checkbox" id="viditelnost_podskupinaIgnore_prihlaseny{{ podskupina.id }}" name="viditelnost_podskupinaIgnore_prihlaseny{{ podskupina.id }}" value="" {% if podskupina.viditelnost.prihlaseny == '' %}checked{% endif %}>
+
 
 
 
@@ -73,6 +158,13 @@
 
   </div>
 </div>
+
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+
+
         {% endfor %}
     {% endif %}
     <!-- (B) MAIN -->
@@ -82,13 +174,16 @@
               <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }}
                   <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ skupina.id }}',true)">Upraviť</button>
               {% if user.is_superuser %}
-              <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-target="#viditelnost_skupina{{ skupina.id }}">Viditelnosť</button>
+              <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#viditelnost_skupina{{ skupina.id }}">Viditelnosť</button>
               {% endif %}
                  <dl id="simpleList{{ forloop.counter }}" class="list-group">
                      {% for key,podskupiny in sys_podskupiny_dict.items %}
                          {% if key == skupina.id %}
                              {% for podskupina in podskupiny %}
-                                <dt id="{{ podskupina.id }}" class="list-group-item">{{ podskupina.meno }} <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ podskupina.id }}',false)">Upraviť</button></dt>
+                                <dt id="{{ podskupina.id }}" class="list-group-item">{{ podskupina.meno }}
+                                    <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ podskupina.id }}',false)">Upraviť</button>
+                                    <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#viditelnost_podskupina{{ podskupina.id }}">Viditelnosť</button>
+                                </dt>
                              {% endfor %}
                          {% endif %}
                      {% endfor %}

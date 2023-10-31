@@ -557,6 +557,8 @@ def administracia(request):
     context['sys_skupiny_list'] = vsetky_systemove_skupiny
     context['sys_podskupiny_dict'] = podskupiny_sys_skupin
     context['get_data'] = dict(request.GET.items())
+    context['vsetci_uzivatelia'] = User.objects.values()
+
 
     return render(request, 'administration/admin.html',context)
 
