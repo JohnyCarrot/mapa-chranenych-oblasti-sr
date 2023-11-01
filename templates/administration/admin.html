@@ -68,39 +68,112 @@
       <br>
       {% for uzivatel,permisie in skupina.viditelnost.uzivatelia.items %}
           {{ uzivatel }}:
-          <label for="viditelnost_skupinaR{{ uzivatel }}{{ skupina.id }}">R</label>
-        <input type="checkbox" id="viditelnost_skupinaR{{ uzivatel }}{{ skupina.id }}" name="viditelnost_skupinaR{{ uzivatel }}{{ skupina.id }}" value="" {% if 'r' in permisie %}checked{% endif %}>
-          <label for="viditelnost_skupinaW{{ uzivatel }}{{ skupina.id }}">W</label>
-        <input type="checkbox" id="viditelnost_skupinaW{{ uzivatel }}{{ skupina.id }}" name="viditelnost_skupinaW{{ uzivatel }}{{ skupina.id }}" value="" {% if 'w' in permisie %}checked{% endif %}>
+          <label for="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}" name="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}" value="" {% if 'r' in permisie %}checked{% endif %}>
+          <label for="viditelnost_skupinaW_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}" name="viditelnost_skupinaW_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}" value="" {% if 'w' in permisie %}checked{% endif %}>
           <br>
           {% endfor %}
       <div id="div_uzivatelia_novy_skupina_{{ skupina.id }}">
       </div>
-      <button type="button" onclick="pridaj_riadok_viditelnost_uzivatelia('div_uzivatelia_novy_skupina_{{ skupina.id }}')" class="btn btn-info btn-sm">+</button>
+      <button type="button" onclick="{{ skupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia('div_uzivatelia_novy_skupina_{{ skupina.id }}')" class="btn btn-info btn-sm">+</button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" onclick="{{ skupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary">Save changes</button>
       </div>
     </div>
 
   </div>
 </div>
          <script>
-         function pridaj_riadok_viditelnost_uzivatelia (id_divu) {
+         function {{ skupina.id|cut:"-" }}skupina_viditelnost_poslat(){
+                var global_read = document.querySelector('[id^="viditelnost_skupinaR{{ skupina.id }}"]');
+                var global_write = document.querySelector('[id^="viditelnost_skupinaW{{ skupina.id }}"]');
+                var prihlaseny_read = document.querySelector('[id^="viditelnost_skupinaR_prihlaseny{{ skupina.id }}"]');
+                var prihlaseny_write = document.querySelector('[id^="viditelnost_skupinaW_prihlaseny{{ skupina.id }}"]');
+                var prihlaseny_ignore = document.querySelector('[id^="viditelnost_skupinaIgnore_prihlaseny{{ skupina.id }}"]');
+
+
+                   {% for uzivatel,permisie in skupina.viditelnost.uzivatelia.items %}
+                       var uzivatel = {
+                        username: '{{ uzivatel }}',
+                        read: document.querySelector('[id*="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}"]').checked,
+                           write: document.querySelector('[id*="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}"]').checked
+
+                       };
+
+                        console.log(uzivatel);
+
+                    {% endfor %}
+
+
+             let poziadavka = {
+                  skupina_id: '{{ skupina.id }}',
+                  global_read: global_read.checked,
+                  global_write: global_write.checked,
+                  prihlaseny_read: prihlaseny_read.checked,
+                  prihlaseny_write: prihlaseny_write.checked,
+                  prihlaseny_ignore: prihlaseny_ignore.checked,
+
+
+                  update_viditelnost_skupina: null
+                };
+
+                let response = fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(poziadavka)
+                });
+         }
+
+
+
+
+
+        function {{ skupina.id|cut:"-" }}pridaj_lejbli_viditelnost(element){
+            for(let i=1;i<=20;i++) { //dôvod: checkbox ostával aj po zmazaní :/
+                element.parentNode.childNodes.forEach((child, index) => {
+                    if (child.nodeType == 3) {
+                        element.parentNode.removeChild(child);
+                    }
+                    if (child.nodeName == 'INPUT') {
+                        //console.log("Im in")
+                        element.parentNode.removeChild(child);
+                    }
+                    //console.log(child,child.type,child.nodeType)
+                });
+            }
+            //Read
+            element.parentNode.appendChild(document.createTextNode("R"))
+            var x = document.createElement("INPUT");
+            x.setAttribute("id", "viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_N_"+element.value);
+            x.setAttribute("type", "checkbox");
+            x.setAttribute("value", element.value);
+            x.setAttribute("style", "margin: 3px;");
+            element.parentNode.appendChild(x)
+            //Write
+            element.parentNode.appendChild(document.createTextNode("W"))
+            var j = document.createElement("INPUT");
+            j.setAttribute("id", "viditelnost_skupinaW_uzivatel_{{ skupina.id }}_u_N_"+element.value);
+            j.setAttribute("type", "checkbox");
+            j.setAttribute("style", "margin: 3px;");
+            j.setAttribute("value", element.value);
+            element.parentNode.appendChild(j)
+        }
+
+         function {{ skupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia (id_divu) {
 
              var html = `<div class="row" style="margin: 3px;">
-          <select class="js-example-basic-single" name="state" style="width: auto;">
+             <div>
+          <select class="js-example-basic-single" name="state" style="width: auto;" onchange="{{ skupina.id|cut:"-" }}pridaj_lejbli_viditelnost(this)">
                     {% for user_username in vsetci_uzivatelia %}
-                  <option style="margin: 3px;" value="{{ user_username.username }}_{{ skupina_pocet_pridanych }}">{{ user_username.username }}</option>
+                  <option style="margin: 3px;" value="{{ user_username.username }}">{{ user_username.username }}</option>
                     {% endfor %}
             </select>
-
-              <label style="margin: 3px;" for="viditelnost_skupinaR_{{ forloop.counter }}_{{ skupina.id }}">R</label>
-        <input style="margin: 3px;" type="checkbox" id="viditelnost_skupinaR_{{ forloop.counter }}_{{ skupina.id }}" name="viditelnost_skupinaR_{{ forloop.counter }}_{{ skupina.id }}">
-          <label style="margin: 3px;" for="viditelnost_skupinaW_{{ forloop.counter }}_{{ skupina.id }}">W</label>
-        <input style="margin: 3px;" type="checkbox" id="viditelnost_skupinaW_{{ forloop.counter }}_{{ skupina.id }}" name="viditelnost_skupinaW_{{ forloop.counter }}_{{ skupina.id }}">
-
+        </div>
       <input style="margin: 3px;" type="button" value="-" onclick="odstran_riadok_viditelnost_uzivatelia(this)">
     </div>`;
 
