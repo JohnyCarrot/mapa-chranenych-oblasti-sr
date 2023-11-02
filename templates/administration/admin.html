@@ -38,7 +38,7 @@
       </a>
     </div>
     {% if user.is_superuser %}
-        {% for skupina in sys_skupiny_list %}
+        {% for skupina,permska,permska_temp in sys_skupiny_list %}
     <!-- Viditelnost modal - skupina -->
 <div id="viditelnost_skupina{{ skupina.id }}" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -211,7 +211,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
 
             {% for key,podskupiny in sys_podskupiny_dict.items %}
                 {% if key == skupina.id %}
-                    {% for podskupina in podskupiny %}
+                    {% for podskupina,permska_podskupina in podskupiny %}
 
     <!-- Viditelnost modal - podskupina -->
 <div id="viditelnost_podskupina{{ podskupina.id }}" class="modal fade" role="dialog">
@@ -395,22 +395,27 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
     <!-- (B) MAIN -->
     <main id="pgmain">
       <ul id="simpleList" class="list-group">
-          {% for skupina in sys_skupiny_list %}
+          {% for skupina,permska,permska_temp in sys_skupiny_list %}
+              {% if permska or permska_temp or user.is_superuser %}
               <li id="{{ skupina.id }}" class="list-group-item">{{ skupina.meno }}
+              {% if permska %}
                   <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ skupina.id }}',true)">Upraviť</button>
+              {% endif %}
               {% if user.is_superuser %}
               <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#viditelnost_skupina{{ skupina.id }}">Viditelnosť</button>
               {% endif %}
                  <dl id="simpleList{{ forloop.counter }}" class="list-group">
                      {% for key,podskupiny in sys_podskupiny_dict.items %}
                          {% if key == skupina.id %}
-                             {% for podskupina in podskupiny %}
+                             {% for podskupina,permska_podskupina in podskupiny %}
+                                 {% if permska_podskupina or user.is_superuser %}
                                 <dt id="{{ podskupina.id }}" class="list-group-item">{{ podskupina.meno }}
                                     <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ podskupina.id }}',false)">Upraviť</button>
                                     {% if user.is_superuser %}
                                     <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#viditelnost_podskupina{{ podskupina.id }}">Viditelnosť</button>
                                     {% endif %}
                                 </dt>
+                                 {% endif %}
                              {% endfor %}
                          {% endif %}
                      {% endfor %}
@@ -419,7 +424,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
          Sortable.create(simpleList{{ forloop.counter }}, { /* options */ });
       </script>
               </li>
-
+            {% endif %}
           {% endfor %}
       </ul>
 
@@ -478,7 +483,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
 
             function admin_podskupiny_poradie_funkcia() {
                 let navbar = null;
-                {% for skupina in sys_skupiny_list %}
+                {% for skupina,permska,permska_temp in sys_skupiny_list %}
                     navbar = document
                       .getElementById('simpleList{{ forloop.counter }}')
                       .querySelectorAll('dt');
@@ -523,13 +528,17 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
         }
 
         </script>
+
+                  {% if user.is_superuser %}
+
+
     <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_podskupiny_poradie_funkcia_tlacidlo()">Aktualizovať poradie</button>
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_skupinuModal">Pridať skupinu</button>
     {% if sys_skupiny_list|length > 0 %}
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_podskupinuModal">Pridať podskupinu</button>
     {% endif %}
     <br>
-
+{% endif %}
 
                       <div id="mapa-preview"></div>
 
@@ -613,7 +622,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
         <form id="pridaj_podskupinuform" method="post" action="api">
             <label for="skupina-pre-podskupinu">Vyber skupinu:</label>
             <select id="skupina-pre-podskupinu" name="skupina-pre-podskupinu">
-                {% for skupina in sys_skupiny_list %}
+                {% for skupina,permska,permska_temp in sys_skupiny_list %}
               <option value="{{ skupina.id }}" >{{ skupina.meno }}</option>
                 {% endfor %}
             </select><br>

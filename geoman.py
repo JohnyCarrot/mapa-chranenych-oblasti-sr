@@ -255,6 +255,7 @@ class Geoman(JSCSSMixin, MacroElement):
                             if(layer.upraveny && layer.upraveny==true){
                                     let layer2 = L.polygon(layer.getLatLngs());
                                     layer.upraveny=false;
+                                    //console.log(layer);
                                     coord_update(layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
                                 }
                             });

@@ -143,8 +143,14 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 
 
 
-def over_viditelnost(viditelnost,prihlaseny = False,username = "",permisia="r"):
+def over_viditelnost(viditelnost,prihlaseny = False,username = "",permisia="r",vlastnik=""):
     if viditelnost == None: return False
+
+    try:
+        if vlastnik == None and prihlaseny and User.objects.get(username=username).is_superuser:
+            return True
+    except:
+        pass
 
     if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and permisia not in viditelnost.uzivatelia[username]:
         return False
@@ -256,12 +262,12 @@ def index(requests):
     geocoder_vlastne_vyhladanie = []
     skupiny_v_navigacii = dict()
     for skupina in Skupiny.objects.all().order_by('priorita'):
-        if over_viditelnost(skupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username)):
+        if over_viditelnost(skupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username),vlastnik=skupina.spravca):
             _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
             _skupina_v_mape.add_to(m)
             podskupiny_v_mape = []
             for podskupina in Podskupiny.objects.all().order_by('priorita'):
-                if(skupina.id ==podskupina.skupina_id and over_viditelnost(podskupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username))):
+                if(skupina.id ==podskupina.skupina_id and over_viditelnost(podskupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username),vlastnik=podskupina.spravca)):
                     _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
                     _podskupina_v_mape.add_to(m)
                     pridaj_objekty_do_podskupiny(podskupina,_podskupina_v_mape,uzivatel=requests.user,geocoder=geocoder_vlastne_vyhladanie)
@@ -579,10 +585,21 @@ def administracia(request):
     vsetky_systemove_skupiny = []
     podskupiny_sys_skupin = dict()
     for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
-        vsetky_systemove_skupiny.append(skupina)
+        permisie_skupina = False
+        permisie_skupina_temp = False
+        if over_viditelnost(skupina.viditelnost,request.user.is_authenticated,request.user.username,"w") or request.user.is_superuser:
+            permisie_skupina = True
         podskupiny = []
         for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
-            podskupiny.append(podskupina)
+            permisie_podskupina = False
+            if over_viditelnost(podskupina.viditelnost, request.user.is_authenticated, request.user.username,"w") or request.user.is_superuser:
+                permisie_podskupina = True
+                permisie_skupina_temp = True
+            podskupiny.append( (podskupina,permisie_podskupina) )
+
+        if permisie_skupina or permisie_skupina_temp:
+            vsetky_systemove_skupiny.append((skupina, permisie_skupina,permisie_skupina_temp))
+
         podskupiny_sys_skupin[skupina.id] = podskupiny
     context['sys_skupiny_list'] = vsetky_systemove_skupiny
     context['sys_podskupiny_dict'] = podskupiny_sys_skupin
