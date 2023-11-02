@@ -471,6 +471,36 @@ def api_request(request):
                 objekt.style = body['style']
                 objekt.save()
                 return HttpResponse(status=201)
+            if "update_viditelnost_skupina" in body and "skupina_id" in body and "global_read" in body and "global_write" in body and "uzivatelia" in body: #A mnoho ďalšiho :)
+                if "update_viditelnost_podskupina" in body and body['update_viditelnost_podskupina']: #Funguje na skupiny aj podskupiny zároveň
+                    skupina = Podskupiny.objects.get(id=body['skupina_id'])
+                else:
+                    skupina = Skupiny.objects.get(id=body['skupina_id'])
+                viditelnost = skupina.viditelnost
+                viditelnost.globalne=""
+                viditelnost.prihlaseny = ""
+                if body['global_read']:viditelnost.globalne+="r"
+
+                if body['global_write']: viditelnost.globalne+="w"
+
+                if body['prihlaseny_read']:viditelnost.prihlaseny+="r"
+
+                if body['prihlaseny_write']:viditelnost.prihlaseny+="w"
+
+                if body['prihlaseny_ignore']:
+                    viditelnost.prihlaseny = ""
+
+                body['uzivatelia'].extend(body['novy_uzivatelia'])
+                for uzivatel in body['uzivatelia']:
+                    permisie = ""
+                    if uzivatel.get("read"): permisie+="r"
+                    if uzivatel.get("write"): permisie += "w"
+                    viditelnost.uzivatelia[uzivatel.get('username')] = permisie
+                viditelnost.save()
+
+
+
+
             ##########Json upload / download vrstiev##########
             if "json_download" in body and "idcka_list" in body:
                 zoznam_idcok_podskupiny =  body.get("idcka_list")

@@ -76,34 +76,51 @@
           {% endfor %}
       <div id="div_uzivatelia_novy_skupina_{{ skupina.id }}">
       </div>
-      <button type="button" onclick="{{ skupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia('div_uzivatelia_novy_skupina_{{ skupina.id }}')" class="btn btn-info btn-sm">+</button>
+      <button type="button" onclick="f{{ skupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia('div_uzivatelia_novy_skupina_{{ skupina.id }}')" class="btn btn-info btn-sm">+</button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" onclick="{{ skupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary">Save changes</button>
+          <button type="button" onclick="f{{ skupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary">Save changes</button>
       </div>
     </div>
 
   </div>
 </div>
          <script>
-         function {{ skupina.id|cut:"-" }}skupina_viditelnost_poslat(){
+         function f{{ skupina.id|cut:"-" }}skupina_viditelnost_poslat(){
                 var global_read = document.querySelector('[id^="viditelnost_skupinaR{{ skupina.id }}"]');
                 var global_write = document.querySelector('[id^="viditelnost_skupinaW{{ skupina.id }}"]');
                 var prihlaseny_read = document.querySelector('[id^="viditelnost_skupinaR_prihlaseny{{ skupina.id }}"]');
                 var prihlaseny_write = document.querySelector('[id^="viditelnost_skupinaW_prihlaseny{{ skupina.id }}"]');
                 var prihlaseny_ignore = document.querySelector('[id^="viditelnost_skupinaIgnore_prihlaseny{{ skupina.id }}"]');
 
+                var novy_uzivatelia_R = document.querySelectorAll('[id^="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_N_"]');
+                var novy_uzivatelia_W = document.querySelectorAll('[id^="viditelnost_skupinaW_uzivatel_{{ skupina.id }}_u_N_"]');
 
+                var novy_uzivatelia_zoznam = [];
+
+                novy_uzivatelia_R.forEach((input_R, index) => {
+
+                    novy_uzivatelia_W.forEach((input_W, index) => {
+                        if(input_W.value == input_R.value) {
+                            var uzivatel = {username: input_W.value, read: input_R.checked,write: input_W.checked};
+                            novy_uzivatelia_zoznam.push(uzivatel);
+                        }
+
+                    });
+                });
+                //console.log(novy_uzivatelia_zoznam)
+
+                var uzivatelia_viditelnost = [];
                    {% for uzivatel,permisie in skupina.viditelnost.uzivatelia.items %}
                        var uzivatel = {
                         username: '{{ uzivatel }}',
                         read: document.querySelector('[id*="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}"]').checked,
-                           write: document.querySelector('[id*="viditelnost_skupinaR_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}"]').checked
+                           write: document.querySelector('[id*="viditelnost_skupinaW_uzivatel_{{ skupina.id }}_u_{{ uzivatel }}"]').checked
 
                        };
-
-                        console.log(uzivatel);
+                        uzivatelia_viditelnost.push(uzivatel);
+                        //console.log(uzivatel);
 
                     {% endfor %}
 
@@ -115,7 +132,8 @@
                   prihlaseny_read: prihlaseny_read.checked,
                   prihlaseny_write: prihlaseny_write.checked,
                   prihlaseny_ignore: prihlaseny_ignore.checked,
-
+                  uzivatelia: uzivatelia_viditelnost,
+                  novy_uzivatelia: novy_uzivatelia_zoznam,
 
                   update_viditelnost_skupina: null
                 };
@@ -133,7 +151,7 @@
 
 
 
-        function {{ skupina.id|cut:"-" }}pridaj_lejbli_viditelnost(element){
+        function f{{ skupina.id|cut:"-" }}pridaj_lejbli_viditelnost(element){
             for(let i=1;i<=20;i++) { //dôvod: checkbox ostával aj po zmazaní :/
                 element.parentNode.childNodes.forEach((child, index) => {
                     if (child.nodeType == 3) {
@@ -164,11 +182,12 @@
             element.parentNode.appendChild(j)
         }
 
-         function {{ skupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia (id_divu) {
+         function f{{ skupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia (id_divu) {
 
              var html = `<div class="row" style="margin: 3px;">
              <div>
-          <select class="js-example-basic-single" name="state" style="width: auto;" onchange="{{ skupina.id|cut:"-" }}pridaj_lejbli_viditelnost(this)">
+          <select class="js-example-basic-single" name="state" style="width: auto;" onchange="f{{ skupina.id|cut:"-" }}pridaj_lejbli_viditelnost(this)">
+                    <option disabled selected value> -- vyberte možnosť -- </option>
                     {% for user_username in vsetci_uzivatelia %}
                   <option style="margin: 3px;" value="{{ user_username.username }}">{{ user_username.username }}</option>
                     {% endfor %}
@@ -178,7 +197,7 @@
     </div>`;
 
   document.querySelector('#'+id_divu).insertAdjacentHTML(
-    'afterbegin',
+    'beforeend',
     html
   )
          $(document).ready(function() {
@@ -204,33 +223,166 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
         <h4 class="modal-title">{{ podskupina.meno }}</h4>
       </div>
       <div class="modal-body">
-          Globálne :
-          <label for="viditelnost_podskupinaR{{ podskupina.id }}">R</label>
-        <input type="checkbox" id="viditelnost_podskupinaR{{ podskupina.id }}" name="viditelnost_podskupinaR{{ podskupina.id }}" value="" {% if 'r' in podskupina.viditelnost.globalne %}checked{% endif %}>
-          <label for="viditelnost_podskupinaW{{ podskupina.id }}">W</label>
-        <input type="checkbox" id="viditelnost_podskupinaW{{ podskupina.id }}" name="viditelnost_podskupinaW{{ podskupina.id }}" value="" {% if 'w' in podskupina.viditelnost.globalne %}checked{% endif %}>
+      Globálne :
+          <label for="viditelnost_skupinaR{{ podskupina.id }}">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR{{ podskupina.id }}" name="viditelnost_skupinaR{{ podskupina.id }}" value="" {% if 'r' in podskupina.viditelnost.globalne %}checked{% endif %}>
+          <label for="viditelnost_skupinaW{{ podskupina.id }}">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW{{ podskupina.id }}" name="viditelnost_skupinaW{{ podskupina.id }}" value="" {% if 'w' in podskupina.viditelnost.globalne %}checked{% endif %}>
           <br>
                 Prihlásený :
-          <label for="viditelnost_podskupinaR_prihlaseny{{ podskupina.id }}">R</label>
-        <input type="checkbox" id="viditelnost_podskupinaR_prihlaseny{{ podskupina.id }}" name="viditelnost_podskupinaR_prihlaseny{{ podskupina.id }}" value="" {% if 'r' in podskupina.viditelnost.prihlaseny %}checked{% endif %}>
-          <label for="viditelnost_podskupinaW_prihlaseny{{ podskupina.id }}">W</label>
-        <input type="checkbox" id="viditelnost_podskupinaW_prihlaseny{{ podskupina.id }}" name="viditelnost_podskupinaW_prihlaseny{{ podskupina.id }}" value="" {% if 'w' in podskupina.viditelnost.prihlaseny %}checked{% endif %}>
+          <label for="viditelnost_skupinaR_prihlaseny{{ podskupina.id }}">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR_prihlaseny{{ podskupina.id }}" name="viditelnost_skupinaR_prihlaseny{{ podskupina.id }}" value="" {% if 'r' in podskupina.viditelnost.prihlaseny %}checked{% endif %}>
+          <label for="viditelnost_skupinaW_prihlaseny{{ podskupina.id }}">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW_prihlaseny{{ podskupina.id }}" name="viditelnost_skupinaW_prihlaseny{{ podskupina.id }}" value="" {% if 'w' in podskupina.viditelnost.prihlaseny %}checked{% endif %}>
 
-                <label for="viditelnost_podskupinaIgnore_prihlaseny{{ podskupina.id }}">Ignorovať</label>
-        <input type="checkbox" id="viditelnost_podskupinaIgnore_prihlaseny{{ podskupina.id }}" name="viditelnost_podskupinaIgnore_prihlaseny{{ podskupina.id }}" value="" {% if podskupina.viditelnost.prihlaseny == '' %}checked{% endif %}>
-
-
+          <label for="viditelnost_skupinaIgnore_prihlaseny{{ podskupina.id }}">Ignorovať</label>
+        <input type="checkbox" id="viditelnost_skupinaIgnore_prihlaseny{{ podskupina.id }}" name="viditelnost_skupinaIgnore_prihlaseny{{ podskupina.id }}" value="" {% if podskupina.viditelnost.prihlaseny == '' %}checked{% endif %}>
+        <br>
+        Užívatelia :
+      <br>
+      {% for uzivatel,permisie in podskupina.viditelnost.uzivatelia.items %}
+          {{ uzivatel }}:
+          <label for="viditelnost_skupinaR_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}" name="viditelnost_skupinaR_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}" value="" {% if 'r' in permisie %}checked{% endif %}>
+          <label for="viditelnost_skupinaW_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}" name="viditelnost_skupinaW_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}" value="" {% if 'w' in permisie %}checked{% endif %}>
+          <br>
+          {% endfor %}
+      <div id="div_uzivatelia_novy_skupina_{{ podskupina.id }}">
+      </div>
+      <button type="button" onclick="z{{ podskupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia('div_uzivatelia_novy_skupina_{{ podskupina.id }}')" class="btn btn-info btn-sm">+</button>
 
 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" onclick="z{{ podskupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary">Save changes</button>
       </div>
     </div>
 
   </div>
 </div>
+
+                                 <script>
+         function z{{ podskupina.id|cut:"-" }}skupina_viditelnost_poslat(){
+                var global_read = document.querySelector('[id^="viditelnost_skupinaR{{ podskupina.id }}"]');
+                var global_write = document.querySelector('[id^="viditelnost_skupinaW{{ podskupina.id }}"]');
+                var prihlaseny_read = document.querySelector('[id^="viditelnost_skupinaR_prihlaseny{{ podskupina.id }}"]');
+                var prihlaseny_write = document.querySelector('[id^="viditelnost_skupinaW_prihlaseny{{ podskupina.id }}"]');
+                var prihlaseny_ignore = document.querySelector('[id^="viditelnost_skupinaIgnore_prihlaseny{{ podskupina.id }}"]');
+
+                var novy_uzivatelia_R = document.querySelectorAll('[id^="viditelnost_skupinaR_uzivatel_{{ podskupina.id }}_u_N_"]');
+                var novy_uzivatelia_W = document.querySelectorAll('[id^="viditelnost_skupinaW_uzivatel_{{ podskupina.id }}_u_N_"]');
+
+                var novy_uzivatelia_zoznam = [];
+
+                novy_uzivatelia_R.forEach((input_R, index) => {
+
+                    novy_uzivatelia_W.forEach((input_W, index) => {
+                        if(input_W.value == input_R.value) {
+                            var uzivatel = {username: input_W.value, read: input_R.checked,write: input_W.checked};
+                            novy_uzivatelia_zoznam.push(uzivatel);
+                        }
+
+                    });
+                });
+                //console.log(novy_uzivatelia_zoznam)
+
+                var uzivatelia_viditelnost = [];
+                   {% for uzivatel,permisie in podskupina.viditelnost.uzivatelia.items %}
+                       var uzivatel = {
+                        username: '{{ uzivatel }}',
+                        read: document.querySelector('[id*="viditelnost_skupinaR_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}"]').checked,
+                           write: document.querySelector('[id*="viditelnost_skupinaW_uzivatel_{{ podskupina.id }}_u_{{ uzivatel }}"]').checked
+
+                       };
+                        uzivatelia_viditelnost.push(uzivatel);
+                        //console.log(uzivatel);
+
+                    {% endfor %}
+
+
+             let poziadavka = {
+                  skupina_id: '{{ podskupina.id }}',
+                  global_read: global_read.checked,
+                  global_write: global_write.checked,
+                  prihlaseny_read: prihlaseny_read.checked,
+                  prihlaseny_write: prihlaseny_write.checked,
+                  prihlaseny_ignore: prihlaseny_ignore.checked,
+                  uzivatelia: uzivatelia_viditelnost,
+                  novy_uzivatelia: novy_uzivatelia_zoznam,
+                  update_viditelnost_podskupina: true,
+                  update_viditelnost_skupina: null
+                };
+
+                let response = fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(poziadavka)
+                });
+         }
+
+
+
+
+
+        function z{{ podskupina.id|cut:"-" }}pridaj_lejbli_viditelnost(element){
+            for(let i=1;i<=20;i++) { //dôvod: checkbox ostával aj po zmazaní :/
+                element.parentNode.childNodes.forEach((child, index) => {
+                    if (child.nodeType == 3) {
+                        element.parentNode.removeChild(child);
+                    }
+                    if (child.nodeName == 'INPUT') {
+                        //console.log("Im in")
+                        element.parentNode.removeChild(child);
+                    }
+                    //console.log(child,child.type,child.nodeType)
+                });
+            }
+            //Read
+            element.parentNode.appendChild(document.createTextNode("R"))
+            var x = document.createElement("INPUT");
+            x.setAttribute("id", "viditelnost_skupinaR_uzivatel_{{ podskupina.id }}_u_N_"+element.value);
+            x.setAttribute("type", "checkbox");
+            x.setAttribute("value", element.value);
+            x.setAttribute("style", "margin: 3px;");
+            element.parentNode.appendChild(x)
+            //Write
+            element.parentNode.appendChild(document.createTextNode("W"))
+            var j = document.createElement("INPUT");
+            j.setAttribute("id", "viditelnost_skupinaW_uzivatel_{{ podskupina.id }}_u_N_"+element.value);
+            j.setAttribute("type", "checkbox");
+            j.setAttribute("style", "margin: 3px;");
+            j.setAttribute("value", element.value);
+            element.parentNode.appendChild(j)
+        }
+
+         function z{{ podskupina.id|cut:"-" }}pridaj_riadok_viditelnost_uzivatelia (id_divu) {
+
+             var html = `<div class="row" style="margin: 3px;">
+             <div>
+          <select class="js-example-basic-single" name="state" style="width: auto;" onchange="z{{ podskupina.id|cut:"-" }}pridaj_lejbli_viditelnost(this)">
+                    <option disabled selected value> -- vyberte možnosť -- </option>
+                    {% for user_username in vsetci_uzivatelia %}
+                  <option style="margin: 3px;" value="{{ user_username.username }}">{{ user_username.username }}</option>
+                    {% endfor %}
+            </select>
+        </div>
+      <input style="margin: 3px;" type="button" value="-" onclick="odstran_riadok_viditelnost_uzivatelia(this)">
+    </div>`;
+
+  document.querySelector('#'+id_divu).insertAdjacentHTML(
+    'beforeend',
+    html
+  )
+         $(document).ready(function() {
+    $('.js-example-basic-single').select2();
+});
+}
+
+         </script>
 
                     {% endfor %}
                 {% endif %}
@@ -255,7 +407,9 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
                              {% for podskupina in podskupiny %}
                                 <dt id="{{ podskupina.id }}" class="list-group-item">{{ podskupina.meno }}
                                     <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ podskupina.id }}',false)">Upraviť</button>
+                                    {% if user.is_superuser %}
                                     <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#viditelnost_podskupina{{ podskupina.id }}">Viditelnosť</button>
+                                    {% endif %}
                                 </dt>
                              {% endfor %}
                          {% endif %}

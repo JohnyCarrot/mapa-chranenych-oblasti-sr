@@ -17,3 +17,5 @@ dorobit viditelnost do api
 
 dorobit api_file aby mohol len ten čo má oprávnenie
 
+Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúcich sa užívateľov
+
