@@ -132,12 +132,12 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria = GEOSGeometry(objekt.geometry)
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
-        styl={}
+
         if objekt.style== None:
-            styl = {}
-        else:
-            styl = objekt.style
-        folium.GeoJson(geometria_cela, style_function=lambda x: styl,name=objekt.meno).add_to(podskupina_v_mape).add_child(
+            objekt.style={}
+            objekt.save()
+        styl = objekt.style
+        folium.GeoJson(geometria_cela, style_function=lambda x, styl=styl: styl,name=objekt.meno).add_to(podskupina_v_mape).add_child(
             folium.Popup(folium.Html(html,script=True),lazy=False))
         geocoder.append({"name":objekt.meno,"center":[geometria.centroid.coord_seq.getY(0),geometria.centroid.coord_seq.getX(0)]})
 
