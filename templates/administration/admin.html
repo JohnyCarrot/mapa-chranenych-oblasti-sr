@@ -80,7 +80,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" onclick="f{{ skupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary">Save changes</button>
+          <button type="button" onclick="f{{ skupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary" data-dismiss="modal" >Save changes</button>
       </div>
     </div>
 
@@ -145,6 +145,7 @@
                   },
                   body: JSON.stringify(poziadavka)
                 });
+                alert("Viditeľnosť úspešne zmenená");
          }
 
 
@@ -256,7 +257,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" onclick="z{{ podskupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary">Save changes</button>
+          <button type="button" onclick="z{{ podskupina.id|cut:"-" }}skupina_viditelnost_poslat()" class="btn btn-primary" data-dismiss="modal">Save changes</button>
       </div>
     </div>
 
@@ -322,6 +323,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
                   },
                   body: JSON.stringify(poziadavka)
                 });
+                alert("Viditeľnosť úspešne zmenená")
          }
 
 
@@ -559,25 +561,34 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
         <form id="pridaj_skupinuform" method="post" action="api">
           <label for="nazov_skupiny">Názov skupiny:</label>
           <input type="text" id="nazov_skupiny" name="nazov_skupiny" required /><br>
-          <label for="viditelnost">Viditeľnosť:</label>
-            <select id="viditelnost" name="viditelnost" class="form-control js-viditelnost-tags" multiple="multiple">
-              <option value="*" >Všetci</option>
-              <option value="-">Iba prihlásený</option>
-              <option value="empty"> </option>
-            </select>
+      Viditeľnosť globálne :
+          <label for="viditelnost_skupinaR_nova">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR_nova" name="viditelnost_skupinaR_nova" value="" >
+          <label for="viditelnost_skupinaW_nova">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW_nova" name="viditelnost_skupinaW_nova" value="" >
+          <br>
+                Viditeľnosť prihlásený :
+          <label for="viditelnost_skupinaR_nova_prihlaseny">R</label>
+        <input type="checkbox" id="viditelnost_skupinaR_nova_prihlaseny" name="viditelnost_skupinaR_nova_prihlaseny" value="">
+          <label for="viditelnost_skupinaW_nova_prihlaseny">W</label>
+        <input type="checkbox" id="viditelnost_skupinaW_nova_prihlaseny" name="viditelnost_skupinaW_nova_prihlaseny" value="">
+
+          <label for="viditelnost_skupinaIgnore_nova_prihlaseny">Ignorovať</label>
+        <input type="checkbox" id="viditelnost_skupinaIgnore_nova_prihlaseny" name="viditelnost_skupinaIgnore_prihlaseny" value="" >
+        <br>
         </form>
-          <script>$('.js-viditelnost-tags').select2({
-                  tags: true,
-                  width: '100%'
-                });
-          </script>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" onclick="
         let inputs_nova_skupina = document.getElementById('pridaj_skupinuform').elements;
             let dejta_nova_skupina = {
-          viditelnost: $('.js-viditelnost-tags').val(),
+          global_r: document.getElementById('viditelnost_skupinaR_nova').checked,
+          global_w: document.getElementById('viditelnost_skupinaW_nova').checked,
+          skupina_r: document.getElementById('viditelnost_skupinaR_nova_prihlaseny').checked,
+          skupina_w: document.getElementById('viditelnost_skupinaW_nova_prihlaseny').checked,
+          skupina_ignore: document.getElementById('viditelnost_skupinaIgnore_nova_prihlaseny').checked,
           nazov_skupiny: inputs_nova_skupina['nazov_skupiny'].value,
           nova_skupina: null
         };
@@ -628,25 +639,34 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
             </select><br>
           <label for="nazov_podskupiny">Názov podskupiny:</label>
           <input type="text" id="nazov_podskupiny" name="nazov_podskupiny" required /><br>
-          <label for="viditelnost_podskupina">Viditeľnosť:</label>
-            <select id="viditelnost_podskupina" name="viditelnost_podskupina" class="form-control js-viditelnost-podskupiny-tags" multiple="multiple">
-              <option value="*" >Všetci</option>
-              <option value="-">Iba prihlásený</option>
-              <option value="empty"> </option>
-            </select>
+              Viditeľnosť globálne :
+          <label for="viditelnost_podskupinaR_nova">R</label>
+        <input type="checkbox" id="viditelnost_podskupinaR_nova" name="viditelnost_podskupinaR_nova" value="" >
+          <label for="viditelnost_podskupinaW_nova">W</label>
+        <input type="checkbox" id="viditelnost_podskupinaW_nova" name="viditelnost_podskupinaW_nova" value="" >
+          <br>
+                Viditeľnosť prihlásený :
+          <label for="viditelnost_podskupinaR_nova_prihlaseny">R</label>
+        <input type="checkbox" id="viditelnost_podskupinaR_nova_prihlaseny" name="viditelnost_podskupinaR_nova_prihlaseny" value="">
+          <label for="viditelnost_podskupinaW_nova_prihlaseny">W</label>
+        <input type="checkbox" id="viditelnost_podskupinaW_nova_prihlaseny" name="viditelnost_podskupinaW_nova_prihlaseny" value="">
+
+          <label for="viditelnost_podskupinaIgnore_nova_prihlaseny">Ignorovať</label>
+        <input type="checkbox" id="viditelnost_podskupinaIgnore_nova_prihlaseny" name="viditelnost_podskupinaIgnore_prihlaseny" value="" >
+        <br>
         </form>
-          <script>$('.js-viditelnost-podskupiny-tags').select2({
-                  tags: true,
-                  width: '100%'
-                });
-          </script>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" onclick="
         let inputs_nova_skupina = document.getElementById('pridaj_podskupinuform').elements;
             let dejta_nova_skupina = {
-          viditelnost: $('.js-viditelnost-podskupiny-tags').val(),
+                global_r: document.getElementById('viditelnost_podskupinaR_nova').checked,
+          global_w: document.getElementById('viditelnost_podskupinaW_nova').checked,
+          podskupina_r: document.getElementById('viditelnost_podskupinaR_nova_prihlaseny').checked,
+          podskupina_w: document.getElementById('viditelnost_podskupinaW_nova_prihlaseny').checked,
+          podskupina_ignore: document.getElementById('viditelnost_podskupinaIgnore_nova_prihlaseny').checked,
           id_skupiny: inputs_nova_skupina['skupina-pre-podskupinu'].value,
           nazov_podskupiny: inputs_nova_skupina['nazov_podskupiny'].value,
           nova_podskupina: null

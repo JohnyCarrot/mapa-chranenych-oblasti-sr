@@ -440,7 +440,7 @@ def api_request(request):
 
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
-            if "nova_skupina" in body and "nazov_skupiny" in body and "viditelnost" in body:
+            if "nova_skupina" in body and "nazov_skupiny" in body and "global_r" in body:
                 if len(body["nazov_skupiny"]) ==0:
                     return HttpResponse(status=303)
                 for skupina in Skupiny.objects.all():
@@ -448,13 +448,23 @@ def api_request(request):
                         return HttpResponse(status=304)
                 nova_skupina = Skupiny()
                 nova_skupina.meno = body['nazov_skupiny']
-                if body['viditelnost']==[]:
-                    body['viditelnost'] = ['*']
-                nova_skupina.viditelnost = body['viditelnost']
                 nova_skupina.spravca = None
+                viditelnost = Viditelnost_mapa()
+
+                permisie_global = ""
+                permisie_prihlaseny = ""
+                if body['global_r']: permisie_global+="r"
+                if body['global_w']: permisie_global += "w"
+                if body['skupina_r']: permisie_prihlaseny += "r"
+                if body['skupina_w']: permisie_prihlaseny += "w"
+                if body['skupina_ignore']: permisie_prihlaseny =""
+                viditelnost.globalne = permisie_global
+                viditelnost.prihlaseny = permisie_prihlaseny
+                viditelnost.save()
+                nova_skupina.viditelnost = viditelnost
                 nova_skupina.save()
                 return HttpResponse(status=201)
-            if "nova_podskupina" in body and "nazov_podskupiny" in body and "viditelnost" in body and "id_skupiny" in body:
+            if "nova_podskupina" in body and "nazov_podskupiny" in body and "global_w" in body and "id_skupiny" in body:
                 if len(body["nazov_podskupiny"]) ==0:
                     return HttpResponse(status=303)
                 skupina = Skupiny.objects.get(id=body['id_skupiny'])
@@ -463,9 +473,20 @@ def api_request(request):
                         return HttpResponse(status=304)
                 nova_podskupina = Podskupiny()
                 nova_podskupina.meno = body['nazov_podskupiny']
-                if body['viditelnost'] == []:
-                    body['viditelnost'] = ['*']
-                nova_podskupina.viditelnost = body['viditelnost']
+
+
+                viditelnost = Viditelnost_mapa()
+                permisie_global = ""
+                permisie_prihlaseny = ""
+                if body['global_r']: permisie_global+="r"
+                if body['global_w']: permisie_global += "w"
+                if body['podskupina_r']: permisie_prihlaseny += "r"
+                if body['podskupina_w']: permisie_prihlaseny += "w"
+                if body['podskupina_ignore']: permisie_prihlaseny =""
+                viditelnost.globalne = permisie_global
+                viditelnost.prihlaseny = permisie_prihlaseny
+                viditelnost.save()
+                nova_podskupina.viditelnost = viditelnost
                 nova_podskupina.spravca = None
                 nova_podskupina.skupina=skupina
                 nova_podskupina.save()
@@ -549,6 +570,7 @@ def api_request(request):
 def api_request_file(request):
     if request.method == 'POST':
         try:
+                #ešte dorobiť viditelnosť
                 file = request.FILES['file']
                 data = file.read()
                 json_data = json.dumps(data.decode(),ensure_ascii=False)

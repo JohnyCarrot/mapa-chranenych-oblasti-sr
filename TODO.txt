@@ -19,3 +19,11 @@ dorobit api_file aby mohol len ten čo má oprávnenie
 
 Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúcich sa užívateľov
 
+administráciu zablokovať ak niesú žiadné oprávnenia na write
+
+administrácia namiesto # dať odkaz (pre reálny reload)
+
+pridať kreslenie do administrácie
+
+sfunkčniť zdieľanie
+
