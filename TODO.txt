@@ -27,3 +27,5 @@ pridať kreslenie do administrácie
 
 sfunkčniť zdieľanie !!!
 
+pridať administráciu do hlavného navbaru
+
