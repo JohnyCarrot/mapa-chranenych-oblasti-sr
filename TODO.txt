@@ -25,5 +25,5 @@ administrácia namiesto # dať odkaz (pre reálny reload)
 
 pridať kreslenie do administrácie
 
-sfunkčniť zdieľanie
+sfunkčniť zdieľanie !!!
 
