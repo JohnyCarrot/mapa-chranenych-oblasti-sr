@@ -52,6 +52,21 @@ def sulad_s_nastavenim_mapy(nastavenie,objekt):
     if (nastavenie.stupen5 == False and objekt.stupen_ochrany == 5): return False
     return True
 
+def navbar_zapni_administraciu(user):
+    for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
+        permisie_skupina = False
+        permisie_skupina_temp = False
+        if over_viditelnost(skupina.viditelnost,user.is_authenticated,user.username,"w") or user.is_superuser:
+            permisie_skupina = True
+
+        for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
+            if over_viditelnost(podskupina.viditelnost, user.is_authenticated, user.username,"w") or user.is_superuser:
+                permisie_skupina_temp = True
+
+        if permisie_skupina or permisie_skupina_temp:
+            return True
+    return False
+
 def zdielat_objekt_html_list(uzivatel,objekt_id):
     html=""
     objekt = Objekty.objects.get(id=objekt_id)
@@ -223,7 +238,10 @@ def index(requests):
     if (requests.user.is_authenticated and requests.GET.get('object_share') != None and requests.GET.get('username') != None and requests.GET.get('objectname')!= None):
         zdielany_objekt = Objekty.objects.get(id=requests.GET.get('object_share'))
         priatel = requests.GET.get('username')
-        nova_podskupina_zdielaneho_objektu = pridaj_podskupinu(requests.GET.get('objectname'),[priatel],priatel,vrat_skupinu_s_uzivatelom_zdielanych_objektov(priatel))
+        viditelnost = Viditelnost_mapa()
+        viditelnost.uzivatelia[priatel] = "r"
+        viditelnost.save()
+        nova_podskupina_zdielaneho_objektu = pridaj_podskupinu(requests.GET.get('objectname'),viditelnost.id,priatel,vrat_skupinu_s_uzivatelom_zdielanych_objektov(priatel))
         if(zdielany_objekt.nastavenia==None):
             nastavenia = dict()
             nastavenia["shared_with"] = dict()
@@ -294,6 +312,8 @@ def index(requests):
     context = {
         'm': m,
     }
+    if requests.user.is_authenticated:
+        context['navbar_administracia'] = navbar_zapni_administraciu(requests.user)
     print(f"---Generacia mapy: %s seconds ---" % (time.time() - start_time_temp))
     print(f"---celá stránka %s seconds ---" % (time.time() - start_time))
     #print("Počet znakov v html: "+str(len(m)))
@@ -601,6 +621,7 @@ def api_request_file(request):
 
     return HttpResponse(status=204)
 
+
 @login_required
 def administracia(request):
     context = {}
@@ -628,6 +649,8 @@ def administracia(request):
     context['get_data'] = dict(request.GET.items())
     context['vsetci_uzivatelia'] = User.objects.values()
 
+    if len(vsetky_systemove_skupiny) ==0: #Ak nemám žiadne oprávnenie ....
+        return redirect('/')
 
     return render(request, 'administration/admin.html',context)
 

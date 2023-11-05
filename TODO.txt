@@ -2,30 +2,18 @@ používatelia aktualizujuci vrstvy
 možnodť vlastného výletu na mape
 vlastný bod s popisom  a diskusiou
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
+dorobiť návratové správy do api
 
 Na základe nastavení vytvoriť funkciu, ktorá vráti unikátne skupiny buďto objektov, alebo zdielaných objektov
-
-Systém viditelnosti
-
-spraviť load / restore na json
 
 views spraviť do zložiek
 
 pridat VSETKO do json downloadu
 
-dorobit viditelnost do api
-
 dorobit api_file aby mohol len ten čo má oprávnenie
 
 Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúcich sa užívateľov
 
-administráciu zablokovať ak niesú žiadné oprávnenia na write
-
-administrácia namiesto # dať odkaz (pre reálny reload)
-
 pridať kreslenie do administrácie
 
-sfunkčniť zdieľanie !!!
-
-pridať administráciu do hlavného navbaru
 

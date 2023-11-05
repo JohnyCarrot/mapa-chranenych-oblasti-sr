@@ -28,7 +28,7 @@
       </div>
 
       <!-- (A2) MENU ITEMS -->
-      <a href="#" class="current">
+      <a href="/administracia" class="current">
         <i class="ico">&#9733;</i>
         <i class="txt">Vrstvy</i>
       </a>
@@ -36,6 +36,10 @@
         <i class="ico">&#9728;</i>
         <i class="txt">Nahrať / stiahnuť vrstvy</i>
       </a>
+        <a href="/">
+            <i class="ico">&#128506;</i>
+            <i class="txt">Naspäť do mapy</i>
+        </a>
     </div>
     {% if user.is_superuser %}
         {% for skupina,permska,permska_temp in sys_skupiny_list %}
