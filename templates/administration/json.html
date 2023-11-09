@@ -143,9 +143,10 @@
     <div class="split right">
   <div class="centered">
     <h3>Nahrať vrstvy:</h3>
-    <form action="/api_file" method="post" enctype="multipart/form-data">
+    <form id="uploadForm" action="/api_file" method="post" enctype="multipart/form-data">
       <label for="file">File</label>
       <input id="file" name="file" type="file" />
+        <input type="hidden" name="json_admin_subor_send" value="ano" />
         <br>
       <button>Nahrať json</button>
     </form>
@@ -153,6 +154,40 @@
 </div>
 
     </main>
+
+  <script>
+
+    // Attach a submit handler to the form
+  // Attach a submit handler to the form
+
+
+$("#uploadForm").submit(function(event) {
+
+    var formData = new FormData();
+    formData.append("file", $('[name="file"]')[0].files[0]);
+    formData.append("json_admin_subor_send","ano")
+    event.stopPropagation();
+    event.preventDefault();
+    $.ajax({
+      url: $(this).attr("action"),
+      data: formData,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function(data) {
+        alert("Súbor úspešne spracovaný");
+
+      },
+        statusCode: {
+    303: function(xhr) {
+      alert("Nesprávny formát alebo obsah súboru")
+    }
+        }
+    });
+    return false;
+  });
+
+    </script>
 
 
   </body>

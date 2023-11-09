@@ -1,0 +1,53 @@
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Mapa chránených území</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'index' %}">Mapa <span class="sr-only">(current)</span></a>
+      </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+        <a class="nav-link" href="/friends">Priatelia</a>
+      </li>
+        {% endif %}
+
+        {% if navbar_administracia %}
+        <li class="nav-item">
+        <a class="nav-link" href="/administracia">Administrácia</a>
+      </li>
+        {% endif %}
+
+      <li class="nav-item">
+        <a class="nav-link" href="#">Čokoľvek ďalšie</a>
+      </li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+    {% if user.is_authenticated %}
+        <li class="nav-item">
+  <a class="nav-link" href="#"
+    onClick="document.getElementById('logoutform').submit()">
+    Logout
+  </a>
+</li>
+<form id="logoutform" method="POST" action="/accounts/logout/">
+  {% csrf_token %}
+  <input type="hidden">
+</form>
+                {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="/accounts/login/">Prihlásenie</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/register">Registrácia</a>
+        </li>
+        {% endif %}
+
+
+    </ul>
+<!-- Tu pridať vyhladavanie eventualne -->
+  </div>
+</nav>

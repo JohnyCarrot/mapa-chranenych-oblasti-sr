@@ -317,7 +317,7 @@ def index(requests):
     print(f"---Generacia mapy: %s seconds ---" % (time.time() - start_time_temp))
     print(f"---celá stránka %s seconds ---" % (time.time() - start_time))
     #print("Počet znakov v html: "+str(len(m)))
-    return render(requests, 'index.html', context)
+    return render(requests, 'index/index.html', context)
 
 
 # Koniec mapy, začiatok diskusného fóra
@@ -457,7 +457,8 @@ def api_request(request):
                 folium.plugins.GroupedLayerControl(skupina_v_navigacii, exclusive_groups=False).add_to(m)
                 folium.plugins.LocateControl(auto_start=True).add_to(m)
                 Geoman().add_to(m)
-
+                from draw_custom_administracia import Draw_custom_admin
+                Draw_custom_admin(export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
             if "nova_skupina" in body and "nazov_skupiny" in body and "global_r" in body:
@@ -591,30 +592,36 @@ def api_request_file(request):
     if request.method == 'POST':
         try:
                 #ešte dorobiť viditelnosť
-                file = request.FILES['file']
-                data = file.read()
-                json_data = json.dumps(data.decode(),ensure_ascii=False)
-                hotovy_json = json.loads(json.loads(json_data))
-                skupiny =  json_ser.Deserializer(hotovy_json['skupiny'])
-                skupiny_viditelnost = json_ser.Deserializer(hotovy_json['skupiny_viditelnost'])
-                podskupiny = json_ser.Deserializer(hotovy_json['podskupiny'])
-                podskupiny_viditelnost = json_ser.Deserializer(hotovy_json['podskupiny_viditelnost'])
-                objekty = json_ser.Deserializer(hotovy_json['objekty'])
+                if "json_admin_subor_send" in request.POST:
 
-                for viditelnost_pre_skupinu in skupiny_viditelnost:
-                    viditelnost_pre_skupinu.save()
+                    try:
+                        file = request.FILES['file']
+                        data = file.read()
+                        json_data = json.dumps(data.decode(),ensure_ascii=False)
+                        hotovy_json = json.loads(json.loads(json_data))
+                        skupiny =  json_ser.Deserializer(hotovy_json['skupiny'])
+                        skupiny_viditelnost = json_ser.Deserializer(hotovy_json['skupiny_viditelnost'])
+                        podskupiny = json_ser.Deserializer(hotovy_json['podskupiny'])
+                        podskupiny_viditelnost = json_ser.Deserializer(hotovy_json['podskupiny_viditelnost'])
+                        objekty = json_ser.Deserializer(hotovy_json['objekty'])
+                    except:
+                        #print("Padol som")
+                        return HttpResponse(status=303) #Ak chyba, tak vyhod modal
 
-                for skupina in skupiny:
-                    skupina.save()
+                    for viditelnost_pre_skupinu in skupiny_viditelnost:
+                        viditelnost_pre_skupinu.save()
 
-                for viditelnost_pre_podskupinu in podskupiny_viditelnost:
-                    viditelnost_pre_podskupinu.save()
+                    for skupina in skupiny:
+                        skupina.save()
 
-                for podskupina in podskupiny:
-                    podskupina.save()
+                    for viditelnost_pre_podskupinu in podskupiny_viditelnost:
+                        viditelnost_pre_podskupinu.save()
 
-                for objekt in objekty:
-                    objekt.save()
+                    for podskupina in podskupiny:
+                        podskupina.save()
+
+                    for objekt in objekty:
+                        objekt.save()
         except:
             traceback.print_exc()
             return HttpResponse(status=500)
@@ -635,6 +642,7 @@ def administracia(request):
         podskupiny = []
         for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
             permisie_podskupina = False
+            if(permisie_skupina): permisie_podskupina=True
             if over_viditelnost(podskupina.viditelnost, request.user.is_authenticated, request.user.username,"w") or request.user.is_superuser:
                 permisie_podskupina = True
                 permisie_skupina_temp = True
@@ -656,6 +664,8 @@ def administracia(request):
 
 @login_required
 def administracia_json(request):
+    if request.user.is_superuser == False:
+        return redirect('/administracia')
     context = {}
     vsetky_systemove_skupiny = []
     podskupiny_sys_skupin = dict()
@@ -667,4 +677,6 @@ def administracia_json(request):
         podskupiny_sys_skupin[skupina.id] = podskupiny
     context['sys_skupiny_list'] = vsetky_systemove_skupiny
     context['sys_podskupiny_dict'] = podskupiny_sys_skupin
+
+
     return render(request, 'administration/json.html',context)
