@@ -161,11 +161,11 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 def over_viditelnost(viditelnost,prihlaseny = False,username = "",permisia="r",vlastnik=""):
     if viditelnost == None: return False
 
-    try:
-        if vlastnik == None and prihlaseny and User.objects.get(username=username).is_superuser:
-            return True
-    except:
-        pass
+    #try:
+     #   if vlastnik == None and prihlaseny and User.objects.get(username=username).is_superuser:
+       #     return True
+    #except:
+     #   pass
 
     if prihlaseny and viditelnost.uzivatelia is not None and username in viditelnost.uzivatelia and permisia not in viditelnost.uzivatelia[username]:
         return False

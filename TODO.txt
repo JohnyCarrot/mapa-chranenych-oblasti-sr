@@ -16,4 +16,6 @@ Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúc
 
 pridať kreslenie do administrácie
 
+ak R na skupinu, tak nech sú viditelne všetky podskupiny v administrácií
+
 
