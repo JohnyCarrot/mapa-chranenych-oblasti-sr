@@ -21,6 +21,7 @@ from django.conf.urls import include as include2
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("__reload__/", include("django_browser_reload.urls")),
     path('',map_views.index,name='index'),
     path('forum/',map_views.forum,name='forum'),
     path('api',map_views.api_request),

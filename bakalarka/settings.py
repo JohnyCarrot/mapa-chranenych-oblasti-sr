@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap4',
     'friendship',
+    'tailwind',
+    'theme',
+    'django_browser_reload',
     #'debug_toolbar',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -55,9 +58,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = 'bakalarka.urls'
+
+TAILWIND_APP_NAME = 'theme'
+
+NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
 
 TEMPLATES = [
     {
