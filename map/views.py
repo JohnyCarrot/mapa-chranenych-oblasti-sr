@@ -23,7 +23,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from friendship.models import Friend, Follow, Block, FriendshipRequest, FriendshipManager
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Skupiny,Podskupiny,Objekty, Profile, Viditelnost_mapa
+from .models import Skupiny,Podskupiny,Objekty, Profile, Viditelnost_mapa, Notifikacie
 from django.contrib.gis.geos import GEOSGeometry
 cur = connection.cursor()
 
@@ -680,6 +680,7 @@ def administracia_json(request):
         podskupiny_sys_skupin[skupina.id] = podskupiny
     context['sys_skupiny_list'] = vsetky_systemove_skupiny
     context['sys_podskupiny_dict'] = podskupiny_sys_skupin
+
 
 
     return render(request, 'administration/json.html',context)

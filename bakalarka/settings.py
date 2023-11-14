@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     #'theme',
     #'django_browser_reload',
     "django_unicorn",
-    'notifications',
+    #'notifications',
     #'debug_toolbar',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

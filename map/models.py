@@ -9,6 +9,8 @@ import uuid
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
+
 
 class Viditelnost_mapa(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -70,6 +72,19 @@ class Profile(models.Model):
     location = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     map_settings = models.OneToOneField(Map_settings, on_delete=models.CASCADE)
+
+class Notifikacie(models.Model):
+    odosielatel = models.ForeignKey(User, on_delete=models.CASCADE,related_name='odosielatel')
+    prijimatel = models.ForeignKey(User, on_delete=models.CASCADE,related_name='prijimatel')
+    sprava = models.TextField(blank=True, null=False,default="")
+    level = models.BigIntegerField(default=1, null=False) #  (1-'info', 3-'warning', 4-'error') (default=info)
+    timestamp = models.DateTimeField(default=timezone.now,null=False)
+    videne = models.BooleanField(default=False)
+
+
+
+
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
