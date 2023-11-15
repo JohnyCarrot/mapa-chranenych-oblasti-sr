@@ -304,7 +304,7 @@ def index(requests):
     folium.plugins.Fullscreen().add_to(m)
     Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
     folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
-    folium.plugins.LocateControl(auto_start=True).add_to(m)
+    folium.plugins.LocateControl(auto_start=False).add_to(m)
     if(requests.user.is_authenticated):
         map_setting = Profile.objects.get(user_id=requests.user.id).map_settings
         EasyButton(map_setting.stupen2,map_setting.stupen3,map_setting.stupen4,map_setting.stupen5).add_to(m)

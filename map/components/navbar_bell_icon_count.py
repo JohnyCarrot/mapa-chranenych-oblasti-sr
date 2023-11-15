@@ -8,7 +8,13 @@ class NavbarBellIconCountView(UnicornView):
     def mount(self):
         kwarg = self.component_kwargs
         if self.request.user.is_authenticated:
-            self.notifications_unread_count = len(Notifikacie.objects.all().filter(prijimatel=self.request.user))
+            self.notifications_unread_count = len(Notifikacie.objects.all().filter(prijimatel=self.request.user,videne=False))
 
     def update(self):
-        self.notifications_unread_count = len(Notifikacie.objects.all().filter(prijimatel=self.request.user))
+        self.notifications_unread_count = len(Notifikacie.objects.all().filter(prijimatel=self.request.user,videne=False))
+
+    def dekrement(self):
+        self.notifications_unread_count = self.notifications_unread_count -1
+
+    def clear(self):
+        self.notifications_unread_count = 0

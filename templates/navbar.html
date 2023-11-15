@@ -46,7 +46,7 @@
             </div>
 
             <div class="notify-drop-footer text-center">
-            	<a href=""><i class="fa fa-eye"></i> Videné...</a>
+            	<a onclick="Unicorn.call('navbar', 'clear');Unicorn.call('navbar_bell_icon_count', 'clear');">Označiť všetky ako videné  <i class="fa fa-eye"></i></a>
             </div>
           </ul>
         </li>
@@ -57,9 +57,17 @@
 
     <script>
 
-        $('.dropdown-menu').on('click', function(event) {
-                  event.stopPropagation();
-                });
+            $('.dropdown').on('hide.bs.dropdown', function (e) {
+              if (!e.clickEvent) {
+                // There is no `clickEvent` property in the `e` object when the `button` (or any other trigger) is clicked.
+                // What we usually want to happen in such situations is to hide the dropdown so we let it hide.
+                return true;
+              }
+
+              var target = $(e.clickEvent.target);
+
+              return !(target.hasClass('dropdown') || target.parents('.dropdown').length);
+                        });
 
         </script>
 
