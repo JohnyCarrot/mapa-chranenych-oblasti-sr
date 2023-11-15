@@ -429,6 +429,7 @@ def api_request(request):
                                # crs="EPSG3857",
 
                                )
+                podskupiny_id_pre_pridavanie_objektu = []
                 if body["skupina"]:
                     geocoder_vlastne_vyhladanie = []
                     skupina_v_navigacii = dict()
@@ -442,9 +443,11 @@ def api_request(request):
                         pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
                                                      geocoder=geocoder_vlastne_vyhladanie)
                         podskupiny_v_mape.append(_podskupina_v_mape)
+                        podskupiny_id_pre_pridavanie_objektu.append(podskupina)
                     skupina_v_navigacii[skupina.meno] = podskupiny_v_mape
                 else:
                     podskupina = Podskupiny.objects.get(id=body['id'])
+                    podskupiny_id_pre_pridavanie_objektu.append(podskupina)
                     geocoder_vlastne_vyhladanie = []
                     skupina_v_navigacii = dict()
                     skupina = podskupina.skupina
@@ -463,7 +466,7 @@ def api_request(request):
                 folium.plugins.LocateControl(auto_start=False).add_to(m)
                 Geoman().add_to(m)
                 from draw_custom_administracia import Draw_custom_admin
-                Draw_custom_admin(export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
+                Draw_custom_admin(podskupiny=podskupiny_id_pre_pridavanie_objektu,export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
             if "nova_skupina" in body and "nazov_skupiny" in body and "global_r" in body:

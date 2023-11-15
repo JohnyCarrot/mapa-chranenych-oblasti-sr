@@ -73,7 +73,7 @@ class Draw(JSCSSMixin, MacroElement):
                      window.parent.location.href = "?new_object="+coords+"&new_object_name="+text;
                       }
 
-                    console.log(coords);
+                    //console.log(coords);
                 });
                 {%- endif %}
                 drawnItems.addLayer(layer);

@@ -45,6 +45,22 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
     _template = Template(
         """
         {% macro script(this, kwargs) %}
+        async function create_object(coords,meno) {
+                  let user = {
+                  coords: coords,
+                  meno: meno,
+                  admin_object_create: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+                           return true;
+        }
             var options = {
               position: {{ this.position|tojson }},
               draw: {{ this.draw_options|tojson }},
@@ -64,9 +80,32 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                 var coords = JSON.stringify(layer.toGeoJSON());
                 {%- if this.show_geometry_on_click %}
                 layer.on('click', function() {
-                    //Unicorn.call('test', 'vypis');
-                    alert(coords);
-                    console.log(coords);
+                                      //let text;
+                      //let person = prompt("Uložiť objekt:");
+                      //if (person == null || person == "") {
+                      //} else {
+                        //text = person;
+                      //alert("Objekt "+text + " úspešne uložený");
+                     //create_object(coords,text);
+                      //}
+                      let style_editor_content = `
+                      
+                        <form>
+                          <label for="fname">Názov objektu:</label><br>
+                          <input type="text" id="fname" name="fname"><br>
+                            <label for="cars">Vyberte podskupinu:</label><br>
+                            
+                            <select name="cars" id="cars">
+                            {% for podskupina in this.podskupiny %}
+                              <option value="{{ podskupina.id }}">{{ podskupina.meno }}</option>               
+                            {% endfor %}
+                            </select>
+                        </form>
+                      
+                      
+                      `;
+                      L.control.window({{ this._parent.get_name() }},{title:'Nový objekt',content:style_editor_content}).show()
+                        
                 });
                 {%- endif %}
                 drawnItems_{{ this.get_name() }}.addLayer(layer);
@@ -93,11 +132,19 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
 
     default_js = [
         (
+            "L.Control.Window.js",
+            "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.js",
+        ),
+        (
             "leaflet_draw_js",
             "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js",
         )
     ]
     default_css = [
+        (
+            "L.Control.Window.css",
+            "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.css",
+        ),
         (
             "leaflet_draw_css",
             "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css",
@@ -112,8 +159,10 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
         show_geometry_on_click=True,
         draw_options=None,
         edit_options=None,
+        podskupiny=[]
     ):
         super().__init__()
+        self.podskupiny = podskupiny
         self._name = "DrawControl"
         self.export = export
         self.filename = filename
