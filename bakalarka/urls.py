@@ -26,6 +26,7 @@ urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path('',map_views.index,name='index'),
     path('forum/',map_views.forum,name='forum'),
+    path('test',map_views.test),
     path('api',map_views.api_request),
     path('api_file',map_views.api_request_file),
     path('administracia',map_views.administracia),

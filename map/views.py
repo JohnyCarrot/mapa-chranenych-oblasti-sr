@@ -1,5 +1,6 @@
 import traceback
 
+import branca
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 import folium
@@ -274,7 +275,7 @@ def index(requests):
 
     #Normálne načítanie
     m = folium.Map(location=[48.73044030054515, 19.456582270083356],
-                   zoom_start=9,
+                   zoom_start=8,
                    width=1000, height=800,
                    prefer_canvas=False,
                    # crs="EPSG3857",
@@ -374,6 +375,7 @@ def friends_main_page(requests):
     context["all_friends"] = Friend.objects.friends(requests.user)
     context["all_unread_friend_requests"] = Friend.objects.unrejected_requests(user=requests.user)
 
+    context['navbar_administracia'] = navbar_zapni_administraciu(requests.user)
     return render(requests, 'friends/index.html',context)
 
 
@@ -421,7 +423,7 @@ def api_request(request):
                 return HttpResponse(status=202)
             if "daj_mapu" in body and "id" in body and "skupina" in body:
                 m = folium.Map(location=[48.73044030054515, 19.456582270083356],
-                               zoom_start=9,
+                               zoom_start=8,
                                width=1280, height=720,
                                prefer_canvas=False,
                                # crs="EPSG3857",
@@ -458,7 +460,7 @@ def api_request(request):
                 folium.plugins.Fullscreen().add_to(m)
                 Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
                 folium.plugins.GroupedLayerControl(skupina_v_navigacii, exclusive_groups=False).add_to(m)
-                folium.plugins.LocateControl(auto_start=True).add_to(m)
+                folium.plugins.LocateControl(auto_start=False).add_to(m)
                 Geoman().add_to(m)
                 from draw_custom_administracia import Draw_custom_admin
                 Draw_custom_admin(export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
@@ -684,3 +686,42 @@ def administracia_json(request):
 
 
     return render(request, 'administration/json.html',context)
+
+
+@login_required
+def test(request):
+    if request.user.is_superuser == False:
+        return redirect('/')
+    context = {}
+    m = folium.Map(location=[48.73044030054515, 19.456582270083356],
+                   zoom_start=10,
+                   width=1280, height=720,
+                   prefer_canvas=False,
+                   # crs="EPSG3857",
+
+                   )
+    html = """
+        <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
+          <button hx-post="/clicked" hx-swap="outerHTML">
+            Click Me
+          </button>
+        <h1> This popup is an Iframe</h1><br>
+        With a few lines of code...
+        <p>
+        <code>
+            from numpy import *<br>
+            exp(-2*pi)
+        </code>
+        </p>
+        """
+
+    iframe = branca.element.IFrame(html=html, width=500, height=300)
+    popup = folium.Popup(iframe, max_width=500)
+    folium.Marker(
+        location=[48.73044030054515, 19.456582270083356],
+        tooltip="Click me!",
+        popup=popup,
+        icon=folium.Icon(icon="cloud"),
+    ).add_to(m)
+    context['m'] = m._repr_html_()
+    return render(request, 'test/test.html', context)

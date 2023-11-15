@@ -64,6 +64,7 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                 var coords = JSON.stringify(layer.toGeoJSON());
                 {%- if this.show_geometry_on_click %}
                 layer.on('click', function() {
+                    //Unicorn.call('test', 'vypis');
                     alert(coords);
                     console.log(coords);
                 });
