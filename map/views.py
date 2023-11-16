@@ -540,7 +540,10 @@ def api_request(request):
                 else:
                     novy_objekt.diskusia = 0
                 novy_objekt.html = body.get('html')
-                novy_objekt.save()
+
+                INSERT_STATEMENT = 'INSERT INTO objekty (meno,html,diskusia,podskupina,stupen_ochrany,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
+                cur.execute(INSERT_STATEMENT, (novy_objekt.meno, novy_objekt.html, novy_objekt.diskusia, novy_objekt.podskupina.id,novy_objekt.stupen_ochrany,str(json.loads(body.get('coords'))['geometry'])   ))
+
                 return HttpResponse(status=201)
             if "update_viditelnost_skupina" in body and "skupina_id" in body and "global_read" in body and "global_write" in body and "uzivatelia" in body: #A mnoho ďalšiho :)
                 if "update_viditelnost_podskupina" in body and body['update_viditelnost_podskupina']: #Funguje na skupiny aj podskupiny zároveň

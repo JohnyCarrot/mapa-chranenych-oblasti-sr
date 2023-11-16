@@ -184,12 +184,12 @@ def chranene_oblasti():
                           str(tuples[13]),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
     return True
 
-def uzemia_europskeho_vyznamu():
+def uzemia_europskeho_vyznamu_nenahrava():
     shapefile = gpd.read_file("data/UEV_20220831.shp")
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
-    skupina = pridaj_skupinu("Územia európskeho významu",None,["*"])
-    podskupina = pridaj_podskupinu("Územia európskeho významu",["*"],None,skupina)
+    #skupina = pridaj_skupinu("Územia európskeho významu",None,["*"])
+    #podskupina = pridaj_podskupinu("Územia európskeho významu",["*"],None,skupina)
     for tuples in shapefile.itertuples():
         fillcolor = color = '#003399'
         html = f"""
@@ -199,13 +199,19 @@ def uzemia_europskeho_vyznamu():
                """
         if ("MULTIPOLYGON" in str(tuples[5])):
             for polygon in tuples[5].geoms:
-                pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(polygon))
+                pass
+                #pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(polygon))
+                #print(str(polygon))
+                break
         else:
-            pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(tuples[5]))
+            pass
+            print(str(tuples[5]))
+            break
+            #pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(tuples[5]))
 
     return vysledok
 if __name__ == '__main__':
     pass
     #stupne_ochrany()
     chranene_oblasti()
-    #uzemia_europskeho_vyznamu()
+    #uzemia_europskeho_vyznamu_nenahrava()

@@ -14,11 +14,11 @@ dorobit api_file aby mohol len ten čo má oprávnenie
 
 Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúcich sa užívateľov
 
-pridať kreslenie do administrácie
-
-upraviť admin kreslenie tak, aby sa dalo uložiť ako a vybrať vybranú podskupinu + pridať meno etc
-
 skontrolovať či aj neprihlásený môžu do administrácie za predpokladu, že majú oprávnenie
+
+tvorba skupiny / podskupiny bez modalu po nacitani
+
+tvorba editu pre marker (nema bounds)
 
 
 
