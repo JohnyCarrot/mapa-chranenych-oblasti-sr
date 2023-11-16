@@ -63,7 +63,10 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                 function value_elementu(id) {
                             return document.getElementById(id).value;
                     } 
-        async function create_object(coords,meno,podskupina_id) {
+                function checked_elementu(id) {
+                            return document.getElementById(id).checked;
+                    } 
+           async function create_object(coords,meno,podskupina_id,stupne_ochrany,diskusia,html) {
         
                     if(meno.length ==0){
                     
@@ -75,6 +78,9 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                   let user = {
                   coords: coords,
                   meno: meno,
+                  stupen: stupne_ochrany,
+                  diskusia: diskusia,
+                  html: html,
                   podskupina_id: podskupina_id,
                   admin_object_create: null
                 };
@@ -86,8 +92,21 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                   },
                   body: JSON.stringify(user)
                 });
+                
+                if(response.status==201){
+                alert("Objekt úspešne pridaný");
+                }
+                else{
+                alert("Niekde nastala chyba, prosím skúste znovu");
+                }
+                response.text().then(function (text) {
                 otvorene_okno = false;
+                parent.posledne_html_z_editora = "";
                 okno_global.close();
+                parent.daj_mapu(parent.daj_mapu_posledna_id,parent.daj_mapu_posledna_skupina_bool);
+                });
+                
+                
                            return true;
         }
             var options = {
@@ -141,12 +160,12 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                           <input type="checkbox" id="diskusia${juju}" name="diskusia${juju}" checked><br>
                             
                             
-                            <button onclick="parent.testament()" type=button>TEST1</button>
+                            <button onclick="parent.uprava_html()" type=button>Uprava-HTML</button>
                             
                             
                             <br>
                             <br>
-                            <button onclick="create_object(  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}')  );" type="button">Uložiť</button>
+                            <button onclick="create_object(  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}'),value_elementu('stupne_ochrany${juju}'),checked_elementu('diskusia${juju}'),parent.posledne_html_z_editora  );" type="button">Uložiť</button>
                             
                             
                         
@@ -156,6 +175,7 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                       okno_global = L.control.window({{ this._parent.get_name() }},{title:'Nový objekt',content:style_editor_content  }).show()
                       okno_global.addEventListener('hide', function (e) {
                                 otvorene_okno = false;
+                                parent.posledne_html_z_editora = "";
                         });
                       otvorene_okno = true;
                       

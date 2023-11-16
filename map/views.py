@@ -533,6 +533,13 @@ def api_request(request):
                 novy_objekt.geometry = GEOSGeometry(json.dumps(geometria_cela.get('geometry')))
                 novy_objekt.meno = body.get('meno')
                 novy_objekt.podskupina = Podskupiny.objects.get(id=body['podskupina_id'])
+                if body.get('stupen')!= '0':
+                    novy_objekt.stupen_ochrany = int(body.get('stupen'))
+                if body.get('diskusia'):
+                    novy_objekt.diskusia = 1
+                else:
+                    novy_objekt.diskusia = 0
+                novy_objekt.html = body.get('html')
                 novy_objekt.save()
                 return HttpResponse(status=201)
             if "update_viditelnost_skupina" in body and "skupina_id" in body and "global_read" in body and "global_write" in body and "uzivatelia" in body: #A mnoho ďalšiho :)
