@@ -14,9 +14,12 @@ class Geoman(JSCSSMixin, MacroElement):
             {
 	        enableForLayer: false
             });
-        async function coord_update(geometry,id,update_pozicia,style) {
+        parent.posledne_html_z_editora = "";
+        var html_pred_zmenou = "";
+        async function coord_update(html,geometry,id,update_pozicia,style) {
                   let user = {
                   id_objektu: id,
+                  html: html,
                   geometry: geometry,
                   update_pozicia: update_pozicia,
                   admin_coord_update: null,
@@ -81,6 +84,8 @@ class Geoman(JSCSSMixin, MacroElement):
         <label id="layer_opacity_label_fill">-</label>
         <input type="range" id="layer_opacity_fill" min="0" max="100" />
         <br>
+        <button onclick="parent.uprava_html()" type=button>Uprava-HTML</button>
+        <br>
         <button id="style_reset_button"type="button">Resetovať</button>
         
         </div>
@@ -112,13 +117,17 @@ class Geoman(JSCSSMixin, MacroElement):
                             let selected_layers = [];                                    
                                     {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
                                             if(layer.feature){
+                                            
+                                            if(layer.feature.geometry.type === "Point"){return;}
+                                            
                                             if(map.getBounds().contains( layer.getBounds().getCenter() )) { 
                                                 layer.upraveny = true
                                                 //draggable.enableForLayer(layer);
                                                 selected_layers.push(layer);
                                                 layer.previous_options = JSON.parse(JSON.stringify(layer.options)); //ked sa bude robit nas5 tlacidlo
                                                 layer_previous_options = JSON.parse(JSON.stringify(layer.options));
-                                                console.log(layer); //do budúcna ZMAZAŤ
+                                                //console.log(layer); //do budúcna ZMAZAŤ
+                                                html_pred_zmenou = layer.feature.geometry.popup_HTML;
                                                  
                                              }
                                              
@@ -128,7 +137,8 @@ class Geoman(JSCSSMixin, MacroElement):
                             if(selected_layers.length == 0){
                                 alert("Neboli vybrané žiadne vrstvy");
                                 return null;
-                            }                            
+                            } 
+                            parent.posledne_html_z_editora = html_pred_zmenou;                          
                             StyleEditor.show();
                             picker = new Picker({ //Zaciatok pickera
                                 parent: document.querySelector('#zmena-farby'),
@@ -202,7 +212,9 @@ class Geoman(JSCSSMixin, MacroElement):
                             });
                             
                             
-                            
+                            if(layer_previous_options.fillColor==null){
+                                    layer_previous_options.fillColor = 'blue';
+                            }
                             picker_pozadie = new Picker({ //Zaciatok pickera
                                 parent: document.querySelector('#zmena-pozadie'),
                                 alpha: false,
@@ -240,6 +252,7 @@ class Geoman(JSCSSMixin, MacroElement):
                             document.getElementById('zmena-farby').style.backgroundColor = "white";
                             document.getElementById('zmena-pozadie').style.backgroundColor = "white";
                             document.getElementById('layer_opacity_label_fill').innerHTML = "-";
+                            parent.posledne_html_z_editora = html_pred_zmenou;
                                     });
                             });
                             
@@ -253,12 +266,22 @@ class Geoman(JSCSSMixin, MacroElement):
                         onClick: function(btn, map) {
                             {{ this._parent.get_name() }}.eachLayer(function (layer) { 
                             if(layer.upraveny && layer.upraveny==true){
+                            
+                                    if(parent.posledne_html_z_editora != html_pred_zmenou && parent.posledne_html_z_editora !=""  ){
+                                        html_pred_zmenou = ""; //Ponechavam si editor html
+                                    }
+                                    else{
+                                        parent.posledne_html_z_editora = "";
+                                        html_pred_zmenou = "";
+                                    }
+                                    
                                     let layer2 = L.polygon(layer.getLatLngs());
                                     layer.upraveny=false;
                                     //console.log(layer);
-                                    coord_update(layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
+                                    coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
                                 }
                             });
+                            parent.posledne_html_z_editora = "";
                             picker_pozadie.destroy();
                             draggable.disable();
                             picker.destroy();

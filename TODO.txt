@@ -20,5 +20,9 @@ tvorba skupiny / podskupiny bez modalu po nacitani
 
 tvorba editu pre marker (nema bounds)
 
+tvorba editu pre html, aby bolo možné html aj upravovať nie vytvárať (zrejme do funkcie treba pridať argumenty)
+
+
+
 
 

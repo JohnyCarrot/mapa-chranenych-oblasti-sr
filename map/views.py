@@ -151,6 +151,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria = GEOSGeometry(objekt.geometry)
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
+        geometria_cela['popup_HTML'] = objekt.html
 
         if objekt.style== None:
             objekt.style={}
@@ -525,6 +526,8 @@ def api_request(request):
                 body['geometry']['coordinates'] = body['update_pozicia']
                 objekt.geometry = GEOSGeometry(json.dumps(body['geometry']))
                 objekt.style = body['style']
+                if body.get('html')!="":
+                    objekt.html = body.get('html')
                 objekt.save()
                 return HttpResponse(status=201)
             if "admin_object_create" in body and "coords" in body and "meno" in body and "podskupina_id" in body:
