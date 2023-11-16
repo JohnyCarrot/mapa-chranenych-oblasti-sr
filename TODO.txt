@@ -18,5 +18,7 @@ pridať kreslenie do administrácie
 
 upraviť admin kreslenie tak, aby sa dalo uložiť ako a vybrať vybranú podskupinu + pridať meno etc
 
+skontrolovať či aj neprihlásený môžu do administrácie za predpokladu, že majú oprávnenie
+
 
 

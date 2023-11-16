@@ -527,6 +527,14 @@ def api_request(request):
                 objekt.style = body['style']
                 objekt.save()
                 return HttpResponse(status=201)
+            if "admin_object_create" in body and "coords" in body and "meno" in body and "podskupina_id" in body:
+                geometria_cela = json.loads(body.get('coords'))
+                novy_objekt = Objekty()
+                novy_objekt.geometry = GEOSGeometry(json.dumps(geometria_cela.get('geometry')))
+                novy_objekt.meno = body.get('meno')
+                novy_objekt.podskupina = Podskupiny.objects.get(id=body['podskupina_id'])
+                novy_objekt.save()
+                return HttpResponse(status=201)
             if "update_viditelnost_skupina" in body and "skupina_id" in body and "global_read" in body and "global_write" in body and "uzivatelia" in body: #A mnoho ďalšiho :)
                 if "update_viditelnost_podskupina" in body and body['update_viditelnost_podskupina']: #Funguje na skupiny aj podskupiny zároveň
                     skupina = Podskupiny.objects.get(id=body['skupina_id'])

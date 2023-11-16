@@ -45,10 +45,37 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
     _template = Template(
         """
         {% macro script(this, kwargs) %}
-        async function create_object(coords,meno) {
+        function random_uuid() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                    return v.toString(16);
+                });
+        }
+        var suradnice_global = "";
+        var okno_global = L.control.window({{ this._parent.get_name() }},{title:'Neviditelne okno',content:'Gratulujem, práve vidíte neviditelné okno.',visible: false});
+        var otvorene_okno = false;
+                
+                function praca_s_formularom(meno,podskupina_id) { //len testovacia funkcia
+                            alert(meno + ' ' +podskupina_id);
+                            return true;
+                        }  
+                        
+                function value_elementu(id) {
+                            return document.getElementById(id).value;
+                    } 
+        async function create_object(coords,meno,podskupina_id) {
+        
+                    if(meno.length ==0){
+                    
+                    alert("Názov objektu nesmie byť prázdny");
+                    return true;
+                    
+                    }
+        
                   let user = {
                   coords: coords,
                   meno: meno,
+                  podskupina_id: podskupina_id,
                   admin_object_create: null
                 };
 
@@ -59,6 +86,8 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                   },
                   body: JSON.stringify(user)
                 });
+                otvorene_okno = false;
+                okno_global.close();
                            return true;
         }
             var options = {
@@ -80,31 +109,61 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                 var coords = JSON.stringify(layer.toGeoJSON());
                 {%- if this.show_geometry_on_click %}
                 layer.on('click', function() {
-                                      //let text;
-                      //let person = prompt("Uložiť objekt:");
-                      //if (person == null || person == "") {
-                      //} else {
-                        //text = person;
-                      //alert("Objekt "+text + " úspešne uložený");
-                     //create_object(coords,text);
-                      //}
+                                    
+                    if(otvorene_okno == false){
+                                
+                         let juju = random_uuid();           
+                        suradnice_global = JSON.stringify(layer.toGeoJSON());
                       let style_editor_content = `
                       
-                        <form>
-                          <label for="fname">Názov objektu:</label><br>
-                          <input type="text" id="fname" name="fname"><br>
-                            <label for="cars">Vyberte podskupinu:</label><br>
+                        
+                          <label for="fname${juju}">Názov objektu:</label><br>
+                          <input type="text" id="fname${juju}" name="fname${juju}"><br>
+                            <label for="cars${juju}">Vyberte podskupinu:</label><br>
                             
-                            <select name="cars" id="cars">
+                            <select name="cars${juju}" id="cars${juju}">
                             {% for podskupina in this.podskupiny %}
                               <option value="{{ podskupina.id }}">{{ podskupina.meno }}</option>               
                             {% endfor %}
                             </select>
-                        </form>
+                            <br>
+                            <label for="stupne_ochrany${juju}">Vyberte stupeň ochrany:</label><br>
+                            
+                            <select name="stupne_ochrany${juju}" id="stupne_ochrany${juju}">
+                              <option value="0">Nedefinované</option>     
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>          
+                            </select>
+                            <br>
+                        <label for="diskusia${juju}">Povoliť diskusiu:</label>
+                          <input type="checkbox" id="diskusia${juju}" name="diskusia${juju}" checked><br>
+                            
+                            
+                            <button onclick="parent.testament()" type=button>TEST1</button>
+                            
+                            
+                            <br>
+                            <br>
+                            <button onclick="create_object(  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}')  );" type="button">Uložiť</button>
+                            
+                            
+                        
                       
                       
                       `;
-                      L.control.window({{ this._parent.get_name() }},{title:'Nový objekt',content:style_editor_content}).show()
+                      okno_global = L.control.window({{ this._parent.get_name() }},{title:'Nový objekt',content:style_editor_content  }).show()
+                      okno_global.addEventListener('hide', function (e) {
+                                otvorene_okno = false;
+                        });
+                      otvorene_okno = true;
+                      
+                      
+                      } //Koniec ifu na otvorene okno
+                      
+                      
+                      else{alert('V jednom momente je možné pridávať iba jeden objekt');}
                         
                 });
                 {%- endif %}
@@ -131,6 +190,7 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
     )
 
     default_js = [
+
         (
             "L.Control.Window.js",
             "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.js",
@@ -141,6 +201,7 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
         )
     ]
     default_css = [
+
         (
             "L.Control.Window.css",
             "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.css",
