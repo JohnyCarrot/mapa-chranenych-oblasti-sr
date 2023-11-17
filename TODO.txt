@@ -20,7 +20,17 @@ tvorba skupiny / podskupiny bez modalu po nacitani
 
 tvorba editu pre marker (nema bounds)
 
-tvorba editu pre html, aby bolo možné html aj upravovať nie vytvárať (zrejme do funkcie treba pridať argumenty)
+pridaťl, že po zmene html sa resetne map preview
+
+ikony sa budú iba pridávať a mazať, nie upravovať
+
+Zmeniť "uprava html" na uprava popisku
+
+Po zmene viditelnosti rozposlať oznámenia
+
+pop up sa nezatvára pri kliknutí na mapu pri delete
+
+zmeniť farbu ikony pri mazaní
 
 
 

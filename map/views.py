@@ -530,6 +530,11 @@ def api_request(request):
                     objekt.html = body.get('html')
                 objekt.save()
                 return HttpResponse(status=201)
+            if "admin_delete_objekt" in body and "id_objektu" in body:
+                for objekt_id in body.get('id_objektu'):
+                    objekt = Objekty(id=objekt_id)
+                    objekt.delete()
+                return HttpResponse(status=201)
             if "admin_object_create" in body and "coords" in body and "meno" in body and "podskupina_id" in body:
                 geometria_cela = json.loads(body.get('coords'))
                 novy_objekt = Objekty()

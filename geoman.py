@@ -302,6 +302,125 @@ class Geoman(JSCSSMixin, MacroElement):
         });
 
 stateChangingButton.addTo( {{ this._parent.get_name() }} );
+
+
+
+//Tu začína mazanie
+    var textbox_ako_klasa   = L.Control.extend({
+        onAdd: function() {
+            
+        var text = L.DomUtil.create('div');
+        text.id = "info_text_delete";
+        text.innerHTML = '<h1 style="color: red;font-size: 50px;">' + 'Režim mazania !' + "</h1>"
+        return text;
+        },
+
+    });
+    var textbox_delete_1 = new textbox_ako_klasa({ position: 'bottomright' });
+    var textbox_delete_2 = new textbox_ako_klasa({ position: 'bottomleft' });
+    
+    
+async function delete_layer_server(id) {
+      let user = {
+      id_objektu: id,
+      admin_delete_objekt: null
+    };
+
+    let response = await fetch('/api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(user)
+    });
+    
+    if(response.status==201){
+        alert("Objekt úspešne zmazaný");
+    }
+    else{
+        alert("Niekde nastala chyba, prosím skúste znovu");
+    }
+        return true;
+}
+    
+    
+function delete_funkcia_prvy_klik(layer){
+    layer.off('click');
+    layer.na_zmazanie = true;
+    if(layer.feature.geometry.type === "Point"){
+        console.log(layer);
+    }
+    else{
+        layer.style_stary = JSON.parse(JSON.stringify(layer.options));
+        layer.setStyle({fillColor: 'grey',color: 'grey'});
+    }
+    layer.on('click',function(e) {delete_funkcia_druhy_klik(layer)});
+    return true;
+}
+
+function delete_funkcia_druhy_klik(layer){
+    layer.off('click');
+    layer.na_zmazanie = false;
+    if(layer.feature.geometry.type === "Point"){
+        console.log(layer);
+    
+    }
+    else{
+    layer.setStyle(layer.style_stary);
+    layer.on('click',function(e) {delete_funkcia_prvy_klik(layer)});
+    }
+    return true;
+}
+    
+var stateChangingButton_delete = L.easyButton({
+    states: [{
+            stateName: 'zoom-to-delete',        // name the state
+            icon:      'fa-trash-can',               // and define its properties
+            title:     'Zmazať',      // like its title
+            onClick: function(btn, map) {       // and its callback
+                  textbox_delete_1.addTo( {{ this._parent.get_name() }} );
+                  textbox_delete_2.addTo( {{ this._parent.get_name() }} );
+                  
+                  
+                {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
+                        if(layer.feature){
+                        
+                            layer.on('click',function(e) {delete_funkcia_prvy_klik(layer)});
+                            
+                         
+                        }                             
+                }); //Koniec označenia vrsiev
+                  
+                  
+                btn.state('zoom-to-school');    // change state on click!
+            }
+        }, {
+            stateName: 'zoom-to-school',
+            icon:      'fa-save',
+            title:     'Uložiť',
+            onClick: function(btn, map) {
+                textbox_delete_1.remove();
+                textbox_delete_2.remove();
+                let vrstvy_na_zmazanie_server_delete = [];
+                {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
+                        if(layer.feature){
+                            layer.off('click');  
+                           if(layer.na_zmazanie == true) {
+                                vrstvy_na_zmazanie_server_delete.push(layer.feature.geometry.serverID);
+                                layer.remove();
+                           }
+                                  
+                        }                             
+                }); //Koniec označenia vrsiev
+                if (typeof vrstvy_na_zmazanie_server_delete !== 'undefined' && vrstvy_na_zmazanie_server_delete.length > 0) {
+                        delete_layer_server(vrstvy_na_zmazanie_server_delete);
+                }
+                btn.state('zoom-to-delete');
+            }
+    }]
+});
+
+stateChangingButton_delete.addTo( {{ this._parent.get_name() }} );
         
         
         
