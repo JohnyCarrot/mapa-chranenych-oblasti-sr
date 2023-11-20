@@ -14,10 +14,6 @@ dorobit api_file aby mohol len ten čo má oprávnenie
 
 Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúcich sa užívateľov
 
-skontrolovať či aj neprihlásený môžu do administrácie za predpokladu, že majú oprávnenie
-
-tvorba skupiny / podskupiny bez modalu po nacitani
-
 ikony sa budú iba pridávať a mazať, nie upravovať
 
 Po zmene viditelnosti rozposlať oznámenia
@@ -26,5 +22,5 @@ pop up sa nezatvára pri kliknutí na mapu pri delete
 
 Pri posielaní notifikácie overiť, či je správa v html, ak áno, brať ako html (priamo v správe mať ikonu prijať / odmietnuť etc do api )
 
-
+Administrácia len pre adminov / prihlasenych, neprihlaseny budú môcž upravovať na pôvodnej stránke.. Normálne sa budú dať upravovať tiež na pôvodnej
 
