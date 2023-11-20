@@ -828,6 +828,9 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
         $(window).on('load', function() {
             $('#skupina_vytvorena_Modal').modal('show');
         });
+        $("#skupina_vytvorena_Modal").on("hidden.bs.modal", function () {
+                window.location = "{{ request.path }}";
+            });
         </script>
     {% endif %}
         {% if key == 'openmodal_subgroupadd_sucess' and value == '1' %}
@@ -853,6 +856,9 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
         <script type="text/javascript">
         $(window).on('load', function() {
             $('#podskupina_vytvorena_Modal').modal('show');
+        });
+        $("#podskupina_vytvorena_Modal").on("hidden.bs.modal", function () {
+        window.location = "{{ request.path }}";
         });
         </script>
     {% endif %}
