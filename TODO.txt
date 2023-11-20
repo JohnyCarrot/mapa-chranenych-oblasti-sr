@@ -18,21 +18,13 @@ skontrolovať či aj neprihlásený môžu do administrácie za predpokladu, že
 
 tvorba skupiny / podskupiny bez modalu po nacitani
 
-tvorba editu pre marker (nema bounds)
-
-pridaťl, že po zmene html sa resetne map preview
-
 ikony sa budú iba pridávať a mazať, nie upravovať
-
-Zmeniť "uprava html" na uprava popisku
 
 Po zmene viditelnosti rozposlať oznámenia
 
 pop up sa nezatvára pri kliknutí na mapu pri delete
 
-zmeniť farbu ikony pri mazaní
-
-
+Pri posielaní notifikácie overiť, či je správa v html, ak áno, brať ako html (priamo v správe mať ikonu prijať / odmietnuť etc do api )
 
 
 

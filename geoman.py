@@ -16,6 +16,18 @@ class Geoman(JSCSSMixin, MacroElement):
             });
         parent.posledne_html_z_editora = "";
         var html_pred_zmenou = "";
+        
+        var textbox_ako_klasa   = L.Control.extend({
+            onAdd: function() {
+                
+            var text = L.DomUtil.create('div');
+            text.id = "info_text_delete";
+            text.innerHTML = '<h1 style="color: red;font-size: 50px;">' + 'Režim úpravy' + "</h1>"
+            return text;
+            },
+        });
+        var textbox_edit_1 = new textbox_ako_klasa({ position: 'bottomright' });
+        var textbox_edit_2 = new textbox_ako_klasa({ position: 'bottomleft' });
         async function coord_update(html,geometry,id,update_pozicia,style) {
                   let user = {
                   id_objektu: id,
@@ -113,6 +125,8 @@ class Geoman(JSCSSMixin, MacroElement):
                         title:     'Upraviť',      // like its title
                         onClick: function(btn, map) {       // and its callback
                             draggable.disable();
+                            textbox_edit_1.addTo( {{ this._parent.get_name() }} );
+                            textbox_edit_2.addTo( {{ this._parent.get_name() }} );
                             let layer_previous_options;
                             let selected_layers = [];                                    
                                     {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
@@ -281,6 +295,8 @@ class Geoman(JSCSSMixin, MacroElement):
                                     coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
                                 }
                             });
+                            textbox_edit_1.remove();
+                            textbox_edit_2.remove();
                             parent.posledne_html_z_editora = "";
                             picker_pozadie.destroy();
                             draggable.disable();
@@ -343,12 +359,30 @@ async function delete_layer_server(id) {
         return true;
 }
     
-    
+var customIcon = L.Icon.extend({
+    options: {
+        iconSize: [40.4, 44],
+        iconAnchor: [20, 43],
+        popupAnchor: [0, -51]
+    }
+});
+
+var customIcon_default = L.Icon.extend({
+    options: {
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    }
+});
+
+var delete_ikona = new customIcon({ iconUrl: '/static/administration/skull-solid.png' });
+var default_ikona = new customIcon_default({ iconUrl: 'https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png' });
+
 function delete_funkcia_prvy_klik(layer){
     layer.off('click');
     layer.na_zmazanie = true;
     if(layer.feature.geometry.type === "Point"){
-        console.log(layer);
+        layer.setIcon(delete_ikona);
     }
     else{
         layer.style_stary = JSON.parse(JSON.stringify(layer.options));
@@ -362,13 +396,12 @@ function delete_funkcia_druhy_klik(layer){
     layer.off('click');
     layer.na_zmazanie = false;
     if(layer.feature.geometry.type === "Point"){
-        console.log(layer);
-    
+        layer.setIcon(    default_ikona     );  
     }
     else{
     layer.setStyle(layer.style_stary);
-    layer.on('click',function(e) {delete_funkcia_prvy_klik(layer)});
     }
+    layer.on('click',function(e) {delete_funkcia_prvy_klik(layer)});
     return true;
 }
     

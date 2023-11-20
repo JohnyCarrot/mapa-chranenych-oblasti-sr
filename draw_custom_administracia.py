@@ -5,42 +5,7 @@ from folium.elements import JSCSSMixin
 
 
 class Draw_custom_admin(JSCSSMixin, MacroElement):
-    """
-    Vector drawing and editing plugin for Leaflet.
 
-    Parameters
-    ----------
-    export : bool, default False
-        Add a small button that exports the drawn shapes as a geojson file.
-    filename : string, default 'data.geojson'
-        Name of geojson file
-    position : {'topleft', 'toprigth', 'bottomleft', 'bottomright'}
-        Position of control.
-        See https://leafletjs.com/reference.html#control
-    show_geometry_on_click : bool, default True
-        When True, opens an alert with the geometry description on click.
-    draw_options : dict, optional
-        The options used to configure the draw toolbar. See
-        http://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html#drawoptions
-    edit_options : dict, optional
-        The options used to configure the edit toolbar. See
-        https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html#editpolyoptions
-
-    Examples
-    --------
-    >>> m = folium.Map()
-    >>> Draw(
-    ...     export=True,
-    ...     filename="my_data.geojson",
-    ...     position="topleft",
-    ...     draw_options={"polyline": {"allowIntersection": False}},
-    ...     edit_options={"poly": {"allowIntersection": False}},
-    ... ).add_to(m)
-
-    For more info please check
-    https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html
-
-    """
 
     _template = Template(
         """
@@ -160,7 +125,7 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                           <input type="checkbox" id="diskusia${juju}" name="diskusia${juju}" checked><br>
                             
                             
-                            <button onclick="parent.uprava_html()" type=button>Uprava-HTML</button>
+                            <button onclick="parent.uprava_html()" type=button>Úprava popisu</button>
                             
                             
                             <br>
