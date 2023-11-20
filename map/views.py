@@ -54,8 +54,8 @@ def sulad_s_nastavenim_mapy(nastavenie,objekt):
     return True
 
 def navbar_zapni_administraciu(user):
-    if user.is_authenticated == False:
-        return False
+    #if user.is_authenticated == False:
+        #return False
     if user.is_superuser: return True
     for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
         permisie_skupina = False
@@ -318,7 +318,7 @@ def index(requests):
         'm': m,
     }
 
-    context['navbar_administracia'] = navbar_zapni_administraciu(requests.user) #Overenie o prihlasení vo vnutri
+    context['navbar_administracia'] = navbar_zapni_administraciu(requests.user) #Neoverovať prihlásenie !!!
     print(f"---Generacia mapy: %s seconds ---" % (time.time() - start_time_temp))
     print(f"---celá stránka %s seconds ---" % (time.time() - start_time))
     #print("Počet znakov v html: "+str(len(m)))
