@@ -381,6 +381,7 @@ def friends_main_page(requests):
 
 
 def register_request(request):
+    errors = {}
     if request.method == "POST":
         form = NewUserForm(request.POST)
         if form.is_valid():
@@ -393,9 +394,10 @@ def register_request(request):
             vlastne_objekty_skupina = pridaj_skupinu("Vlastné objekty",user.username,viditelnost.id,nastavenia = json.dumps({'own': None,}))
             zdielane_objekty_podskupina = pridaj_skupinu("So mnou zdieľané objekty",user.username,viditelnost.id,nastavenia = json.dumps({'shared': None,}))
             return redirect('/')
-        messages.error(request, "Unsuccessful registration. Invalid information.")
+        #messages.error(request, "Unsuccessful registration. Invalid information.")
+        errors = form.errors
     form = NewUserForm()
-    return render(request=request, template_name="main/register.html", context={"register_form": form})
+    return render(request=request, template_name="main/register.html", context={"register_form": form,"errors": errors})
 
 @csrf_exempt
 def api_request(request):
