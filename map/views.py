@@ -55,17 +55,15 @@ def sulad_s_nastavenim_mapy(nastavenie,objekt):
     return True
 
 def navbar_zapni_administraciu(user):
-    #if user.is_authenticated == False:
-        #return False
     if user.is_superuser: return True
     for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
         permisie_skupina = False
         permisie_skupina_temp = False
-        if over_viditelnost(skupina.viditelnost,user.is_authenticated,user.username,"w") or user.is_superuser:
+        if type(skupina.viditelnost.uzivatelia)==dict and skupina.viditelnost.uzivatelia.get(user.username) != None and "w" in skupina.viditelnost.uzivatelia.get(user.username):
             permisie_skupina = True
 
         for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
-            if over_viditelnost(podskupina.viditelnost, user.is_authenticated, user.username,"w") or user.is_superuser:
+            if type(podskupina.viditelnost.uzivatelia)==dict and podskupina.viditelnost.uzivatelia.get(user.username) != None and "w" in podskupina.viditelnost.uzivatelia.get(user.username):
                 permisie_skupina_temp = True
 
         if permisie_skupina or permisie_skupina_temp:
@@ -591,7 +589,19 @@ def api_request(request):
                 for uzivatel in body['uzivatelia']:
                     permisie = ""
                     if uzivatel.get("read"): permisie+="r"
-                    if uzivatel.get("write"): permisie += "w"
+                    if uzivatel.get("write"):
+                        notifikacia = Notifikacie()
+                        notifikacia.odosielatel = User.objects.get(username=request.user.username)
+                        notifikacia.prijimatel = User.objects.get(username=uzivatel.get('username'))
+                        notifikacia.sprava = f"Bolo Vám udelené právo upravovať systémovú skupinu {skupina.meno}"
+                        notifikacia.save()
+                        permisie += "w"
+                    if uzivatel.get('username') in viditelnost.uzivatelia and "w" not in permisie and "w" in viditelnost.uzivatelia[uzivatel.get('username')]:
+                        notifikacia = Notifikacie()
+                        notifikacia.odosielatel = User.objects.get(username=request.user.username)
+                        notifikacia.prijimatel = User.objects.get(username=uzivatel.get('username'))
+                        notifikacia.sprava = f"Bolo Vám zrušené právo upravovať systémovú skupinu {skupina.meno}"
+                        notifikacia.save()
                     viditelnost.uzivatelia[uzivatel.get('username')] = permisie
                 viditelnost.save()
 
@@ -638,6 +648,7 @@ def api_request(request):
 
 @csrf_exempt
 def api_request_file(request):
+    if request.user.is_superuser==False: return HttpResponse(status=304) #neautorizovaný
     if request.method == 'POST':
         try:
                 #ešte dorobiť viditelnosť
@@ -680,6 +691,8 @@ def api_request_file(request):
 
 @login_required
 def administracia(request):
+    if navbar_zapni_administraciu(request.user)==False: #Ak nemám žiadne oprávnenie ....
+        return redirect('/')
     context = {}
     vsetky_systemove_skupiny = []
     podskupiny_sys_skupin = dict()
@@ -705,9 +718,6 @@ def administracia(request):
     context['sys_podskupiny_dict'] = podskupiny_sys_skupin
     context['get_data'] = dict(request.GET.items())
     context['vsetci_uzivatelia'] = User.objects.values()
-
-    if len(vsetky_systemove_skupiny) ==0: #Ak nemám žiadne oprávnenie ....
-        return redirect('/')
 
     return render(request, 'administration/admin.html',context)
 
