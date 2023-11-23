@@ -24,3 +24,7 @@ Pri posielaní notifikácie overiť, či je správa v html, ak áno, brať ako h
 
 Administrácia len pre adminov / prihlasenych, neprihlaseny budú môcž upravovať na pôvodnej stránke.. Normálne sa budú dať upravovať tiež na pôvodnej
 
+Prístup do administrácie len pre osoby, ktoré majú explicitný prístup (W)
+
+async include na generovanie mapy ?
+

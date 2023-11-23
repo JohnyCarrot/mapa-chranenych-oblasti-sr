@@ -16,16 +16,14 @@
           {% load static %}<link rel="stylesheet" href="{% static 'navbar/style.css' %}" >
       <!-- navbar závislosti koniec-->
 
-    <title>Home Page</title>
+    <title>Mapa chránených oblastí SR</title>
   </head>
   <body>
     {% include "navbar.html" with navbar_administracia=navbar_administracia %}
     <div class="container-xxl">
-        <div class="row lg-3">
             <div class="col-lg-9 offset-lg-3">
                 {{m | safe}}
             </div>
-        </div>
     </div>
 
 

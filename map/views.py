@@ -2,6 +2,7 @@ import traceback
 
 import branca
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render
 import folium
 import time
@@ -398,6 +399,18 @@ def register_request(request):
         errors = form.errors
     form = NewUserForm()
     return render(request=request, template_name="main/register.html", context={"register_form": form,"errors": errors})
+
+def login_request(request):
+    errors = {}
+    if request.method == "POST":
+        form = AuthenticationForm(request,data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('/')
+        errors = form.errors
+    form = AuthenticationForm()
+    return render(request=request, template_name="main/login.html", context={"register_form": form,"errors": errors})
 
 @csrf_exempt
 def api_request(request):

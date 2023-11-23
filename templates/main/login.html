@@ -1,0 +1,29 @@
+{% extends "main/header.html" %}
+
+{% block content %} 
+
+{% load crispy_forms_tags %}
+
+    {% if errors|length > 0 %}
+
+    <ul class="list-group">
+    {% for key, value in errors.items %}
+        <li class="list-group-item">{{ value }}</li>
+    {% endfor %}
+    </ul>
+
+    {% endif %}
+
+
+<!--Register--> 
+<div class="container py-5">
+	<h1>Prihlásenie</h1>
+	<form method="POST">
+		{% csrf_token %}
+		{{ register_form|crispy }}
+		<button class="btn btn-primary" type="submit">Prihlásiť</button>
+	</form>
+	<p class="text-center">Ak už máte účet, prosím prejdite na <a href="/accounts/login/">prihlásenie</a>.</p>
+</div>
+
+{% endblock %}
