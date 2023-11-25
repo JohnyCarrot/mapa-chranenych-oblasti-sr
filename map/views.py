@@ -55,6 +55,7 @@ def sulad_s_nastavenim_mapy(nastavenie,objekt):
     return True
 
 def navbar_zapni_administraciu(user):
+    if user.is_authenticated == False: return False
     if user.is_superuser: return True
     for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
         permisie_skupina = False

@@ -17,11 +17,7 @@
       </li>
         {% endif %}
 
-        {% if navbar_administracia %}
-        <li class="nav-item">
-        <a class="nav-link" href="/administracia">Administrácia</a>
-      </li>
-        {% endif %}
+        {% unicorn 'navbar_items' %}
 
       <li class="nav-item">
         <a class="nav-link" href="#">Čokoľvek ďalšie</a>

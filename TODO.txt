@@ -10,8 +10,6 @@ views spraviť do zložiek
 
 Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúcich sa užívateľov
 
-ikony sa budú iba pridávať a mazať, nie upravovať
-
 Po zmene viditelnosti rozposlať oznámenia
 
 Pri posielaní notifikácie overiť, či je správa v html, ak áno, brať ako html (priamo v správe mať ikonu prijať / odmietnuť etc do api )
@@ -22,7 +20,9 @@ async include na generovanie mapy ?
 
 zdielanie objektu etc do API, nie do mainu
 
-po zmene viditelnosti refresh
+Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checknut cez checkbox aj sys vrstvy
 
-Po pridaní / odobratí oprávnenia checkovat administráciu v navbare
+pozrieť sa na "tooltips" a preložiť do slovenčiny
+
+django user accounts
 
