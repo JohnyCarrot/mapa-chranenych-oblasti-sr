@@ -26,3 +26,5 @@ pozrieť sa na "tooltips" a preložiť do slovenčiny
 
 django user accounts
 
+doplnit, aby zdielany objekt nemohol byt zmazany etc
+

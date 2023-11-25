@@ -15,6 +15,7 @@ from folium import plugins
 from django.db import connection
 from draw_custom import Draw as Draw_custom
 from geoman import Geoman as Geoman
+from geoman_user import Geoman as Geoman_user
 from geocoder_custom import Geocoder as Geocoder_custom
 from easy_button_non_universal import EasyButton as EasyButton
 from django.shortcuts import render, redirect
@@ -151,6 +152,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria = GEOSGeometry(objekt.geometry)
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
+        geometria_cela['podskupina_spravca'] = objekt.podskupina.spravca
         geometria_cela['popup_HTML'] = objekt.html
 
         if objekt.style== None:
@@ -310,6 +312,7 @@ def index(requests):
     if(requests.user.is_authenticated):
         map_setting = Profile.objects.get(user_id=requests.user.id).map_settings
         EasyButton(map_setting.stupen2,map_setting.stupen3,map_setting.stupen4,map_setting.stupen5).add_to(m)
+        Geoman_user(username=requests.user.username).add_to(m)
         Draw_custom(export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
     print(f"---Pluginy: %s seconds ---" % (time.time() - start_time_temp))
     start_time_temp = time.time()
