@@ -28,3 +28,5 @@ django user accounts
 
 doplnit, aby zdielany objekt nemohol byt zmazany etc
 
+spravit user edit
+
