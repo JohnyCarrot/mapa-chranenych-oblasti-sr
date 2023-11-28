@@ -337,50 +337,13 @@ def subgroup_edit(requests):
 
     return render(requests, 'spravuj_podskupiny/index.html')
 
+@login_required
 def friends_main_page(requests):
-    if requests.user.is_authenticated == False:
-        return render(requests, 'friends/index.html')
     context = {}
-    user_search = []
-    if(requests.GET.get('search') != None):
-        for i in get_user_model().objects.all():
-            uz_odoslane = False  # kontrola, či už náhodou žiadosť nebola poslaná
-            if Friend.objects.are_friends(requests.user, i) == True:
-                continue #Ak sú priatelia nechcem ho vo vyhladávaní
-            if (requests.user.get_username()==i.get_username()):
-                continue
-            if str(i.get_username()).startswith(requests.GET.get('search')):
-                for x in Friend.objects.sent_requests(user=requests.user):
-                    if(User.objects.get(id=x.to_user_id).get_username() == i.get_username()):
-                        uz_odoslane = True
-                user_search.append(   (str(i.get_username()),uz_odoslane)  )
-    context['user_search'] = user_search
-    if (requests.GET.get('friendship_request') != None):
-        other_user = User.objects.get(username=requests.GET.get('friendship_request'))
-        Friend.objects.add_friend(
-            requests.user,
-            other_user)
-    if (requests.GET.get('cancel_friendship_request') != None):
-        other_user = User.objects.get(username=requests.GET.get('cancel_friendship_request'))
-        for x in Friend.objects.sent_requests(user=requests.user):
-            if (User.objects.get(id=x.to_user_id).get_username() == other_user.get_username()):
-                x.cancel()
-    if (requests.GET.get('friendship_accept') != None):
-        other_user = User.objects.get(username=requests.GET.get('friendship_accept'))
-        for x in Friend.objects.unrejected_requests(user=requests.user):
-            if (User.objects.get(id=x.from_user_id).get_username() == other_user.get_username()):
-                x.accept()
-    if (requests.GET.get('friendship_reject') != None):
-        other_user = User.objects.get(username=requests.GET.get('friendship_reject'))
-        for x in Friend.objects.unrejected_requests(user=requests.user):
-            if (User.objects.get(id=x.from_user_id).get_username() == other_user.get_username()):
-                x.reject()
 
-    context["all_friends"] = Friend.objects.friends(requests.user)
-    context["all_unread_friend_requests"] = Friend.objects.unrejected_requests(user=requests.user)
 
     context['navbar_administracia'] = navbar_zapni_administraciu(requests.user)
-    return render(requests, 'friends/index.html',context)
+    return render(requests, 'friends/friends.html',context)
 
 
 def register_request(request):
@@ -597,14 +560,14 @@ def api_request(request):
                         notifikacia = Notifikacie()
                         notifikacia.odosielatel = User.objects.get(username=request.user.username)
                         notifikacia.prijimatel = User.objects.get(username=uzivatel.get('username'))
-                        notifikacia.sprava = f"Bolo Vám udelené právo upravovať systémovú skupinu {skupina.meno}"
+                        notifikacia.sprava = f"Bolo Vám udelené právo upravovať skupinu {skupina.meno}"
                         notifikacia.save()
                         permisie += "w"
                     if uzivatel.get('username') in viditelnost.uzivatelia and "w" not in permisie and "w" in viditelnost.uzivatelia[uzivatel.get('username')]:
                         notifikacia = Notifikacie()
                         notifikacia.odosielatel = User.objects.get(username=request.user.username)
                         notifikacia.prijimatel = User.objects.get(username=uzivatel.get('username'))
-                        notifikacia.sprava = f"Bolo Vám zrušené právo upravovať systémovú skupinu {skupina.meno}"
+                        notifikacia.sprava = f"Bolo Vám zrušené právo upravovať skupinu {skupina.meno}"
                         notifikacia.save()
                     viditelnost.uzivatelia[uzivatel.get('username')] = permisie
                 viditelnost.save()

@@ -30,3 +30,9 @@ doplnit, aby zdielany objekt nemohol byt zmazany etc
 
 spravit user edit
 
+zoradit hladanie užívatelov
+
+overiť či žiadosť o priatelstvo už nebola odoslaná
+
+pridať notifikácie do priatelov
+

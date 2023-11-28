@@ -36,6 +36,6 @@ urlpatterns = [
     path('accounts/',include('django.contrib.auth.urls'),name = "accounts"),
     path("register", map_views.register_request, name="register"),
     path('friendship/', include2('friendship.urls')),
-    path("friends",map_views.friends_main_page),
+    path("friends",map_views.friends_main_page,name="friends"),
     #path('__debug__/', include('debug_toolbar.urls')),
 ]
