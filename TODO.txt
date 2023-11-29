@@ -32,7 +32,13 @@ spravit user edit
 
 zoradit hladanie užívatelov
 
-overiť či žiadosť o priatelstvo už nebola odoslaná
-
 pridať notifikácie do priatelov
+
+Porozmýšľať nad fungovaním blokácie
+
+next pri logine aby presmerovalo kam má, nie vždy na hlavnú stránku
+
+zdielanie objektu -> v priateloch v modali vypísať všetky zdielané objekty
+
+vo views sa vykaslat na own a shared a pozerat sa do zdielanie objektu
 

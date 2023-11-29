@@ -73,6 +73,12 @@ class Profile(models.Model):
     birth_date = models.DateField(null=True, blank=True)
     map_settings = models.OneToOneField(Map_settings, on_delete=models.CASCADE)
 
+class zdielanie_objektu(models.Model):
+    zdielane_s = models.ForeignKey(User, on_delete=models.CASCADE)
+    objekt = models.ForeignKey(Objekty, on_delete=models.CASCADE)
+    zapis = models.BooleanField(default=False)
+
+
 class Notifikacie(models.Model):
     odosielatel = models.ForeignKey(User, on_delete=models.CASCADE,related_name='odosielatel')
     prijimatel = models.ForeignKey(User, on_delete=models.CASCADE,related_name='prijimatel')

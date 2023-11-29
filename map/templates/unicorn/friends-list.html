@@ -19,6 +19,28 @@
 
 
                          {% for priatel in zoznam_priatelov %}
+
+                          <!-- modal permissions begin-->
+                         <div id="modal_opravnenia_{{ priatel.username }}"class="modal fade" tabindex="-1" role="dialog">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">Modal title</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                <p>Modal body text goes here.</p>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                         <!-- modal permissions end -->
                         <!-- begin col-6 -->
                         <div class="col-md-6 m-b-2">
                            <div class="p-10 bg-white">
@@ -34,9 +56,9 @@
                                        <a href="javascript:;" class="btn btn-default"></a>
                                        <a href="javascript:;" data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-expanded="false"></a>
                                        <ul class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(101px, 34px, 0px);">
-                                            <li><a href="javascript:;">Zmeniť oprávnenia</a></li>
-                                           <li><a href="javascript:;">Zrušiť priateľstvo</a></li>
-                                          <li><a href="javascript:;">Zablokovať</a></li>
+                                            <li><a href="javascript:;" onclick="$('#modal_opravnenia_{{ priatel.username }}').modal('show');">Zmeniť oprávnenia</a></li>
+                                           <li><a href="javascript:;" unicorn:click="priatelia_zrusit_priatelstvo({{ priatel.pk }})">Zrušiť priateľstvo</a></li>
+                                        <!-- <li><a href="javascript:;">Zablokovať</a></li>  -->
                                        </ul>
                                     </div>
                                  </div>
@@ -120,7 +142,7 @@
         </div>
 
 
-                      {% for uzivatel in hladane_osoby %}
+                      {% for uzivatel,uz_odoslane in hladane_osoby %}
                           <br>
                           <div class="media media-xs overflow-visible">
                                  <a class="media-left" href="javascript:;">
@@ -130,7 +152,17 @@
                                     <b class="text-inverse">{{ uzivatel.username }}</b>
                                  </div>
                                  <div class="media-body valign-middle text-right overflow-visible">
-                                    <button unicorn:click="" type="button" class="btn btn-info btn-sm">Odoslať žiadosť o priateľstvo</button>
+                                     {% if uz_odoslane == 0 %}
+                                     <button unicorn:click="poziadat_o_priatelstvo({{ uzivatel.pk }})" type="button" class="btn btn-info btn-sm">Odoslať žiadosť o priateľstvo</button>
+                                     {% elif uz_odoslane == 1 %}
+                                     <button type="button" class="btn btn-info btn-sm" disabled>Žiadosť o priateľstvo bola odoslaná</button> <!-- Zrušiť žiadosť  o priateľstvo ? -->
+                                     {% elif uz_odoslane == 2 %}
+                                     <button type="button" class="btn btn-success btn-sm" disabled>Priateľ</button>
+                                     {% elif uz_odoslane == 3 %}
+                                     <button type="button" class="btn btn-danger btn-sm" disabled>Zablokovaný</button>
+
+                                     {% endif %}
+
                                  </div>
                               </div>
                       {% endfor %}

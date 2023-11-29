@@ -45,7 +45,7 @@ class FriendsListView(UnicornView):
 
     def odmietni_ziadost(self,id):
         ziadost = FriendshipRequest.objects.get(id=id)
-        ziadost.reject()
+        ziadost.cancel()
         self.prepni_na_ziadosti()
 
     def primi_ziadost(self,id):
@@ -54,10 +54,37 @@ class FriendsListView(UnicornView):
         self.prepni_na_ziadosti()
 
     def hladat_priatelov(self):
+        #0 - žiaden vzťah
+        #1 - žiadosť odoslaná
+        #2 - priatelia
+        #3 - zablokovaný
         self.hladane_osoby = []
         for uzivatel in User.objects.all():
-            if self.similar(self.vyhladavacie_pole,uzivatel.username) > 0.3:
-                self.hladane_osoby.append(uzivatel)
+            if uzivatel.username == self.request.user.username:
+                continue
+            uz_odoslane = 0
+            if self.similar(self.vyhladavacie_pole,uzivatel.username) > 0.5:
+                for x in Friend.objects.sent_requests(user=self.request.user):
+                    if (User.objects.get(id=x.to_user_id).get_username() == uzivatel.username):
+                        uz_odoslane = 1
+                if Friend.objects.are_friends(self.request.user, uzivatel) == True:
+                    uz_odoslane = 2
+                if Block.objects.is_blocked(self.request.user, uzivatel) == True:
+                    uz_odoslane = 3
+                self.hladane_osoby.append(  (uzivatel,uz_odoslane)  )
+
+    def poziadat_o_priatelstvo(self,other_user_pk):
+        other_user = User.objects.get(pk=other_user_pk)
+        Friend.objects.add_friend(
+            self.request.user,
+            other_user,
+                )
+        self.hladat_priatelov()
+
+    def priatelia_zrusit_priatelstvo(self,other_user_pk):
+        other_user = User.objects.get(pk=other_user_pk)
+        Friend.objects.remove_friend(self.request.user, other_user)
+        self.prepni_na_priatelov()
 
 
     def similar(self,a, b):
