@@ -42,3 +42,5 @@ zdielanie objektu -> v priateloch v modali vypísať všetky zdielané objekty
 
 vo views sa vykaslat na own a shared a pozerat sa do zdielanie objektu
 
+
+

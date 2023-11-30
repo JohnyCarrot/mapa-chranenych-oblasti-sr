@@ -127,6 +127,51 @@
             </div>
             <!-- end profile-content -->
 
+                      <br>
+                      <br>
+                      <br>
+                        <!-- begin profile-content -->
+            <div class="profile-content">
+               <!-- begin tab-content -->
+               <div class="tab-content p-0">
+                  <!-- begin #profile-friends tab -->
+                  <div class="tab-pane fade in active show" id="profile-friends">
+                     <h4 class="m-t-0 m-b-20">Odoslané žiadosti o priateľstvo ({{ zoznam_odoslanych_ziadosti_pocet }})</h4>
+                     <!-- begin row -->
+                     <div class="row row-space-2">
+
+
+                         {% for odoslana_ziadost in zoznam_odoslanych_ziadosti %}
+                        <!-- begin col-6 -->
+                        <div class="col-md-6 m-b-2">
+                           <div class="p-10 bg-white">
+                              <div class="media media-xs overflow-visible">
+                                 <a class="media-left" href="javascript:;">
+                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 </a>
+                                 <div class="media-body valign-middle">
+                                    <b class="text-inverse">{{ odoslana_ziadost.to_user.username }}</b>
+                                 </div>
+                                 <div class="media-body valign-middle text-right overflow-visible">
+                                     <button unicorn:click="odmietni_ziadost({{ odoslana_ziadost.id }})" type="button" class="btn btn-danger btn-sm" >Zrušiť žiadosť</button>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <!-- end col-6 -->
+                         {% endfor %}
+
+
+
+                     </div>
+                     <!-- end row -->
+                  </div>
+                  <!-- end #profile-friends tab -->
+               </div>
+               <!-- end tab-content -->
+            </div>
+            <!-- end profile-content -->
+
             {% endif %}
 
 
@@ -162,6 +207,96 @@
                                      <button type="button" class="btn btn-danger btn-sm" disabled>Zablokovaný</button>
 
                                      {% endif %}
+
+                                 </div>
+                              </div>
+                      {% endfor %}
+
+
+                  </div>
+               </div>
+                         </div>
+
+         {% endif %}
+
+
+
+                  {% if blokacie_obsah %}
+
+                                        <!-- begin profile-content -->
+            <div class="profile-content">
+               <!-- begin tab-content -->
+               <div class="tab-content p-0">
+                  <!-- begin #profile-friends tab -->
+                  <div class="tab-pane fade in active show" id="profile-friends">
+                     <h4 class="m-t-0 m-b-20">Blokovaný užívatelia ({{ blokovane_osoby_pocet }})</h4>
+                     <!-- begin row -->
+                     <div class="row row-space-2">
+
+
+                         {% for blokacia in blokovane_osoby %}
+                        <!-- begin col-6 -->
+                        <div class="col-md-6 m-b-2">
+                           <div class="p-10 bg-white">
+                              <div class="media media-xs overflow-visible">
+                                 <a class="media-left" href="javascript:;">
+                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 </a>
+                                 <div class="media-body valign-middle">
+                                    <b class="text-inverse">{{ blokacia.username }}</b>
+                                 </div>
+                                 <div class="media-body valign-middle text-right overflow-visible">
+                                     <button unicorn:click="odblokuj_uzivatela({{ blokacia.pk }})" type="button" class="btn btn-danger btn-sm" >Odblokovať</button>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <!-- end col-6 -->
+                         {% endfor %}
+
+
+
+                     </div>
+                     <!-- end row -->
+                  </div>
+                  <!-- end #profile-friends tab -->
+               </div>
+               <!-- end tab-content -->
+            </div>
+            <!-- end profile-content -->
+
+
+                      <br>
+                      <br>
+                      <br>
+                         <div class="profile-content">
+               <!-- begin tab-content -->
+               <div class="tab-content p-0">
+                  <!-- begin #profile-friends tab -->
+                  <div class="tab-pane fade in active show" id="profile-friends">
+                      <h4> Zablokovať užívateľa</h4>
+         <div class="input-group">
+          <input unicorn:model="vyhladavacie_pole" type="text" class="form-control rounded" aria-label="Search" aria-describedby="search-addon" />
+          <button onclick="Unicorn.call('friends-list', 'hladat_priatelov');" type="button" class="btn btn-outline-primary" >Hľadať</button>
+        </div>
+
+
+                      {% for uzivatel,uz_odoslane in hladane_osoby %}
+                          <br>
+                          <div class="media media-xs overflow-visible">
+                                 <a class="media-left" href="javascript:;">
+                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 </a>
+                                 <div class="media-body valign-middle">
+                                    <b class="text-inverse">{{ uzivatel.username }}</b>
+                                 </div>
+                                 <div class="media-body valign-middle text-right overflow-visible">
+                                     {% if uz_odoslane == 3 %}
+                                     <button type="button" class="btn btn-danger btn-sm" disabled>Zablokovaný</button>
+                                     {% else %}
+                                         <button unicorn:click="zablokuj_osobu({{ uzivatel.pk }})" type="button" class="btn btn-danger btn-sm">Zablokovať</button>
+                                     {% endif %}
+
 
                                  </div>
                               </div>
