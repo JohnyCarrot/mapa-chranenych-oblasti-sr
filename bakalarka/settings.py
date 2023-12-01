@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     #'theme',
     #'django_browser_reload',
     "django_unicorn",
+    'corsheaders',
     #'notifications',
     #'debug_toolbar',
 ]
@@ -55,6 +56,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 MIDDLEWARE = [
     #"debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,6 +65,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #"django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ['*']
 
 ROOT_URLCONF = 'bakalarka.urls'
 

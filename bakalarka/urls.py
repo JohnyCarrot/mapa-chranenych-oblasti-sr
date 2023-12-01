@@ -39,3 +39,9 @@ urlpatterns = [
     path("friends",map_views.friends_main_page,name="friends"),
     #path('__debug__/', include('debug_toolbar.urls')),
 ]
+
+htmx_urlpatterns = [
+    path('zdielanie_list/',map_views.zdielanie_list,name='zdielanie_list'),
+]
+
+urlpatterns+=htmx_urlpatterns

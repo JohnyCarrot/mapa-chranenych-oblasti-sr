@@ -23,11 +23,19 @@ class FriendsListView(UnicornView):
     blokovane_osoby_pocet = 0
     def mount(self):
         self.zoznam_priatelov = Friend.objects.friends(self.request.user)
+        for priatel in self.zoznam_priatelov:
+            if Block.objects.is_blocked(self.request.user, priatel) == True:
+                self.zoznam_priatelov.remove(priatel)
+
         self.zoznam_priatelov_pocet = len(self.zoznam_priatelov)
         self.priatelia_obsah = True
 
     def prepni_na_priatelov(self):
         self.zoznam_priatelov = Friend.objects.friends(self.request.user)
+        for priatel in self.zoznam_priatelov:
+            if Block.objects.is_blocked(self.request.user,priatel) == True:
+                self.zoznam_priatelov.remove(priatel)
+
         self.zoznam_priatelov_pocet = len(self.zoznam_priatelov)
         self.priatelia_obsah = True
         self.ziadosti_obsah = False

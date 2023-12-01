@@ -72,19 +72,7 @@ def navbar_zapni_administraciu(user):
             return True
     return False
 
-def zdielat_objekt_html_list(uzivatel,objekt_id):
-    html=""
-    objekt = Objekty.objects.get(id=objekt_id)
-    for priatel in Friend.objects.friends(uzivatel):
-        if objekt_id in [x.id for x in vrat_zdielane_objekty_s_uzivatelom(priatel.username)]:
-            html += f"""
-            {priatel.username} <a href="?object_unshare={objekt_id}&username={priatel.username}&objectname={objekt.meno}" target="_top" class="button">Zrušiť zdielanie</a> <br> 
-            """
-        else:
-            html+=f"""
-            {priatel.username} <a href="?object_share={objekt_id}&username={priatel.username}&objectname={objekt.meno}" target="_top" class="button">Zdieľať</a> <br> 
-            """
-    return html
+
 
 
 def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel = None):
@@ -98,7 +86,17 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         zdielane = False
         if(sulad_s_nastavenim_mapy(nastavenie_mapy,objekt)==False):
             continue
-        html = objekt.html
+            #Započatie html
+        html="""
+        <!DOCTYPE html>
+            <html>
+            <head>
+            <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+            </head>
+            <body>
+            <div style="font-size: 13.5px;margin=0;">
+        """#Započatie html
+        html += objekt.html
         if(objekt.nastavenia != None and uzivatel!= None):
             nastavenia = json.loads(objekt.nastavenia)
             if"shared_with" in nastavenia and uzivatel.username in nastavenia["shared_with"] and nastavenia["shared_with"][uzivatel.username]==podskupina.id:
@@ -110,57 +108,31 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         if (objekt.diskusia == 1): html+=f"""<a href="forum/{objekt.id}" target="_blank" rel="noopener noreferrer">Diskusia</a>"""
         if(uzivatel!= None and zdielane == False and podskupina.spravca == uzivatel.username):
             html+= f"""<a href="spravuj?={objekt.id}" target="_blank" rel="noopener noreferrer">Upraviť</a><br>"""
-            html+="""<iframe
-              srcdoc='
-                <html>
-                  <head>
-                    <style>
-                      .toggle-button {
-                        cursor: pointer;
-                      }
-                      
-                      .toggle-button:hover {
-                        text-decoration: underline;
-                      }
-                      
-                      .toggle-button:focus {
-                        outline: none;
-                      }
-                      
-                      .toggle-content {
-                        max-height: 0;
-                        overflow: hidden;
-                        transition: max-height 0.5s ease-out;
-                      }
-                      
-                      .toggle-content.show {
-                        max-height: 1000px;
-                        transition: max-height 0.5s ease-in;
-                      }
-                    </style>
-                  </head>
-                  <body>
-                    <button class="toggle-button" onclick="document.querySelector(&#x27;.toggle-content&#x27;).classList.toggle(&#x27;show&#x27;)">Zdieľať</button>
-                    <div class="toggle-content">
-                      <p>Vyberte užívateľa s ktorým chcete objekt zdieľať:</p>
-                      %s
-                    </div>
-                  </body>
-                </html>'
-            ></iframe>
-            """ % (zdielat_objekt_html_list(uzivatel,objekt.id))
+            html+=f"""   
+            
+                        <button hx-post="http://127.0.0.1:8000/zdielanie_list/" hx-swap="outerHTML">
+                                Click Me
+                              </button> 
+                              
+                              """
+
+
+
         geometria = GEOSGeometry(objekt.geometry)
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
         geometria_cela['podskupina_spravca'] = objekt.podskupina.spravca
         geometria_cela['popup_HTML'] = objekt.html
 
+        html+="</div></body></html>" #Koniec html
+        iframe = branca.element.IFrame(html=html, width='150px',ratio='100%')
+
         if objekt.style== None:
             objekt.style={}
             objekt.save()
         styl = objekt.style
         folium.GeoJson(geometria_cela, style_function=lambda x, styl=styl: styl,name=objekt.meno).add_to(podskupina_v_mape).add_child(
-            folium.Popup(folium.Html(html,script=True),lazy=False))
+            folium.Popup(iframe, max_width=500))
         geocoder.append({"name":objekt.meno,"center":[geometria.centroid.coord_seq.getY(0),geometria.centroid.coord_seq.getX(0)]})
 
 
@@ -736,8 +708,18 @@ def test(request):
         </p>
         """
 
+    html = """
+    
+            <b>PR Štokeravská vápenka</b><br> 
+            IV. stupeň ochrany<br> 
+                <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
+                <br> 
+            
+    """
+
     iframe = branca.element.IFrame(html=html, width=500, height=300)
-    popup = folium.Popup(iframe, max_width=500)
+    popup = folium.Popup(folium.Html(html, script=True), lazy=False)
+    #popup = folium.Popup(iframe, max_width=500)
     folium.Marker(
         location=[48.73044030054515, 19.456582270083356],
         tooltip="Click me!",
@@ -746,3 +728,9 @@ def test(request):
     ).add_to(m)
     context['m'] = m._repr_html_()
     return render(request, 'test/test.html', context)
+
+@csrf_exempt
+def zdielanie_list(request):
+    response = HttpResponse("Dobre")
+    print(response.headers)
+    return response

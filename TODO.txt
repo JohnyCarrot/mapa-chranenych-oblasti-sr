@@ -40,7 +40,10 @@ next pri logine aby presmerovalo kam má, nie vždy na hlavnú stránku
 
 zdielanie objektu -> v priateloch v modali vypísať všetky zdielané objekty
 
-vo views sa vykaslat na own a shared a pozerat sa do zdielanie objektu
+prerobiť zdieľanie
 
-Dorobiť aby blokovateľ zablokovaného nevidel v priateľoch
+Pridať premenovanie do administrácie
 
+vyhrať sa s popup stylom
+
+user edit aby bol klikací, nie "to čo vidíš"
