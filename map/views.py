@@ -92,12 +92,18 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             <html>
             <head>
             <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Bootstrap CSS / JS-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
             </head>
             <body>
-            <div style="font-size: 13.5px;margin=0;">
+            <div style="font-size: 13.5px;">
         """#Započatie html
         html += objekt.html
-        if(objekt.nastavenia != None and uzivatel!= None):
+        if(objekt.nastavenia != None and uzivatel!= None and uzivatel.is_authenticated):
             nastavenia = json.loads(objekt.nastavenia)
             if"shared_with" in nastavenia and uzivatel.username in nastavenia["shared_with"] and nastavenia["shared_with"][uzivatel.username]==podskupina.id:
                 zdielane = True
@@ -110,8 +116,8 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             html+= f"""<a href="spravuj?={objekt.id}" target="_blank" rel="noopener noreferrer">Upraviť</a><br>"""
             html+=f"""   
             
-                        <button hx-post="http://127.0.0.1:8000/zdielanie_list/" hx-swap="outerHTML">
-                                Click Me
+                        <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
+                                Zdieľať
                               </button> 
                               
                               """
@@ -121,7 +127,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria = GEOSGeometry(objekt.geometry)
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
-        geometria_cela['podskupina_spravca'] = objekt.podskupina.spravca
+        geometria_cela['podskupina_spravca'] = objekt.podskupina.spravca# zrejme zamenit / pridať len za pravo menit
         geometria_cela['popup_HTML'] = objekt.html
 
         html+="</div></body></html>" #Koniec html
@@ -132,7 +138,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             objekt.save()
         styl = objekt.style
         folium.GeoJson(geometria_cela, style_function=lambda x, styl=styl: styl,name=objekt.meno).add_to(podskupina_v_mape).add_child(
-            folium.Popup(iframe, max_width=500))
+            folium.Popup(iframe, max_width=500,lazy=True))
         geocoder.append({"name":objekt.meno,"center":[geometria.centroid.coord_seq.getY(0),geometria.centroid.coord_seq.getX(0)]})
 
 
@@ -184,6 +190,8 @@ def vrat_zdielane_objekty_s_uzivatelom(username):
     return objekty_cele
 
 
+
+
 def index(requests):
     start_time = time.time()
     start_time_temp = time.time()
@@ -213,40 +221,8 @@ def index(requests):
         INSERT_STATEMENT = 'INSERT INTO objekty (meno, style,html,diskusia,podskupina,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
         cur.execute(INSERT_STATEMENT, (requests.GET.get('new_object_name'),None,"",0,podskupina_noveho_objektu.id,str(dictData['geometry'])   )  )
         return HttpResponseRedirect(requests.path_info)
-    #Zdielanie objektu
-    if (requests.user.is_authenticated and requests.GET.get('object_share') != None and requests.GET.get('username') != None and requests.GET.get('objectname')!= None):
-        zdielany_objekt = Objekty.objects.get(id=requests.GET.get('object_share'))
-        priatel = requests.GET.get('username')
-        viditelnost = Viditelnost_mapa()
-        viditelnost.uzivatelia[priatel] = "r"
-        viditelnost.save()
-        nova_podskupina_zdielaneho_objektu = pridaj_podskupinu(requests.GET.get('objectname'),viditelnost.id,priatel,vrat_skupinu_s_uzivatelom_zdielanych_objektov(priatel))
-        if(zdielany_objekt.nastavenia==None):
-            nastavenia = dict()
-            nastavenia["shared_with"] = dict()
-            nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
-        elif "shared_with" in zdielany_objekt.nastavenia:
-            nastavenia = json.loads(zdielany_objekt.nastavenia)
-            nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
-        else:
-            nastavenia = json.loads(zdielany_objekt.nastavenia)
-            nastavenia["shared_with"] = dict()
-            nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
-        zdielany_objekt.nastavenia = json.dumps(nastavenia)
-        zdielany_objekt.save()
-        return HttpResponseRedirect(requests.path_info)
-    # Zrušenie zdielania objektu
 
-    if (requests.user.is_authenticated and requests.GET.get('object_unshare') != None and requests.GET.get('username') != None and requests.GET.get('objectname') != None):
-        priatel = requests.GET.get('username')
-        zdielany_objekt = Objekty.objects.get(id=requests.GET.get('object_unshare'))
-        nastavenia = json.loads(zdielany_objekt.nastavenia)
-        if "shared_with" in nastavenia and (priatel in nastavenia["shared_with"]):
-            Podskupiny.objects.get(id=nastavenia["shared_with"][priatel]).delete()
-            nastavenia["shared_with"].pop(priatel)
-            zdielany_objekt.nastavenia = json.dumps(nastavenia)
-            zdielany_objekt.save()
-        return HttpResponseRedirect(requests.path_info)
+
 
     #Normálne načítanie
     m = folium.Map(location=[48.73044030054515, 19.456582270083356],
@@ -730,7 +706,76 @@ def test(request):
     return render(request, 'test/test.html', context)
 
 @csrf_exempt
-def zdielanie_list(request):
-    response = HttpResponse("Dobre")
-    print(response.headers)
+def htmx_request(request):
+    #<button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list" hx-swap="outerHTML">
+    html = ""
+    if "request" not in request.GET:
+        return HttpResponse("Chýba požiadavka, skúste znova")
+    poziadavka = request.GET.get('request')
+    try:
+        user = User.objects.get(username=request.GET.get('username'))
+
+        if poziadavka == "zdielanie_list" and "objekt" in request.GET:
+            objekt = Objekty.objects.get(id=request.GET.get('objekt'))
+            if objekt.nastavenia!= None:
+                nastavenia = json.loads(objekt.nastavenia)
+            else:
+                nastavenia = None
+            zoznam_priatelov = Friend.objects.friends(user)
+            for priatel in zoznam_priatelov:
+                if Block.objects.is_blocked(user, priatel) == True:
+                    zoznam_priatelov.remove(priatel)
+            if(len(zoznam_priatelov)==0):
+                return HttpResponse("Nemáte žiadnych priateľov s ktorými by sa objekt dal zdieľať")
+            html = ""
+            html+="""<ul class="list-group">"""
+            for priatel in zoznam_priatelov:
+                if nastavenia != None and "shared_with" in nastavenia and priatel.username in nastavenia["shared_with"]:
+                    html+= f"""<li class="list-group-item py-1 px-1">{priatel.username} <a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zrusit_zdielanie&objekt={objekt.id}&zdielane_s={priatel.username}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a></li>"""
+                else:
+                    html += f"""<li class="list-group-item py-1 px-1">{priatel.username} <a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zdielat&objekt={objekt.id}&zdielane_s={priatel.username}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a></li>"""
+
+            html+="</ul>"
+        if poziadavka == "zdielat" and "objekt" in request.GET and "zdielane_s" in request.GET:
+            zdielany_objekt = Objekty.objects.get(id=request.GET.get('objekt'))
+            priatel = User.objects.get(username=request.GET.get('zdielane_s')).username #!!!
+            viditelnost = Viditelnost_mapa()
+            viditelnost.uzivatelia[priatel] = "r"
+            viditelnost.save()
+            nova_podskupina_zdielaneho_objektu = pridaj_podskupinu(zdielany_objekt.meno, viditelnost.id,
+                                                                   priatel,
+                                                                   vrat_skupinu_s_uzivatelom_zdielanych_objektov(
+                                                                       priatel))
+            if (zdielany_objekt.nastavenia == None):
+                nastavenia = dict()
+                nastavenia["shared_with"] = dict()
+                nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
+            elif "shared_with" in zdielany_objekt.nastavenia:
+                nastavenia = json.loads(zdielany_objekt.nastavenia)
+                nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
+            else:
+                nastavenia = json.loads(zdielany_objekt.nastavenia)
+                nastavenia["shared_with"] = dict()
+                nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
+            zdielany_objekt.nastavenia = json.dumps(nastavenia)
+            zdielany_objekt.save()
+
+            return HttpResponse(f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zrusit_zdielanie&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a>""")
+
+        if poziadavka == "zrusit_zdielanie" and "objekt" in request.GET and "zdielane_s" in request.GET:
+            zdielany_objekt = Objekty.objects.get(id=request.GET.get('objekt'))
+            priatel = User.objects.get(username=request.GET.get('zdielane_s')).username #!!!
+            nastavenia = json.loads(zdielany_objekt.nastavenia)
+            if "shared_with" in nastavenia and (priatel in nastavenia["shared_with"]):
+                Podskupiny.objects.get(id=nastavenia["shared_with"][priatel]).delete()
+                nastavenia["shared_with"].pop(priatel)
+                zdielany_objekt.nastavenia = json.dumps(nastavenia)
+                zdielany_objekt.save()
+            return HttpResponse(f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zdielat&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a>""")
+
+    except:
+        traceback.print_exc()
+        return HttpResponse("Niekde nastala chyba, skúste znova")
+
+    response = HttpResponse(html)
     return response

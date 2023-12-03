@@ -41,7 +41,7 @@ urlpatterns = [
 ]
 
 htmx_urlpatterns = [
-    path('zdielanie_list/',map_views.zdielanie_list,name='zdielanie_list'),
+    path('htmx/',map_views.htmx_request,name='zdielanie_list'),
 ]
 
 urlpatterns+=htmx_urlpatterns

@@ -47,3 +47,7 @@ Pridať premenovanie do administrácie
 vyhrať sa s popup stylom
 
 user edit aby bol klikací, nie "to čo vidíš"
+
+nastavenie profilu tak, aby ss dalo nastavit, že či chcem aby ktokolvek so mnou mohol zdielat + či dostavat upozornenie
+
+navbar neprihlaseny error -pozriet
