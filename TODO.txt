@@ -51,3 +51,15 @@ user edit aby bol klikací, nie "to čo vidíš"
 nastavenie profilu tak, aby ss dalo nastavit, že či chcem aby ktokolvek so mnou mohol zdielat + či dostavat upozornenie
 
 navbar neprihlaseny error -pozriet
+
+pozrieť sa na databázové dopyty, či sa nedajú zefektívniť
+
+informácia o stránke S v prihlásení
+
+kôš do administrácie
+
+v administrácií nech sú vidieť všetky skupiny
+
+pridať kôš
+
+myslieť na menšie obrazovky
