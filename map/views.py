@@ -339,6 +339,19 @@ def api_request(request):
                 mapa_nastavenia.stupen5 = body['stupen5']
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
+
+            if "toggle_zapis_zdielania" in body and "uzivatel" in body and "id_objektu" in body:
+                objekt = Objekty.objects.get(pk=body.get('id_objektu'))
+                other_user = User.objects.get(pk=body.get('uzivatel'))
+                nastavenia = json.loads(objekt.nastavenia)
+                pseudo_podskupina_objektu = Podskupiny.objects.get(pk = nastavenia["shared_with"][other_user.username])
+                viditelnost = pseudo_podskupina_objektu.viditelnost
+                if "w" in viditelnost.uzivatelia[other_user.username]:
+                    viditelnost.uzivatelia[other_user.username] = viditelnost.uzivatelia[other_user.username].replace('w', '')
+                else:
+                    viditelnost.uzivatelia[other_user.username] +="w"
+                viditelnost.save()
+                return HttpResponse(status=202)
             ##########Administrácia##########
             if "podskupina" in body and "id" in body and "priorita" in body:
                 podskupina = Podskupiny.objects.get(id=body['id'])
@@ -398,6 +411,41 @@ def api_request(request):
                 Draw_custom_admin(podskupiny=podskupiny_id_pre_pridavanie_objektu,export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
+
+            if "daj_mapu_celu" in body and request.user.is_superuser:
+                m = folium.Map(location=[48.73044030054515, 19.456582270083356],
+                               zoom_start=8,
+                               width=1280, height=720,
+                               prefer_canvas=False,
+                               # crs="EPSG3857",
+
+                               )
+
+                geocoder_vlastne_vyhladanie = []
+                skupiny_v_navigacii = dict()
+                for skupina in Skupiny.objects.all().filter(spravca=None).order_by('priorita'):
+                    _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
+                    _skupina_v_mape.add_to(m)
+                    podskupiny_v_mape = []
+                    for podskupina in Podskupiny.objects.all().order_by('priorita'):
+                        if (skupina.id == podskupina.skupina_id):
+                            _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape,
+                                                                                     name=podskupina.meno)
+                            _podskupina_v_mape.add_to(m)
+                            pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
+                                                         geocoder=geocoder_vlastne_vyhladanie)
+                            podskupiny_v_mape.append(_podskupina_v_mape)
+                    skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
+
+                # mapa nastavenie
+                folium.plugins.Fullscreen().add_to(m)
+                Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
+                folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
+                folium.plugins.LocateControl(auto_start=False).add_to(m)
+
+                return HttpResponse(m._repr_html_(), content_type="text/plain")
+
+
             if "nova_skupina" in body and "nazov_skupiny" in body and "global_r" in body:
                 if len(body["nazov_skupiny"]) ==0:
                     return HttpResponse(status=303)

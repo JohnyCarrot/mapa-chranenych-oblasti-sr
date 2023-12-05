@@ -104,7 +104,7 @@
   -ms-transition: all 1s ease;
   transition: all 1s ease;
 }
-@media (max-width: 767px) {
+@media (max-width: 200px) {
   .nav-side-menu {
     position: relative;
     width: 100%;
@@ -130,7 +130,7 @@
     line-height: 50px !important;
   }
 }
-@media (min-width: 767px) {
+@media (min-width: 200px) {
   .nav-side-menu .menu-list .menu-content {
     display: block;
   }
@@ -189,7 +189,7 @@
   -ms-transition: all 1s ease;
   transition: all 1s ease;
 }
-@media (max-width: 767px) {
+@media (max-width: 200px) {
     .nav-side-menu .sub-menu {
         position: relative;
         width: 100%;
@@ -271,7 +271,7 @@
         transition: all 1s ease;
     }
 }
-@media (max-width: 767px) {
+@media (max-width: 200px) {
     .sub-line {
         position: relative;
         width: 100%;

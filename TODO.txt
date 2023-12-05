@@ -4,19 +4,7 @@ vlastný bod s popisom  a diskusiou
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
 dorobiť návratové správy do api
 
-Na základe nastavení vytvoriť funkciu, ktorá vráti unikátne skupiny buďto objektov, alebo zdielaných objektov
-
 views spraviť do zložiek
-
-Vo výbere viditelnosti "vyšediť" už vybrané / vo viditelnosti nachádzajúcich sa užívateľov
-
-Po zmene viditelnosti rozposlať oznámenia
-
-Pri posielaní notifikácie overiť, či je správa v html, ak áno, brať ako html (priamo v správe mať ikonu prijať / odmietnuť etc do api )
-
-Administrácia len pre adminov / prihlasenych, neprihlaseny budú môcž upravovať na pôvodnej stránke.. Normálne sa budú dať upravovať tiež na pôvodnej
-
-async include na generovanie mapy ?
 
 zdielanie objektu etc do API, nie do mainu
 
@@ -40,8 +28,6 @@ next pri logine aby presmerovalo kam má, nie vždy na hlavnú stránku
 
 zdielanie objektu -> v priateloch v modali vypísať všetky zdielané objekty
 
-prerobiť zdieľanie
-
 Pridať premenovanie do administrácie
 
 vyhrať sa s popup stylom
@@ -50,16 +36,15 @@ user edit aby bol klikací, nie "to čo vidíš"
 
 nastavenie profilu tak, aby ss dalo nastavit, že či chcem aby ktokolvek so mnou mohol zdielat + či dostavat upozornenie
 
-navbar neprihlaseny error -pozriet
-
 pozrieť sa na databázové dopyty, či sa nedajú zefektívniť
 
 informácia o stránke S v prihlásení
 
 kôš do administrácie
 
-v administrácií nech sú vidieť všetky skupiny
-
 pridať kôš
 
 myslieť na menšie obrazovky
+
+mapa nech sa načítava cez ajax
+

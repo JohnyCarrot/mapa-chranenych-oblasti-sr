@@ -634,6 +634,27 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
                 });
 
         }
+            async function daj_mapu_celu(){ //Iba admin
+                map_preview_update('Načítavanie');
+            let user = {
+                  daj_mapu_celu: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+                response.text().then(function (text) {
+                  map_preview_update(text);
+                  document.getElementById('mapa-preview').scrollIntoView({
+                          behavior: "smooth",
+                        });
+                });
+
+        }
 
         </script>
 
@@ -641,6 +662,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
 
 
     <button class = "btn btn-primary btn-sm" onclick="admin_skupiny_podskupiny_poradie_funkcia_tlacidlo()">Aktualizovať poradie</button>
+                      <button class = "btn btn-primary btn-sm" onclick="daj_mapu_celu()">Zobraziť všetko</button>
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_skupinuModal">Pridať skupinu</button>
     {% if sys_skupiny_list|length > 0 %}
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_podskupinuModal">Pridať podskupinu</button>
