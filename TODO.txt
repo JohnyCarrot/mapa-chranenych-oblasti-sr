@@ -24,8 +24,6 @@ pridať notifikácie do priatelov
 
 Porozmýšľať nad fungovaním blokácie
 
-next pri logine aby presmerovalo kam má, nie vždy na hlavnú stránku
-
 zdielanie objektu -> v priateloch v modali vypísať všetky zdielané objekty
 
 Pridať premenovanie do administrácie
@@ -39,8 +37,6 @@ nastavenie profilu tak, aby ss dalo nastavit, že či chcem aby ktokolvek so mno
 pozrieť sa na databázové dopyty, či sa nedajú zefektívniť
 
 informácia o stránke S v prihlásení
-
-kôš do administrácie
 
 pridať kôš
 

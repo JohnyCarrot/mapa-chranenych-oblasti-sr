@@ -320,6 +320,8 @@ def login_request(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            if "next" in request.GET:
+                return redirect(request.GET.get('next'))
             return redirect('/')
         errors = form.errors
     form = AuthenticationForm()
