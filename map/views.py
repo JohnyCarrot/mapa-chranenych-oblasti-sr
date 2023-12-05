@@ -352,6 +352,17 @@ def api_request(request):
                     viditelnost.uzivatelia[other_user.username] +="w"
                 viditelnost.save()
                 return HttpResponse(status=202)
+            if "zrusit_zdielanie" in body and "uzivatel_meno" in body and "id_objektu" in body:
+                zdielany_objekt = Objekty.objects.get(id=body.get('id_objektu'))
+                priatel = User.objects.get(username=body.get('uzivatel_meno')).username  # !!!
+                nastavenia = json.loads(zdielany_objekt.nastavenia)
+                if "shared_with" in nastavenia and (priatel in nastavenia["shared_with"]):
+                    Podskupiny.objects.get(id=nastavenia["shared_with"][priatel]).delete()
+                    nastavenia["shared_with"].pop(priatel)
+                    zdielany_objekt.nastavenia = json.dumps(nastavenia)
+                    zdielany_objekt.save()
+
+                return HttpResponse(status=202)
             ##########Administrácia##########
             if "podskupina" in body and "id" in body and "priorita" in body:
                 podskupina = Podskupiny.objects.get(id=body['id'])

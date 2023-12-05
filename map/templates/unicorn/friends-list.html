@@ -43,11 +43,34 @@
                             });
 
                             }
+                      async function zrusit_zdielanie(id_objektu,meno_uzivatela,id_html_elementu){
+                        let user = {
+                                id_objektu: id_objektu,
+                                uzivatel_meno: meno_uzivatela,
+                              zrusit_zdielanie: null
+                            };
+
+                            let response = await fetch('/api', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json;charset=utf-8'
+                              },
+                              body: JSON.stringify(user)
+                            });
+                            response.text().then(function (text) {
+                                let button = document.getElementById(id_html_elementu);
+                                button.outerHTML = '<i class="fas fa-check"></i>';
+                                alert('Zdieľanie úspešne zrušené');
+
+
+                            });
+
+                            }
                          </script>
                          {% for priatel in zoznam_priatelov %}
 
                           <!-- modal permissions begin-->
-                         <div id="modal_opravnenia_{{ priatel.username }}"class="modal fade" tabindex="-1" role="dialog">
+                         <div id="modal_opravnenia_{{ priatel.username }}"class="modal fade" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
@@ -57,7 +80,10 @@
                                 </button>
                               </div>
                               <div class="modal-body">
-                                <table class="table table-bordered table-sm">
+
+                                    {% for vrstva,zapis in zdielane_vrstvy %}
+                                        {% if forloop.first %}
+                                            <table class="table table-bordered table-sm">
                                   <thead>
                                     <tr>
                                       <th class="text-center" scope="col">Vrstva</th>
@@ -66,18 +92,23 @@
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {% for vrstva,zapis in zdielane_vrstvy %}
+                                        {% endif %}
+
+
                                         <tr>
                                   <td class="text-center">{{ vrstva.meno }}</td>
                                       <td class="text-center"><input onclick="zmen_zapis_uzivatela('{{ vrstva.pk }}','{{ priatel.pk }}','zapis_{{ priatel.username }}_{{ vrstva.id }}')" type="checkbox" id="zapis_{{ priatel.username }}_{{ vrstva.id }}" {% if zapis == True %}checked{% endif %} /></td>
-                                      <td class="text-center"><button  type="button" class="btn btn-danger btn-sm">X</button></td>
+                                      <td class="text-center"><button onclick="zrusit_zdielanie('{{ vrstva.pk }}','{{ priatel.username }}','zrusit_{{ priatel.username }}_{{ vrstva.id }}')" id="zrusit_{{ priatel.username }}_{{ vrstva.id }}" type="button" class="btn btn-danger btn-sm">X</button></td>
 
                                         </tr>
+                                        {% if forloop.last %}
+                                            </tbody>
+                                            </table>
+                                        {% endif %}
                                         {% empty %}
                                             S {{ priatel.username }} nie je zdieľaná žiadna vrstva.
                                     {% endfor %}
-                                  </tbody>
-                                </table>
+
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Zatvoriť</button>
