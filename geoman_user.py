@@ -10,12 +10,35 @@ class Geoman(JSCSSMixin, MacroElement):
     _template = Template(
         """
         {% macro script(this, kwargs) %}
+            async function zozbieraj_iframe_na_upravu() {
+                  let user = {
+                  username: '{{ this.username }}',
+                  dostan_vrstvy_uprava_iframe: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+                    response.text().then(function (text) {
+                        //alert(text);
+                });
+           return true;
+        }
+        
          const draggable = new L.DraggableLines({{ this._parent.get_name() }}, 
             {
 	        enableForLayer: false
             });
         parent.posledne_html_z_editora = "";
         var html_pred_zmenou = "";
+        
+        var obchadzanie_iframe = window.setInterval(function(){
+              zozbieraj_iframe_na_upravu();
+            }, 7000);
         
         var textbox_ako_klasa   = L.Control.extend({
             onAdd: function() {

@@ -119,10 +119,28 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
                         <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
                                 Zdieľať
                               </button> 
-                              
-                              
-                              
+                              <button onclick="uprav_uzivatelsku_vrstvu('{objekt.id}');"></button>
                               """
+            html+="""
+                    <script>
+                async function uprav_uzivatelsku_vrstvu(id) {
+                  let user = {
+                  id: id,
+                  uprav_vrstvu_iframe: null
+                };
+
+                let response = await fetch('http://127.0.0.1:8000/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+
+           return true;
+        }
+            </script>
+            """
 
 
 
@@ -335,13 +353,16 @@ def login_request(request):
     form = AuthenticationForm()
     return render(request=request, template_name="main/login.html", context={"register_form": form,"errors": errors})
 
+uzivatelska_vrstva_na_zmazanie = [] #Obchádzanie text/html src iframu
+uzivatelska_vrstva_na_upravu = ""
 @csrf_exempt
 def api_request(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
-            profil = Profile.objects.get(user_id=request.user.id)
+            global uzivatelska_vrstva_na_upravu
             if("stupen2" in body and "stupen3" in body and "stupen4" in body and "stupen5" in body):
+                profil = Profile.objects.get(user_id=request.user.id)
                 mapa_nastavenia = profil.map_settings
                 mapa_nastavenia.stupen2 = body['stupen2']
                 mapa_nastavenia.stupen3 = body['stupen3']
@@ -349,6 +370,15 @@ def api_request(request):
                 mapa_nastavenia.stupen5 = body['stupen5']
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
+
+            if "uprav_vrstvu_iframe" in body and "id" in body:
+                uzivatelska_vrstva_na_upravu = body['id']
+                return HttpResponse(status=202)
+
+            if "dostan_vrstvy_uprava_iframe" in body and "username" in body:
+                vysledok = str(uzivatelska_vrstva_na_upravu)
+                uzivatelska_vrstva_na_upravu = ""
+                return HttpResponse(vysledok,status=202)
 
             if "toggle_zapis_zdielania" in body and "uzivatel" in body and "id_objektu" in body:
                 objekt = Objekty.objects.get(pk=body.get('id_objektu'))
@@ -758,14 +788,32 @@ def test(request):
             <b>PR Štokeravská vápenka</b><br> 
             IV. stupeň ochrany<br> 
                 <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
-                <br> 
-            
+                <br>       
+        <button onlick="uprav_uzivatelsku_vrstvu('Ano');"></button>
+        <script>
+                async function uprav_uzivatelsku_vrstvu(id) {
+                  let user = {
+                  id: id,
+                  uprav_vrstvu_iframe: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+
+           return true;
+        }
+            </script>
     """
     
 
     iframe = branca.element.IFrame(html=html, width=500, height=300)
-    popup = folium.Popup(folium.Html(html, script=True), lazy=False)
-    #popup = folium.Popup(iframe, max_width=500)
+    #popup = folium.Popup(folium.Html(html, script=True), lazy=False)
+    popup = folium.Popup(iframe, max_width=500)
     folium.Marker(
         location=[48.73044030054515, 19.456582270083356],
         tooltip="Click me!",
