@@ -44,3 +44,6 @@ myslieť na menšie obrazovky
 
 mapa nech sa načítava cez ajax
 
+zrušiť zdieľanie v zdielanom html  + notifikácie  etc dorobiť
+
+režim úpravy text keď nie sú vybrané vrstvy opraviť

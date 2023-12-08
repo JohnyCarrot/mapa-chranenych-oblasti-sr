@@ -130,7 +130,7 @@ class Geoman(JSCSSMixin, MacroElement):
                             let layer_previous_options;
                             let selected_layers = [];                                    
                                     {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
-                                            if(layer.feature){
+                                            if(layer.feature && (layer.feature.geometry.podskupina_spravca == '{{ this.username }}' || layer.feature.geometry.zdielane_w == true)  ){
                                             
                                             if(layer.feature.geometry.type === "Point"){return;}
                                             

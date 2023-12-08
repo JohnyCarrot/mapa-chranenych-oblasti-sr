@@ -120,6 +120,8 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
                                 Zdieľať
                               </button> 
                               
+                              
+                              
                               """
 
 
@@ -128,6 +130,12 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
         geometria_cela['podskupina_spravca'] = objekt.podskupina.spravca# zrejme zamenit / pridať len za pravo menit
+        geometria_cela['zdielane_w'] = False #Zdielane a pravo zapisovat
+        if zdielane:
+            pseudo_podskupina_objektu = Podskupiny.objects.get(pk=nastavenia["shared_with"][uzivatel.username])
+            viditelnost = pseudo_podskupina_objektu.viditelnost
+            if "w" in viditelnost.uzivatelia[uzivatel.username]:
+                geometria_cela['zdielane_w'] = True
         geometria_cela['popup_HTML'] = objekt.html
 
         html+="</div></body></html>" #Koniec html
@@ -753,6 +761,7 @@ def test(request):
                 <br> 
             
     """
+    
 
     iframe = branca.element.IFrame(html=html, width=500, height=300)
     popup = folium.Popup(folium.Html(html, script=True), lazy=False)
