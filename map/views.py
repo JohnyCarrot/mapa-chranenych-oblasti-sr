@@ -113,13 +113,13 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             continue
         if (objekt.diskusia == 1): html+=f"""<a href="forum/{objekt.id}" target="_blank" rel="noopener noreferrer">Diskusia</a>"""
         if(uzivatel!= None and zdielane == False and podskupina.spravca == uzivatel.username):
-            html+= f"""<a href="spravuj?={objekt.id}" target="_blank" rel="noopener noreferrer">Upraviť</a><br>"""
             html+=f"""   
             
                         <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
                                 Zdieľať
                               </button> 
-                              <button onclick="uprav_uzivatelsku_vrstvu('{objekt.id}');"></button>
+                              <br>
+                              <button onclick="uprav_uzivatelsku_vrstvu('{objekt.id}');"><i class="fa-solid fa-pencil"></i></button>
                               """
             html+="""
                     <script>

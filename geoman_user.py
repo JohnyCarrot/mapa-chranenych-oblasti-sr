@@ -24,7 +24,8 @@ class Geoman(JSCSSMixin, MacroElement):
                   body: JSON.stringify(user)
                 });
                     response.text().then(function (text) {
-                        //alert(text);
+                    uprav_vrstvu(text);
+                        
                 });
            return true;
         }
@@ -38,7 +39,7 @@ class Geoman(JSCSSMixin, MacroElement):
         
         var obchadzanie_iframe = window.setInterval(function(){
               zozbieraj_iframe_na_upravu();
-            }, 7000);
+            }, 300);
         
         var textbox_ako_klasa   = L.Control.extend({
             onAdd: function() {
@@ -477,6 +478,231 @@ var stateChangingButton_delete = L.easyButton({
 });
 
 stateChangingButton_delete.addTo( {{ this._parent.get_name() }} );
+
+//Začiatok iframe obchdázania
+
+            var SingleStyleEditorContent = `
+        <style>
+            .leaflet-styleeditor-stroke {
+                height: 20px;
+                width: 150px;
+                background-repeat: no-repeat;
+                border: 1px solid white;
+                background-image: url("static/administration/dash_array.png");
+                cursor: pointer;
+            }
+            .leaflet-styleeditor-stroke:hover {
+                border: 1px solid black;
+            }
+
+        </style>
+        
+        <div style="height:500px; width:300px;" class="content-hlavny">
+        
+        <label id="Singledraggable_checkbox_label">Editor tvaru</label>
+        <input type="checkbox" id="Singledraggable_checkbox" min="0" max="100" />
+        <br>
+        
+        <b>Farba hrany: </b> <div id="Singlezmena-farby" style="width:25px;height:25px;border: 1px solid black;"></div>
+        <br>
+        
+        <b>Viditeľnosť hrany: </b> <br>
+        <label id="Singlelayer_opacity_label">-</label>
+        <input type="range" id="Singlelayer_opacity" min="0" max="100" />
+        
+                <br>
+        <b>Hrúbka hrany: </b> <br>
+        <label id="Singlelayer_weight_label">-</label>
+        <input type="range" id="Singlelayer_weight" min="0" max="30" />
+                        <br>
+        <b>Orámovanie hrany: </b> <br>
+        <div id="Singlelayer_dash_array_1" class="leaflet-styleeditor-stroke" style="background-position: 0px -75px;"></div>
+        <div id="Singlelayer_dash_array_2" class="leaflet-styleeditor-stroke" style="background-position: 0px -95px;"></div>
+        <div id="Singlelayer_dash_array_3" class="leaflet-styleeditor-stroke" style="background-position: 0px -115px;"></div>
+        <br>
+        
+        <b>Farba pozadia: </b> <div id="Singlezmena-pozadie" style="width:25px;height:25px;border: 1px solid black;"></div>
+        <br>
+        
+        <b>Viditeľnosť pozadia: </b> <br>
+        <label id="Singlelayer_opacity_label_fill">-</label>
+        <input type="range" id="Singlelayer_opacity_fill" min="0" max="100" />
+        <br>
+        <button style="margin: 0px;margin-left: 8px;" onclick="parent.uprava_html()" type=button>Uprava-HTML</button>
+        <br>
+        <button style="margin-bottom: 0px;padding-bottom: 0px;margin-top: 0px;padding-top: 0px;" id="Singlestyle_reset_button"type="button">Resetovať</button>
+        <br>
+        <button style="margin-top: 0px;padding-top: 0px;" id="Singlestyle_apply_button"type="button">Uložiť zmeny</button>
+        
+        </div>
+        `;
+        var SingleStyleEditor = L.control.window({{ this._parent.get_name() }},{title:'',content:SingleStyleEditorContent,
+        visible: false,
+        maxWidth: 650,
+        position: 'topRight',
+        prompt: {callback:function(){
+    //alert('Chellou!');
+    
+        //koniec funkcie
+        }
+    ,buttonOK:'  '} //Po stlačení button OK zmizne celé okno, zrejme bude treba dorobiť iný button, zrejme ho treba prevytvoriť
+        });
+        SingleStyleEditor.disableBtn();
+        var Singlepicker;
+        var Singlepicker_pozadie;
+
+
+function uprav_vrstvu(id_vrstvy){
+        if(id_vrstvy == ''){return;}
+        
+                stateChangingButton.disable();   
+                stateChangingButton_delete.disable();
+                let Singlelayer;
+                draggable.disable();
+                let layer_previous_options;
+    
+        {{ this._parent.get_name() }}.eachLayer(function (layer) { 
+        if(layer.feature && (layer.feature.geometry.podskupina_spravca == '{{ this.username }}' || layer.feature.geometry.zdielane_w == true)  ){
+        
+        if(layer.feature.geometry.type === "Point"){return;}
+        
+        if(  id_vrstvy ==  layer.feature.geometry.serverID ) { 
+                
+            layer.upraveny = true
+            layer.previous_options = JSON.parse(JSON.stringify(layer.options)); 
+            layer_previous_options = JSON.parse(JSON.stringify(layer.options));
+            html_pred_zmenou = layer.feature.geometry.popup_HTML;
+            Singlelayer = layer;
+                             
+         }
+         
+        }                             
+    }); //Koniec označenia vrsiev
+    
+    
+    parent.posledne_html_z_editora = html_pred_zmenou; 
+    SingleStyleEditor.show();
+    Singlepicker = new Picker({ //Zaciatok pickera
+    parent: document.querySelector('#Singlezmena-farby'),
+    alpha: false,
+    popup: 'bottom',
+    cancelButton: false,
+    editor: false,
+    defaultColor: layer_previous_options.color,
+    onChange: function(color) {
+                  document.querySelector('#Singlezmena-farby').style.background = color.rgbaString;
+                    Singlelayer.options.color = color.rgbaString;
+                    Singlelayer.setStyle(Singlelayer.options);
+                  
+              },
+    }); //Koniec pickera     
+    document.getElementById('Singledraggable_checkbox').outerHTML = document.getElementById('Singledraggable_checkbox').outerHTML;
+    
+    document.getElementById('Singledraggable_checkbox').addEventListener('change', function () {
+    
+      if (this.checked) {
+            draggable.enable();
+           draggable.enableForLayer(Singlelayer);
+          } else {
+            draggable.disable();
+          }
+
+    });  
+    
+    document.getElementById('Singlelayer_opacity').outerHTML = document.getElementById('Singlelayer_opacity').outerHTML;
+    document.getElementById('Singlelayer_opacity_label').innerHTML = "-";
+    
+    document.getElementById('Singlelayer_opacity').addEventListener('input', function (event) {
+    
+        Singlelayer.options.opacity = parseInt( document.getElementById('Singlelayer_opacity').value )/100;
+        document.getElementById('Singlelayer_opacity_label').innerHTML = document.getElementById('Singlelayer_opacity').value;
+        Singlelayer.setStyle(Singlelayer.options);
+
+});
+
+document.getElementById('Singlelayer_weight').outerHTML = document.getElementById('Singlelayer_weight').outerHTML;
+document.getElementById('Singlelayer_weight_label').innerHTML = "-";
+document.getElementById('Singlelayer_weight').addEventListener('input', function (event) {
+
+        Singlelayer.options.weight = parseInt( document.getElementById('Singlelayer_weight').value );
+        document.getElementById('Singlelayer_weight_label').innerHTML = document.getElementById('Singlelayer_weight').value;
+        Singlelayer.setStyle(Singlelayer.options);
+
+});
+
+document.getElementById('Singlelayer_dash_array_1').addEventListener('click', function (event) {
+
+        Singlelayer.options.dashArray = "1";
+        Singlelayer.setStyle(Singlelayer.options);
+
+});
+
+document.getElementById('Singlelayer_dash_array_2').addEventListener('click', function (event) {
+
+        Singlelayer.options.dashArray = '10';
+        Singlelayer.setStyle(Singlelayer.options);
+
+});
+
+document.getElementById('Singlelayer_dash_array_3').addEventListener('click', function (event) {
+
+        Singlelayer.options.dashArray = "15, 10, 1, 10";
+        Singlelayer.setStyle(Singlelayer.options);
+
+});
+    
+    
+if(layer_previous_options.fillColor==null){
+        layer_previous_options.fillColor = 'blue';
+}
+
+Singlepicker_pozadie = new Picker({ //Zaciatok pickera
+    parent: document.querySelector('#Singlezmena-pozadie'),
+    alpha: false,
+    popup: 'bottom',
+    cancelButton: false,
+    editor: false,
+    defaultColor: layer_previous_options.fillColor,
+    onChange: function(color) {
+                  document.querySelector('#Singlezmena-pozadie').style.background = color.rgbaString;
+                  
+                      Singlelayer.options.fillColor = color.rgbaString;
+                      Singlelayer.setStyle(Singlelayer.options);
+
+                  
+              },
+}); //Koniec pickera
+
+
+document.getElementById('Singlelayer_opacity_fill').outerHTML = document.getElementById('Singlelayer_opacity_fill').outerHTML;
+document.getElementById('Singlelayer_opacity_label_fill').innerHTML = "-";
+document.getElementById('Singlelayer_opacity_fill').addEventListener('input', function (event) {
+        Singlelayer.options.fillOpacity = parseInt( document.getElementById('Singlelayer_opacity_fill').value )/100;
+        document.getElementById('Singlelayer_opacity_label_fill').innerHTML = document.getElementById('Singlelayer_opacity_fill').value;
+        Singlelayer.setStyle(Singlelayer.options);
+});
+
+
+document.getElementById('Singlestyle_reset_button').outerHTML = document.getElementById('Singlestyle_reset_button').outerHTML;
+
+document.getElementById('Singlestyle_reset_button').addEventListener('click', function (event) {
+                                 
+        Singlelayer.setStyle(Singlelayer.previous_options);
+        
+        document.getElementById('Singlelayer_opacity_label').innerHTML = "-";
+        document.getElementById('Singlelayer_weight_label').innerHTML = "-";
+        document.getElementById('Singlezmena-farby').style.backgroundColor = "white";
+        document.getElementById('Singlezmena-pozadie').style.backgroundColor = "white";
+        document.getElementById('Singlelayer_opacity_label_fill').innerHTML = "-";
+        parent.posledne_html_z_editora = html_pred_zmenou;
+
+});
+
+
+
+
+
+}
         
         
         
