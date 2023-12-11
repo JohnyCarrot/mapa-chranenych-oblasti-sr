@@ -30,6 +30,26 @@ class Geoman(JSCSSMixin, MacroElement):
            return true;
         }
         
+            async function zozbieraj_iframe_na_zmazanie() {
+                  let user = {
+                  username: '{{ this.username }}',
+                  dostan_vrstvy_zmazanie_iframe: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+                    response.text().then(function (text) {
+                    //uprav_vrstvu(text);
+                        
+                });
+           return true;
+        }
+        
          const draggable = new L.DraggableLines({{ this._parent.get_name() }}, 
             {
 	        enableForLayer: false
@@ -39,6 +59,7 @@ class Geoman(JSCSSMixin, MacroElement):
         
         var obchadzanie_iframe = window.setInterval(function(){
               zozbieraj_iframe_na_upravu();
+              zozbieraj_iframe_na_zmazanie();
             }, 300);
         
         var textbox_ako_klasa   = L.Control.extend({

@@ -47,3 +47,11 @@ mapa nech sa načítava cez ajax
 zrušiť zdieľanie v zdielanom html  + notifikácie  etc dorobiť
 
 režim úpravy text keď nie sú vybrané vrstvy opraviť
+
+namiesto "neboli vybrane žiadne vrstvy" zmeniť , že žiadne nie sú v dohľade
+
+upravit aby iframe mohol skonzumovat iba ten komu ide
+
+po zavreti upravy uvilnit tlačidla
+
+aby tklacidla boli aj v zdielanych vrstvach s upravou

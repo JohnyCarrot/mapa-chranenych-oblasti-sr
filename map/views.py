@@ -120,6 +120,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
                               </button> 
                               <br>
                               <button onclick="uprav_uzivatelsku_vrstvu('{objekt.id}');"><i class="fa-solid fa-pencil"></i></button>
+                              <button onclick="zmaz_uzivatelsku_vrstvu('{objekt.id}');"><i class="fa-solid fa-trash"></i></button>
                               """
             html+="""
                     <script>
@@ -127,6 +128,23 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
                   let user = {
                   id: id,
                   uprav_vrstvu_iframe: null
+                };
+
+                let response = await fetch('http://127.0.0.1:8000/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+
+           return true;
+        }
+        
+            async function zmaz_uzivatelsku_vrstvu(id) {
+                  let user = {
+                  id: id,
+                  zmaz_vrstvu_iframe: null
                 };
 
                 let response = await fetch('http://127.0.0.1:8000/api', {
@@ -353,7 +371,7 @@ def login_request(request):
     form = AuthenticationForm()
     return render(request=request, template_name="main/login.html", context={"register_form": form,"errors": errors})
 
-uzivatelska_vrstva_na_zmazanie = [] #Obchádzanie text/html src iframu
+uzivatelska_vrstva_na_zmazanie = "" #Obchádzanie text/html src iframu
 uzivatelska_vrstva_na_upravu = ""
 @csrf_exempt
 def api_request(request):
@@ -361,6 +379,7 @@ def api_request(request):
         try:
             body = json.loads(request.body)
             global uzivatelska_vrstva_na_upravu
+            global uzivatelska_vrstva_na_zmazanie
             if("stupen2" in body and "stupen3" in body and "stupen4" in body and "stupen5" in body):
                 profil = Profile.objects.get(user_id=request.user.id)
                 mapa_nastavenia = profil.map_settings
@@ -374,11 +393,49 @@ def api_request(request):
             if "uprav_vrstvu_iframe" in body and "id" in body:
                 uzivatelska_vrstva_na_upravu = body['id']
                 return HttpResponse(status=202)
+            if "zmaz_vrstvu_iframe" in body and "id" in body:
+                uzivatelska_vrstva_na_zmazanie = body['id']
+                return HttpResponse(status=202)
+
+            if "dostan_vrstvy_zmazanie_iframe" in body and "username" in body:
+                user = User.objects.get(username=body['username'])
+                objekt = Objekty.objects.get(pk=uzivatelska_vrstva_na_upravu)
+                if objekt.podskupina.spravca == user.username:
+                    vysledok = str(uzivatelska_vrstva_na_zmazanie)
+                    uzivatelska_vrstva_na_zmazanie = ""
+                    return HttpResponse(vysledok, status=202)
+                if objekt.nastavenia != None:
+                    nastavenia = json.loads(objekt.nastavenia)
+                    if "shared_with" in nastavenia and user.username in nastavenia["shared_with"]:
+                        pseudo_podskupina_objektu = Podskupiny.objects.get(
+                            pk=nastavenia["shared_with"][user.username])
+                        viditelnost = pseudo_podskupina_objektu.viditelnost
+                        if "w" in viditelnost.uzivatelia[user.username]:
+                            vysledok = str(uzivatelska_vrstva_na_zmazanie)
+                            uzivatelska_vrstva_na_zmazanie = ""
+                            return HttpResponse(vysledok, status=202)
+
+                return HttpResponse("", status=202)
 
             if "dostan_vrstvy_uprava_iframe" in body and "username" in body:
-                vysledok = str(uzivatelska_vrstva_na_upravu)
-                uzivatelska_vrstva_na_upravu = ""
-                return HttpResponse(vysledok,status=202)
+                user = User.objects.get(username=body['username'])
+                objekt = Objekty.objects.get(pk=uzivatelska_vrstva_na_upravu)
+                if objekt.podskupina.spravca == user.username:
+                    vysledok = str(uzivatelska_vrstva_na_upravu)
+                    uzivatelska_vrstva_na_upravu = ""
+                    return HttpResponse(vysledok, status=202)
+                if objekt.nastavenia != None:
+                    nastavenia = json.loads(objekt.nastavenia)
+                    if "shared_with" in nastavenia and user.username in nastavenia["shared_with"]:
+                        pseudo_podskupina_objektu = Podskupiny.objects.get(
+                            pk=nastavenia["shared_with"][user.username])
+                        viditelnost = pseudo_podskupina_objektu.viditelnost
+                        if "w" in viditelnost.uzivatelia[user.username]:
+                            vysledok = str(uzivatelska_vrstva_na_upravu)
+                            uzivatelska_vrstva_na_upravu = ""
+                            return HttpResponse(vysledok, status=202)
+
+                return HttpResponse("", status=202)
 
             if "toggle_zapis_zdielania" in body and "uzivatel" in body and "id_objektu" in body:
                 objekt = Objekty.objects.get(pk=body.get('id_objektu'))
