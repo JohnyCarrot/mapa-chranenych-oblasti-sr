@@ -532,7 +532,7 @@ stateChangingButton_delete.addTo( {{ this._parent.get_name() }} );
         <br>
         <button style="margin-bottom: 0px;padding-bottom: 0px;margin-top: 0px;padding-top: 0px;" id="Singlestyle_reset_button"type="button">Resetovať</button>
         <br>
-        <button style="margin-top: 0px;padding-top: 0px;" id="Singlestyle_apply_button"type="button">Uložiť zmeny</button>
+        <button style="margin-top: 0px;padding-top: 0px;" id="Singlestyle_apply_button"type="button" onclick="uprav_vrstvu_uloz_iframe();" >Uložiť zmeny</button>
         
         </div>
         `;
@@ -698,12 +698,49 @@ document.getElementById('Singlestyle_reset_button').addEventListener('click', fu
 
 });
 
-
-
-
-
 }
+function uprav_vrstvu_uloz_iframe(){
+                            {{ this._parent.get_name() }}.eachLayer(function (layer) { 
+                            if(layer.upraveny && layer.upraveny==true){
+                            
+                                    if(parent.posledne_html_z_editora != html_pred_zmenou && parent.posledne_html_z_editora !=""  ){
+                                        html_pred_zmenou = ""; //Ponechavam si editor html
+                                    }
+                                    else{
+                                        parent.posledne_html_z_editora = "";
+                                        html_pred_zmenou = "";
+                                    }
+                                    
+                                    let layer2 = L.polygon(layer.getLatLngs());
+                                    layer.upraveny=false;
+                                    coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
+                                }
+                            });
+                            parent.posledne_html_z_editora = "";
+                            Singlepicker_pozadie.destroy();
+                            draggable.disable();
+                            Singlepicker.destroy();
+                            SingleStyleEditor.hide();
+                            
+                            stateChangingButton.enable();   
+                            stateChangingButton_delete.enable();
+                            
+                            alert("Zmeny úspešne uložené");
+                            
+                            //vratit html elementy do povodneho stavu
+                            document.getElementById('Singledraggable_checkbox').outerHTML = document.getElementById('Singledraggable_checkbox').outerHTML;
+                            document.getElementById('Singlelayer_opacity').outerHTML = document.getElementById('Singlelayer_opacity').outerHTML;
+                            document.getElementById('Singlelayer_opacity_label').innerHTML = "-";
+                            document.getElementById('Singlelayer_weight').outerHTML = document.getElementById('Singlelayer_weight').outerHTML;
+                            document.getElementById('Singlelayer_weight_label').innerHTML = "-";
+                            document.getElementById('Singlezmena-farby').style.backgroundColor = "white";
+                            document.getElementById('Singlezmena-pozadie').style.backgroundColor = "white";
+                            document.getElementById('Singlelayer_opacity_fill').outerHTML = document.getElementById('Singlelayer_opacity_fill').outerHTML;
+                            document.getElementById('Singlelayer_opacity_label_fill').innerHTML = "-";
         
+
+
+}        
         
         
         {% endmacro %}
