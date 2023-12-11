@@ -398,8 +398,10 @@ def api_request(request):
                 return HttpResponse(status=202)
 
             if "dostan_vrstvy_zmazanie_iframe" in body and "username" in body:
+                if uzivatelska_vrstva_na_zmazanie =="":
+                    return HttpResponse("", status=304)
                 user = User.objects.get(username=body['username'])
-                objekt = Objekty.objects.get(pk=uzivatelska_vrstva_na_upravu)
+                objekt = Objekty.objects.get(pk=uzivatelska_vrstva_na_zmazanie)
                 if objekt.podskupina.spravca == user.username:
                     vysledok = str(uzivatelska_vrstva_na_zmazanie)
                     uzivatelska_vrstva_na_zmazanie = ""
@@ -415,9 +417,11 @@ def api_request(request):
                             uzivatelska_vrstva_na_zmazanie = ""
                             return HttpResponse(vysledok, status=202)
 
-                return HttpResponse("", status=202)
+                return HttpResponse("", status=304)
 
             if "dostan_vrstvy_uprava_iframe" in body and "username" in body:
+                if uzivatelska_vrstva_na_upravu =="":
+                    return HttpResponse("", status=304)
                 user = User.objects.get(username=body['username'])
                 objekt = Objekty.objects.get(pk=uzivatelska_vrstva_na_upravu)
                 if objekt.podskupina.spravca == user.username:
@@ -435,7 +439,7 @@ def api_request(request):
                             uzivatelska_vrstva_na_upravu = ""
                             return HttpResponse(vysledok, status=202)
 
-                return HttpResponse("", status=202)
+                return HttpResponse("", status=304)
 
             if "toggle_zapis_zdielania" in body and "uzivatel" in body and "id_objektu" in body:
                 objekt = Objekty.objects.get(pk=body.get('id_objektu'))
