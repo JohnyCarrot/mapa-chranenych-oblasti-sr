@@ -84,6 +84,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
     for objekt in Objekty.objects.all():
         nastavenia = None
         zdielane = False
+        zdielane_w = False
         if(sulad_s_nastavenim_mapy(nastavenie_mapy,objekt)==False):
             continue
             #Započatie html
@@ -107,26 +108,34 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             nastavenia = json.loads(objekt.nastavenia)
             if"shared_with" in nastavenia and uzivatel.username in nastavenia["shared_with"] and nastavenia["shared_with"][uzivatel.username]==podskupina.id:
                 zdielane = True
-                html+=f"""<p style="white-space: nowrap">Zdieľané používateľom: <b>{objekt.podskupina.spravca}</b></p>"""
-                html += f"""<a href="?object_unshare={objekt.id}&username={uzivatel.username}&objectname={objekt.meno}" target="_top" class="button">Zrušiť zdielanie</a> <br> """
+                html+=f"""<p style="white-space: nowrap">Zdieľané používateľom: <br><b>{objekt.podskupina.spravca}</b></p>"""
+                html += f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zrusit_zdielanie&ifrejm=true&objekt={objekt.id}&zdielane_s={uzivatel.username}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a> <br><br>"""
+
+                pseudo_podskupina_objektu = Podskupiny.objects.get(pk=nastavenia["shared_with"][uzivatel.username])
+                viditelnost = pseudo_podskupina_objektu.viditelnost
+                if "w" in viditelnost.uzivatelia[uzivatel.username]:
+                    zdielane_w = True
+
         if(objekt.podskupina_id!=podskupina.id and zdielane == False):
             continue
         if (objekt.diskusia == 1): html+=f"""<a href="forum/{objekt.id}" target="_blank" rel="noopener noreferrer">Diskusia</a>"""
-        if(uzivatel!= None and zdielane == False and podskupina.spravca == uzivatel.username):
-            html+=f"""   
-            
-                        <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
-                                Zdieľať
-                              </button> 
-                              <br>
-                              <button onclick="uprav_uzivatelsku_vrstvu('{objekt.id}');"><i class="fa-solid fa-pencil"></i></button>
-                              <button onclick="zmaz_uzivatelsku_vrstvu('{objekt.id}');"><i class="fa-solid fa-trash"></i></button>
-                              """
+        if (uzivatel != None and zdielane == False and podskupina.spravca == uzivatel.username):
+            html+=f"""
+                    <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
+                        Zdieľať
+                    </button> 
+                    <br>
+            """
+        if(uzivatel!= None and zdielane == False and podskupina.spravca == uzivatel.username) or (zdielane_w):
+            html+=f"""<button onclick="uprav_uzivatelsku_vrstvu('{objekt.id}','{uzivatel.username}');"><i class="fa-solid fa-pencil"></i></button>"""
+            if podskupina.spravca == uzivatel.username and zdielane == False and zdielane_w == False:
+                html += f"""<button onclick="zmaz_uzivatelsku_vrstvu('{objekt.id}','{uzivatel.username}');"><i class="fa-solid fa-trash"></i></button>"""
             html+="""
                     <script>
-                async function uprav_uzivatelsku_vrstvu(id) {
+                async function uprav_uzivatelsku_vrstvu(id,meno) {
                   let user = {
                   id: id,
+                  username: meno,
                   uprav_vrstvu_iframe: null
                 };
 
@@ -141,9 +150,10 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
            return true;
         }
         
-            async function zmaz_uzivatelsku_vrstvu(id) {
+            async function zmaz_uzivatelsku_vrstvu(id,meno) {
                   let user = {
                   id: id,
+                  username: meno,
                   zmaz_vrstvu_iframe: null
                 };
 
@@ -167,10 +177,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria_cela['serverID'] = objekt.id
         geometria_cela['podskupina_spravca'] = objekt.podskupina.spravca# zrejme zamenit / pridať len za pravo menit
         geometria_cela['zdielane_w'] = False #Zdielane a pravo zapisovat
-        if zdielane:
-            pseudo_podskupina_objektu = Podskupiny.objects.get(pk=nastavenia["shared_with"][uzivatel.username])
-            viditelnost = pseudo_podskupina_objektu.viditelnost
-            if "w" in viditelnost.uzivatelia[uzivatel.username]:
+        if zdielane and zdielane_w:
                 geometria_cela['zdielane_w'] = True
         geometria_cela['popup_HTML'] = objekt.html
 
@@ -373,6 +380,7 @@ def login_request(request):
 
 uzivatelska_vrstva_na_zmazanie = "" #Obchádzanie text/html src iframu
 uzivatelska_vrstva_na_upravu = ""
+opravneny_uzivatel = ""
 @csrf_exempt
 def api_request(request):
     if request.method == 'POST':
@@ -380,6 +388,7 @@ def api_request(request):
             body = json.loads(request.body)
             global uzivatelska_vrstva_na_upravu
             global uzivatelska_vrstva_na_zmazanie
+            global opravneny_uzivatel
             if("stupen2" in body and "stupen3" in body and "stupen4" in body and "stupen5" in body):
                 profil = Profile.objects.get(user_id=request.user.id)
                 mapa_nastavenia = profil.map_settings
@@ -390,15 +399,17 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
 
-            if "uprav_vrstvu_iframe" in body and "id" in body:
+            if "uprav_vrstvu_iframe" in body and "id" in body and "username" in body:
+                opravneny_uzivatel = body['username']
                 uzivatelska_vrstva_na_upravu = body['id']
                 return HttpResponse(status=202)
-            if "zmaz_vrstvu_iframe" in body and "id" in body:
+            if "zmaz_vrstvu_iframe" in body and "id" in body and "username" in body:
+                opravneny_uzivatel = body['username']
                 uzivatelska_vrstva_na_zmazanie = body['id']
                 return HttpResponse(status=202)
 
             if "dostan_vrstvy_zmazanie_iframe" in body and "username" in body:
-                if uzivatelska_vrstva_na_zmazanie =="":
+                if uzivatelska_vrstva_na_zmazanie =="" or body['username']!= opravneny_uzivatel:
                     return HttpResponse("", status=304)
                 user = User.objects.get(username=body['username'])
                 objekt = Objekty.objects.get(pk=uzivatelska_vrstva_na_zmazanie)
@@ -420,7 +431,7 @@ def api_request(request):
                 return HttpResponse("", status=304)
 
             if "dostan_vrstvy_uprava_iframe" in body and "username" in body:
-                if uzivatelska_vrstva_na_upravu =="":
+                if uzivatelska_vrstva_na_upravu =="" or body['username']!= opravneny_uzivatel:
                     return HttpResponse("", status=304)
                 user = User.objects.get(username=body['username'])
                 objekt = Objekty.objects.get(pk=uzivatelska_vrstva_na_upravu)
@@ -850,11 +861,12 @@ def test(request):
             IV. stupeň ochrany<br> 
                 <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
                 <br>       
-        <button onlick="uprav_uzivatelsku_vrstvu('Ano');"></button>
+        <button onlick="uprav_uzivatelsku_vrstvu('Ano','admin');"></button>
         <script>
-                async function uprav_uzivatelsku_vrstvu(id) {
+                async function uprav_uzivatelsku_vrstvu(id,meno) {
                   let user = {
                   id: id,
+                  username: meno,
                   uprav_vrstvu_iframe: null
                 };
 
@@ -950,6 +962,9 @@ def htmx_request(request):
                 nastavenia["shared_with"].pop(priatel)
                 zdielany_objekt.nastavenia = json.dumps(nastavenia)
                 zdielany_objekt.save()
+            if "ifrejm" in request.GET:
+                return HttpResponse(
+                    f"""Zdieľanie objektu úspešne zrušené, zmena sa prejaví po znovunačítaní mapy""")
             return HttpResponse(f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zdielat&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a>""")
 
     except:

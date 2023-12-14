@@ -4,19 +4,9 @@ vlastný bod s popisom  a diskusiou
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
 dorobiť návratové správy do api
 
-views spraviť do zložiek
-
-zdielanie objektu etc do API, nie do mainu
-
-Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checknut cez checkbox aj sys vrstvy
+Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checknut cez checkbox aj sys vrstvy (zrejme v nastaveniach mapy)
 
 pozrieť sa na "tooltips" a preložiť do slovenčiny
-
-django user accounts
-
-doplnit, aby zdielany objekt nemohol byt zmazany etc
-
-spravit user edit
 
 zoradit hladanie užívatelov
 
@@ -28,13 +18,11 @@ Pridať premenovanie do administrácie
 
 vyhrať sa s popup stylom
 
-user edit aby bol klikací, nie "to čo vidíš"
-
 nastavenie profilu tak, aby ss dalo nastavit, že či chcem aby ktokolvek so mnou mohol zdielat + či dostavat upozornenie
 
 pozrieť sa na databázové dopyty, či sa nedajú zefektívniť
 
-informácia o stránke S v prihlásení
+informácia o stránke S v prihlásení (nejaké logo etc)
 
 pridať kôš
 
@@ -42,13 +30,7 @@ myslieť na menšie obrazovky
 
 mapa nech sa načítava cez ajax
 
-zrušiť zdieľanie v zdielanom html  + notifikácie  etc dorobiť
-
-namiesto "neboli vybrane žiadne vrstvy" zmeniť , že žiadne nie sú v dohľade
-
-upravit aby iframe mohol skonzumovat iba ten komu ide
-
-aby tklacidla boli aj v zdielanych vrstvach s upravou
+notifikácie na zdieľanie  etc dorobiť
 
 zmena html sa prejaví až po obnovení mapy
 

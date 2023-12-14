@@ -500,7 +500,7 @@ var stateChangingButton_delete = L.easyButton({
     }]
 });
 
-stateChangingButton_delete.addTo( {{ this._parent.get_name() }} );
+// stateChangingButton_delete.addTo( {{ this._parent.get_name() }} ); //Aktuálne chcem, aby sa dalo mazať iba po jednom
 
 //Začiatok iframe obchdázania
 
