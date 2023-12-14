@@ -24,8 +24,6 @@ pridať notifikácie do priatelov
 
 Porozmýšľať nad fungovaním blokácie
 
-zdielanie objektu -> v priateloch v modali vypísať všetky zdielané objekty
-
 Pridať premenovanie do administrácie
 
 vyhrať sa s popup stylom
@@ -46,12 +44,14 @@ mapa nech sa načítava cez ajax
 
 zrušiť zdieľanie v zdielanom html  + notifikácie  etc dorobiť
 
-režim úpravy text keď nie sú vybrané vrstvy opraviť
-
 namiesto "neboli vybrane žiadne vrstvy" zmeniť , že žiadne nie sú v dohľade
 
 upravit aby iframe mohol skonzumovat iba ten komu ide
 
-po zavreti upravy uvilnit tlačidla
-
 aby tklacidla boli aj v zdielanych vrstvach s upravou
+
+zmena html sa prejaví až po obnovení mapy
+
+prázdny html editor sa neuloží
+
+pri mazaní vlastných / zdielaných objektov mazať aj podskupinu

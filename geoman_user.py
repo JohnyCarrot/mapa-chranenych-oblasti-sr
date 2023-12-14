@@ -44,7 +44,7 @@ class Geoman(JSCSSMixin, MacroElement):
                   body: JSON.stringify(user)
                 });
                     response.text().then(function (text) {
-                    //uprav_vrstvu(text);
+                    zmaz_vrstvu(text);
                         
                 });
            return true;
@@ -194,7 +194,9 @@ class Geoman(JSCSSMixin, MacroElement):
                                     }); //Koniec označenia vrsiev
                             
                             if(selected_layers.length == 0){
-                                alert("Neboli vybrané žiadne vrstvy");
+                                alert("Momentálne nie sú k dispozícii žiadne vrstvy na úpravu. Priblížte alebo posuňte mapu tak, aby boli viditeľné vrstvy na editáciu.");
+                                textbox_edit_1.remove();
+                                textbox_edit_2.remove();
                                 return null;
                             } 
                             parent.posledne_html_z_editora = html_pred_zmenou;                          
@@ -569,6 +571,9 @@ stateChangingButton_delete.addTo( {{ this._parent.get_name() }} );
     ,buttonOK:'  '} //Po stlačení button OK zmizne celé okno, zrejme bude treba dorobiť iný button, zrejme ho treba prevytvoriť
         });
         SingleStyleEditor.disableBtn();
+        
+
+        
         var Singlepicker;
         var Singlepicker_pozadie;
 
@@ -600,6 +605,11 @@ function uprav_vrstvu(id_vrstvy){
         }                             
     }); //Koniec označenia vrsiev
     
+    SingleStyleEditor.addEventListener("hide", function() {
+        stateChangingButton.enable();   
+        stateChangingButton_delete.enable();
+        Singlelayer.setStyle(layer_previous_options);
+    });
     
     parent.posledne_html_z_editora = html_pred_zmenou; 
     SingleStyleEditor.show();
@@ -762,7 +772,34 @@ function uprav_vrstvu_uloz_iframe(){
 
 
 }        
-        
+        function zmaz_vrstvu(id_vrstvy){
+                
+                if(id_vrstvy == ''){ return null;}
+                let okno_zmaz_vrstvu = L.control.window({{ this._parent.get_name() }},{title:'Zmazanie vrstvy',content:'Naozaj chcete zmazať túto vrstvu ?',visible: true})
+                okno_zmaz_vrstvu.prompt({
+                    buttonOK: 'Áno',
+                    callback: function(){
+                    
+                    let Singlelayer;
+            {{ this._parent.get_name() }}.eachLayer(function (layer) { 
+        if(layer.feature && (layer.feature.geometry.podskupina_spravca == '{{ this.username }}' || layer.feature.geometry.zdielane_w == true)  ){
+
+        if(  id_vrstvy ==  layer.feature.geometry.serverID ) {      
+            Singlelayer = layer;                 
+         }
+         
+        }                             
+    }); 
+        Singlelayer.remove();
+        delete_layer_server([Singlelayer.feature.geometry.serverID]);
+                    
+                    
+                    },
+                    buttonCancel: 'Nie',
+                
+                });
+                
+        }
         
         {% endmacro %}
         """

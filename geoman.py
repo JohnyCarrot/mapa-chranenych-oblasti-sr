@@ -149,7 +149,9 @@ class Geoman(JSCSSMixin, MacroElement):
                                     }); //Koniec označenia vrsiev
                             
                             if(selected_layers.length == 0){
-                                alert("Neboli vybrané žiadne vrstvy");
+                                alert("Momentálne nie sú k dispozícii žiadne vrstvy na úpravu. Priblížte alebo posuňte mapu tak, aby boli viditeľné vrstvy na editáciu.");
+                                textbox_edit_1.remove();
+                                textbox_edit_2.remove();
                                 return null;
                             } 
                             parent.posledne_html_z_editora = html_pred_zmenou;                          
