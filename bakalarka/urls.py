@@ -32,6 +32,7 @@ urlpatterns = [
     path('api_file',map_views.api_request_file),
     path('administracia',map_views.administracia),
     path('administracia/json', map_views.administracia_json),
+    path('administracia/bin', map_views.admin_bin),
     path('spravuj',map_views.subgroup_edit),
     path('accounts/',include('django.contrib.auth.urls'),name = "accounts"),
     path("register", map_views.register_request, name="register"),

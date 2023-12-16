@@ -104,6 +104,12 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             <div style="font-size: 13.5px;">
         """#Započatie html
         html += objekt.html
+
+        if objekt.nastavenia != None:
+            nastavenia = json.loads(objekt.nastavenia)
+            if "deleted" in nastavenia and nastavenia['deleted'] == True:
+                continue
+
         if(objekt.nastavenia != None and uzivatel!= None and uzivatel.is_authenticated):
             nastavenia = json.loads(objekt.nastavenia)
             if"shared_with" in nastavenia and uzivatel.username in nastavenia["shared_with"] and nastavenia["shared_with"][uzivatel.username]==podskupina.id:
@@ -399,6 +405,18 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
 
+            if "objekt_zmazanie_navzdy" in body and "objekt_id" in body:
+                Objekty.objects.get(id=body['objekt_id']).delete()
+                return HttpResponse(status=201)
+
+            if "obnov_objekt_z_kosa" in body and "objekt_id" in body:
+                objekt = Objekty.objects.get(id=body['objekt_id'])
+                nastavenia = json.loads(objekt.nastavenia)
+                nastavenia['deleted'] = False
+                objekt.nastavenia = json.dumps(nastavenia)
+                objekt.save()
+                return HttpResponse(status=201)
+
             if "uprav_vrstvu_iframe" in body and "id" in body and "username" in body:
                 opravneny_uzivatel = body['username']
                 uzivatelska_vrstva_na_upravu = body['id']
@@ -631,8 +649,17 @@ def api_request(request):
                 return HttpResponse(status=201)
             if "admin_delete_objekt" in body and "id_objektu" in body:
                 for objekt_id in body.get('id_objektu'):
-                    objekt = Objekty(id=objekt_id)
-                    objekt.delete()
+                    objekt = Objekty.objects.get(id=objekt_id)
+                    if (objekt.nastavenia == None):
+                        nastavenia = dict()
+                        nastavenia["deleted"] = True
+                    else:
+                        nastavenia = json.loads(objekt.nastavenia)
+                        nastavenia["deleted"] = True
+                    objekt.nastavenia = json.dumps(nastavenia)
+                    objekt.save()
+
+
                 return HttpResponse(status=201)
             if "admin_object_create" in body and "coords" in body and "meno" in body and "podskupina_id" in body:
                 geometria_cela = json.loads(body.get('coords'))
@@ -829,6 +856,26 @@ def administracia_json(request):
 
 
 @login_required
+def admin_bin(request):
+    if navbar_zapni_administraciu(request.user)==False: #Ak nemám žiadne oprávnenie ....
+        return redirect('/')
+    context = {}
+    vysledok = []
+    for objekt in Objekty.objects.filter(nastavenia__isnull=False,podskupina__spravca__isnull=True):
+        nastavenia = json.loads(objekt.nastavenia)
+        if "deleted" not in nastavenia:
+            continue
+        elif "deleted" in nastavenia and nastavenia["deleted"]!=True:
+            continue
+        podskupina = objekt.podskupina
+        skupina = podskupina.skupina
+        vysledok.append(  (skupina,podskupina,objekt)  )
+    context['kos'] = vysledok
+
+    return render(request, 'administration/bin.html',context)
+
+
+@login_required
 def test(request):
     if request.user.is_superuser == False:
         return redirect('/')
@@ -950,6 +997,12 @@ def htmx_request(request):
                 nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
             zdielany_objekt.nastavenia = json.dumps(nastavenia)
             zdielany_objekt.save()
+            notifikacia = Notifikacie()
+            notifikacia.prijimatel = User.objects.get(username=request.GET.get('zdielane_s'))
+            notifikacia.odosielatel = User.objects.get(username=zdielany_objekt.podskupina.spravca)
+            notifikacia.sprava = f"s Vami zdieľa objekt <b>{zdielany_objekt.meno}</b>"
+            notifikacia.save()
+
 
             return HttpResponse(f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zrusit_zdielanie&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a>""")
 

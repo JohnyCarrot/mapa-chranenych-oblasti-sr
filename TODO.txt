@@ -36,4 +36,8 @@ zmena html sa prejaví až po obnovení mapy
 
 prázdny html editor sa neuloží
 
-pri mazaní vlastných / zdielaných objektov mazať aj podskupinu
+mazanie / premenovanie skupiny / podskupin
+
+pridať možnosť spojiť 2 objekty do jednej podskupiny
+
+v administrácií vysypať kôš / celkovo mazať môže len admin
