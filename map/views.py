@@ -284,7 +284,6 @@ def index(requests):
     #Normálne načítanie
     m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                    zoom_start=8,
-                   width=1000, height=800,
                    prefer_canvas=False,
                    # crs="EPSG3857",
 
@@ -321,9 +320,11 @@ def index(requests):
         Draw_custom(export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
     print(f"---Pluginy: %s seconds ---" % (time.time() - start_time_temp))
     start_time_temp = time.time()
-    m = m._repr_html_()
+    #m = m._repr_html_()
+    fig = branca.element.Figure(height='100%')
+    fig.add_child(m)
     context = {
-        'm': m,
+        'm': fig._repr_html_(),
     }
 
     context['navbar_administracia'] = navbar_zapni_administraciu(requests.user) #Neoverovať prihlásenie !!!
