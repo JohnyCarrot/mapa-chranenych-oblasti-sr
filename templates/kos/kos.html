@@ -47,7 +47,19 @@
 </table>
 
   {% else %}
-  Som tak prázdny...
+    <style>
+    .center-screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 60vh;
+    }
+    </style>
+       <div class="center-screen">
+     {% load static %}<img src="{% static 'bin/trash_can.png' %}" width="300px" height="300px">
+           <h4>Som tak prázdny ...</h4>
+     </div>
   {% endif %}
 
   <script>
