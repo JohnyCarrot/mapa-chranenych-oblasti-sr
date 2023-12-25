@@ -854,6 +854,23 @@ def administracia_json(request):
 
 
 @login_required
+def user_bin(request):
+    context = {}
+    vysledok = []
+    for objekt in Objekty.objects.filter(nastavenia__isnull=False,podskupina__spravca__isnull=False,podskupina__spravca=request.user.username):
+        nastavenia = json.loads(objekt.nastavenia)
+        if "deleted" not in nastavenia:
+            continue
+        elif "deleted" in nastavenia and nastavenia["deleted"]!=True:
+            continue
+        podskupina = objekt.podskupina
+        skupina = podskupina.skupina
+        vysledok.append(  (skupina,podskupina,objekt)  )
+    context['kos'] = vysledok
+    context['navbar_administracia'] = navbar_zapni_administraciu(request.user)
+    return render(request, 'kos/kos.html',context)
+
+@login_required
 def admin_bin(request):
     if navbar_zapni_administraciu(request.user)==False: #Ak nemám žiadne oprávnenie ....
         return redirect('/')
