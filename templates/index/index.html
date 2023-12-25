@@ -21,7 +21,7 @@
 
     <title>Mapa chránených oblastí SR</title>
   </head>
-  <body>
+  <body onload="daj_mapu_celu()">
     {% include "navbar.html" with navbar_administracia=navbar_administracia %}
   <style>
     #bodyWrapper {
@@ -45,7 +45,7 @@
 
 
                   <div id="mapWrapper">
-            <div id="map">{{m | safe}}</div>
+            <div id="map"></div>
           </div>
 
 
@@ -71,6 +71,30 @@
     handle: '.modal-header'
 });
 $('.modal.draggable>.modal-dialog>.modal-content>.modal-header').css('cursor', 'move');
+function map_preview_update(html){
+        let wrapper = document.getElementById('map');
+        wrapper.innerHTML= html;
+}
+
+async function daj_mapu_celu(){
+    map_preview_update('Načítavanie mapy....');
+    let user = {
+          //daj_mapu_celu: null
+        };
+
+    let response = await fetch('/mapa', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',"X-CSRFToken": '{{csrf_token}}'
+      },
+      body: JSON.stringify(user),
+      credentials: 'same-origin',
+    });
+    response.text().then(function (text) {
+      map_preview_update(text);
+    });
+
+}
 var posledne_html_z_editora = "";
 
   function summer_note_destroyer(){

@@ -28,6 +28,7 @@ urlpatterns = [
     path('',map_views.index,name='index'),
     path('forum/',map_views.forum,name='forum'),
     path('test',map_views.test),
+    path('mapa',map_views.render_mapy),
     path('api',map_views.api_request),
     path('api_file',map_views.api_request_file),
     path('administracia',map_views.administracia),

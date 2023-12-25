@@ -250,8 +250,6 @@ def vrat_zdielane_objekty_s_uzivatelom(username):
 
 
 def index(requests):
-    start_time = time.time()
-    start_time_temp = time.time()
     if requests.user.is_authenticated:
         if vrat_skupinu_vlastnych_objektov_uzivatela(username=requests.user.username) == None:
             viditelnost = Viditelnost_mapa()
@@ -279,8 +277,11 @@ def index(requests):
         cur.execute(INSERT_STATEMENT, (requests.GET.get('new_object_name'),None,"",0,podskupina_noveho_objektu.id,str(dictData['geometry'])   )  )
         return HttpResponseRedirect(requests.path_info)
 
+    return render(requests, 'index/index.html')
 
-
+def render_mapy(requests):
+    start_time = time.time()
+    start_time_temp = time.time()
     #Normálne načítanie
     m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                    zoom_start=8,
@@ -306,8 +307,6 @@ def index(requests):
 
     start_time_temp = time.time()
 
-
-
     # mapa nastavenie
     folium.plugins.Fullscreen().add_to(m)
     Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
@@ -330,9 +329,7 @@ def index(requests):
     context['navbar_administracia'] = navbar_zapni_administraciu(requests.user) #Neoverovať prihlásenie !!!
     print(f"---Generacia mapy: %s seconds ---" % (time.time() - start_time_temp))
     print(f"---celá stránka %s seconds ---" % (time.time() - start_time))
-    #print("Počet znakov v html: "+str(len(m)))
-    return render(requests, 'index/index.html', context)
-
+    return HttpResponse(m._repr_html_(), content_type="text/plain")
 
 # Koniec mapy, začiatok diskusného fóra
 def forum(requests):
