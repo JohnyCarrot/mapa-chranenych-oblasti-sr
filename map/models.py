@@ -88,6 +88,22 @@ class Notifikacie(models.Model):
     videne = models.BooleanField(default=False)
 
 
+class Diskusia(models.Model):
+    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    viditelnost = models.ForeignKey(Viditelnost_mapa, blank=True, null=True, on_delete=models.CASCADE, to_field='id',db_column="viditelnost")
+    anonym_read = models.BooleanField(default=True) #Ak True, môže vidieť každý, inak len ten čo má r vo viditelnosti
+    anonym_write = models.BigIntegerField(default=0, null=False) #0 - všetci,1 - R, 2 - W
+    spravca = models.TextField(blank=True, null=True)
+
+class Diskusny_prispevok(models.Model):
+    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    diskusia = models.OneToOneField(Diskusia, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    sprava = models.TextField(blank=True, null=False, default="")
+    timestamp = models.DateTimeField(default=timezone.now, null=False)
+    karma = models.JSONField(blank=True, null=True, default=dict) # meno uzivatela a + / - a nakoniec sa karma sčíta
+
+
 
 
 

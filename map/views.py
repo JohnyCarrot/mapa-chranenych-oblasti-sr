@@ -333,7 +333,7 @@ def render_mapy(requests):
 
 # Koniec mapy, začiatok diskusného fóra
 def forum(requests):
-    return render(requests, 'forum/index.html')
+    return render(requests, 'forum/diskusia.html')
 
 # Editacia objektov
 def subgroup_edit(requests):
@@ -874,6 +874,8 @@ def user_bin(request):
 def admin_bin(request):
     if navbar_zapni_administraciu(request.user)==False: #Ak nemám žiadne oprávnenie ....
         return redirect('/')
+    if request.user.is_superuser == False:
+        return redirect('/administracia')
     context = {}
     vysledok = []
     for objekt in Objekty.objects.filter(nastavenia__isnull=False,podskupina__spravca__isnull=True):
