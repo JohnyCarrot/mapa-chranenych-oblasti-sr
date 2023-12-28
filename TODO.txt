@@ -2,7 +2,6 @@ používatelia aktualizujuci vrstvy
 možnodť vlastného výletu na mape
 vlastný bod s popisom  a diskusiou
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
-dorobiť návratové správy do api
 
 Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checknut cez checkbox aj sys vrstvy (zrejme v nastaveniach mapy)
 
@@ -18,26 +17,21 @@ Pridať premenovanie do administrácie
 
 vyhrať sa s popup stylom
 
-nastavenie profilu tak, aby ss dalo nastavit, že či chcem aby ktokolvek so mnou mohol zdielat + či dostavat upozornenie
-
-pozrieť sa na databázové dopyty, či sa nedajú zefektívniť
 
 informácia o stránke S v prihlásení (nejaké logo etc)
 
-pridať kôš
-
-myslieť na menšie obrazovky
-
-mapa nech sa načítava cez ajax
 
 notifikácie na zdieľanie  etc dorobiť
 
 zmena html sa prejaví až po obnovení mapy
 
-prázdny html editor sa neuloží
 
 mazanie / premenovanie skupiny / podskupin
 
-pridať možnosť spojiť 2 objekty do jednej podskupiny
 
 v administrácií vysypať kôš / celkovo mazať môže len admin
+notifikácie o diskusií  budú chodiť len tam, kde nie je null
+
+v administrácií sa bude dať nastaviť úroven diskusie (skupinová, podskupinová, objktová, viacero objektob spoločná diskusia) na základe toho sa v objektoch prepíše id
+
+diskusia odbery slúžia na prihlásenie sa na odber

@@ -79,6 +79,11 @@ def vytvor_viditelnost():
     INSERT_STATEMENT = 'INSERT INTO map_viditelnost_mapa (id,globalne,prihlaseny,uzivatelia) VALUES (%s,%s,%s,%s) RETURNING id;'
     return pridaj_do_databazy(INSERT_STATEMENT, (uuid.uuid4().__str__(),"r","",json.dumps({})))
 
+def vytvor_diskusiu():
+    INSERT_STATEMENT = 'INSERT INTO map_diskusia (id,anonym_read,anonym_write,spravca,aktivna,odbery) VALUES (%s,%s,%s,%s,%s,%s) RETURNING id;'
+    return pridaj_do_databazy(INSERT_STATEMENT, (uuid.uuid4().__str__(),True,1,None,True,json.dumps({})))
+
+
 def stupne_ochrany():
     skupina = pridaj_skupinu("Chránené oblasti",None,["*"])
     podskupiny = dict()
@@ -177,10 +182,10 @@ def chranene_oblasti():
         style = json.dumps(style)
         if ("MULTIPOLYGON" in str(tuples[13])):
             for polygon in tuples[13].geoms:
-                pridaj_objekt(tuples[5], style, html, 1, podskupiny[tuples[6]],
+                pridaj_objekt(tuples[5], style, html, vytvor_diskusiu(), podskupiny[tuples[6]],
                               str(polygon),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
         else:
-            pridaj_objekt(tuples[5], style, html, 1, podskupiny[tuples[6]],
+            pridaj_objekt(tuples[5], style, html, vytvor_diskusiu(), podskupiny[tuples[6]],
                           str(tuples[13]),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
     return True
 

@@ -26,7 +26,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from friendship.models import Friend, Follow, Block, FriendshipRequest, FriendshipManager
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Skupiny,Podskupiny,Objekty, Profile, Viditelnost_mapa, Notifikacie
+from .models import Skupiny,Podskupiny,Objekty, Profile, Viditelnost_mapa, Notifikacie, Diskusia, Diskusny_prispevok
 from django.contrib.gis.geos import GEOSGeometry
 cur = connection.cursor()
 
@@ -124,7 +124,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 
         if(objekt.podskupina_id!=podskupina.id and zdielane == False):
             continue
-        if (objekt.diskusia == 1): html+=f"""<a href="forum/{objekt.id}" target="_blank" rel="noopener noreferrer">Diskusia</a>"""
+        if (objekt.diskusia.aktivna): html+=f"""<a href="http://127.0.0.1:8000/diskusia?q={objekt.diskusia.id}" target="_blank" rel="noopener noreferrer">Diskusia</a>"""
         if (uzivatel != None and zdielane == False and podskupina.spravca == uzivatel.username):
             html+=f"""
                     <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
