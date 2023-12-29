@@ -201,6 +201,7 @@
          posledne_html_z_editora =  $('#summernote').summernote('code');
           $('#summernote').summernote('destroy');
           document.getElementById('summernote').innerHTML= '';
+          posli_novy_prispevok();
           $('#staticBackdrop').modal('hide');
 
       });
@@ -208,11 +209,11 @@
       return true;
   }
 
-  async function posli_novy_prispevok(html,diskusia) {
+  async function posli_novy_prispevok() {
           let user = {
-          id_diskusie: diskusia,
-          html: html,
-          admin_coord_update: null,
+          id_diskusie: '{{ diskusia.id }}',
+          html: posledne_html_z_editora,
+          diskusia_novy_prispevok: null,
         };
 
         let response = await fetch('/api', {
@@ -222,7 +223,12 @@
           },
           body: JSON.stringify(user)
         });
-                   return true;
+
+        if (response.ok && response.status === 201){
+            alert("Príspevok úspešne uverejnený");
+            location.reload();
+        }
+        return true;
 }
 
   </script>

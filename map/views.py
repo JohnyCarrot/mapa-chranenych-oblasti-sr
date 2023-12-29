@@ -333,7 +333,10 @@ def render_mapy(requests):
 
 # Koniec mapy, začiatok diskusného fóra
 def forum(requests):
-    return render(requests, 'forum/diskusia.html')
+    context = {}
+    if "q" in requests.GET:
+        context['diskusia'] = Diskusia.objects.get(id = requests.GET.get('q'))
+    return render(requests, 'forum/diskusia.html',context)
 
 # Editacia objektov
 def subgroup_edit(requests):
@@ -403,6 +406,15 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
 
+
+            if "diskusia_novy_prispevok" in body and "html" in body and "id_diskusie" in body:
+                diskusia = Diskusia.objects.get(id = body['id_diskusie'])
+                novy_prispevok = Diskusny_prispevok()
+                novy_prispevok.diskusia = diskusia
+                novy_prispevok.sprava = body['html']
+                novy_prispevok.user = request.user
+                novy_prispevok.save()
+                return HttpResponse(status=201)
             if "objekt_zmazanie_navzdy" in body and "objekt_id" in body:
                 Objekty.objects.get(id=body['objekt_id']).delete()
                 return HttpResponse(status=201)

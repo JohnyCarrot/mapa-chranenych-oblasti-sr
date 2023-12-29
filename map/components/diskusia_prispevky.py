@@ -7,6 +7,8 @@ class DiskusiaPrispevkyView(UnicornView):
     prispevky = []
     id_diskusie = ""
     def mount(self):
+        self.prispevky = []
+        self.id_diskusie = ""
         if "q" in self.request.GET:
             self.id_diskusie = self.request.GET.get("q")
 
