@@ -162,6 +162,9 @@ INTERNAL_IPS = [
 GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal306'
 GEOS_LIBRARY_PATH = r'C:\OSGeo4W\bin\geos_c.dll'
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 262144000 #Malo by byť 250 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 262144000 #Malo by byť 250 MB
+
 import os
 STATICFILES_DIRS = (
   os.path.join(BASE_DIR, 'static'),
