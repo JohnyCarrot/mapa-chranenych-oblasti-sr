@@ -338,9 +338,18 @@ def forum(requests):
         context['diskusia'] = Diskusia.objects.get(id = requests.GET.get('q'))
     return render(requests, 'forum/diskusia.html',context)
 
-# Editacia objektov
+@login_required
+def profil(requests):
+    if "u" in requests.GET and User.objects.filter(username=requests.GET['u']).exists():
+        context = {}
+        uzivatel = User.objects.get(username=requests.GET['u'])
+        profil = Profile.objects.get(user=uzivatel)
+        context['uzivatel'] = uzivatel
+        context['profil'] = profil
+        return render(requests, 'profil/profil.html',context)
+    else:
+        return HttpResponse("Profil neexistuje")
 def subgroup_edit(requests):
-
     return render(requests, 'spravuj_podskupiny/index.html')
 
 @login_required

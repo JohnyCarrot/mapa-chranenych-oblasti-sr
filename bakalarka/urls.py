@@ -29,6 +29,7 @@ urlpatterns = [
     path('diskusia',map_views.forum,name='forum'),
     path('test',map_views.test),
     path('bin',map_views.user_bin, name='bin'),
+    path('profil',map_views.profil, name='profil'),
     path('mapa',map_views.render_mapy),
     path('api',map_views.api_request),
     path('api_file',map_views.api_request_file),

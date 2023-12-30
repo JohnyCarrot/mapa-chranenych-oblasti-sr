@@ -83,9 +83,16 @@ class Map_settings(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    icon = models.TextField(blank=True, null=False, default="")  # HTML !!!!
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True, blank=True)
+    website_url = models.TextField(max_length=500, blank=True, default="")
+    facebook_url = models.TextField(max_length=500, blank=True, default="")
+    instagram_url = models.TextField(max_length=500, blank=True, default="")
+    youtube_url = models.TextField(max_length=500, blank=True, default="")
+    linked_in_url = models.TextField(max_length=500, blank=True, default="")
+    reg_date = models.DateTimeField(default=timezone.now, null=False)
     map_settings = models.OneToOneField(Map_settings, on_delete=models.CASCADE)
 
 class zdielanie_objektu(models.Model):
