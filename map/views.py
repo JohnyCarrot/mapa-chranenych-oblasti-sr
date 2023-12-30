@@ -19,7 +19,7 @@ from geoman_user import Geoman as Geoman_user
 from geocoder_custom import Geocoder as Geocoder_custom
 from easy_button_non_universal import EasyButton as EasyButton
 from django.shortcuts import render, redirect
-from .forms import NewUserForm
+from .forms import NewUserForm, NewUserForm_valid_check
 from django.contrib.auth import login
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -415,6 +415,32 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
 
+            if "uzivatel_nastavenia_ulozit" in body and "email" in body and "location" in body:
+                profilcek = Profile.objects.get(user=request.user)
+                email = body['email']
+                if body['email']=="":
+                    email = request.user.email
+                location = body['location']
+                if body['location'] == "":
+                    location = profilcek.location
+                dob = body['datum_narodenia']
+                passwd = body['password']
+                passwd2 = body['password2']
+                data = {
+                  "email": email,
+                  "location": location,
+                  "date_of_birth": dob,
+                }
+                form = NewUserForm_valid_check(data)
+                response_data = form.errors
+                response_data.pop("password1", None)
+                response_data.pop("password2", None)
+                if response_data == {}:
+                    if passwd!="" and passwd==passwd2:
+                        request.user.set_password(passwd)
+                        request.user.save()
+                    return HttpResponse(status=201)
+                return HttpResponse(json.dumps(response_data), content_type="application/json",status=301)
 
             if "diskusia_novy_prispevok" in body and "html" in body and "id_diskusie" in body:
                 diskusia = Diskusia.objects.get(id = body['id_diskusie'])

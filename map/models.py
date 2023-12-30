@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from datetime import datetime
 
 
 class Viditelnost_mapa(models.Model):
@@ -95,6 +96,10 @@ class Profile(models.Model):
     reg_date = models.DateTimeField(default=timezone.now, null=False)
     map_settings = models.OneToOneField(Map_settings, on_delete=models.CASCADE)
 
+    @property
+    def vek(self):
+        return int((datetime.now().date() - self.birth_date).days / 365.25)
+
 class zdielanie_objektu(models.Model):
     zdielane_s = models.ForeignKey(User, on_delete=models.CASCADE)
     objekt = models.ForeignKey(Objekty, on_delete=models.CASCADE)
@@ -116,11 +121,3 @@ class Notifikacie(models.Model):
 
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance,map_settings=Map_settings.objects.create())
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
