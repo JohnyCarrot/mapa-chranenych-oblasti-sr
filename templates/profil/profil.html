@@ -25,6 +25,75 @@
   <body>
   {% include "navbar.html" with navbar_administracia=navbar_administracia %}
 
+
+  <!-- Modal zmena popisku -->
+<div class="modal fade" id="zmena_popisu" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Zmena popisu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+            <label for="zmena_popisu_text_area">Nový popis:</label>
+            <textarea class="form-control" id="zmena_popisu_text_area" placeholder="{{ profil.bio }}" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="zmena_popisu_web_url">Odkaz na web stránku</label>
+            <input type="text" class="form-control" id="zmena_popisu_web_url" placeholder="{{ profil.website_url}}">
+          </div>
+          <div class="form-group">
+            <label for="zmena_popisu_fb_url">Facebook</label>
+            <input type="text" class="form-control" id="zmena_popisu_fb_url" placeholder="{{ profil.facebook_url}}">
+          </div>
+          <div class="form-group">
+            <label for="zmena_popisu_ig_url">Instagram</label>
+            <input type="text" class="form-control" id="zmena_popisu_ig_url" placeholder="{{ profil.instagram_url}}">
+          </div>
+          <div class="form-group">
+            <label for="zmena_popisu_yt_url">Youtube</label>
+            <input type="text" class="form-control" id="zmena_popisu_yt_url" placeholder="{{ profil.youtube_url}}">
+          </div>
+          <div class="form-group">
+            <label for="zmena_popisu_li_url">Linked in</label>
+            <input type="text" class="form-control" id="zmena_popisu_li_url" placeholder="{{ profil.linked_in_url}}">
+          </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" data-dismiss="modal">Zatvoriť</button>
+        <button type="button" class="btn btn-success">Uložiť</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Modal zmena fotografie -->
+<div class="modal fade" id="zmena_fotografie" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="container" style="margin-top: 2%">
 
     <div class="row" id="user-profile">
@@ -183,22 +252,24 @@
                         <div class="form-group">
                             <div class="col-xs-12">
                                 <br>
-                                <button class="btn btn-lg btn-success" type="button" onclick="uloz_nastavenia()"><i class="glyphicon glyphicon-ok-sign"></i>Uložiť</button>
-                                <button class="btn btn-lg btn-danger" type="reset"><i class="glyphicon glyphicon-repeat"></i>Resetovať</button>
+                                <button class="btn btn-lg btn-success" type="button" onclick="uloz_nastavenia()">Uložiť</button>
+                                <button class="btn btn-lg btn-danger" type="reset">Resetovať</button>
+                                <button class="btn btn-lg btn-info" type="button" data-toggle="modal" data-target="#zmena_popisu">Zmeniť popis</button>
+                                <button class="btn btn-lg btn-primary" type="button" data-toggle="modal" data-target="#zmena_fotografie">Zmeniť fotografiu</button>
                             </div>
                         </div>
                     </form>
                 </div>
 
             </div>
-            <!--/tab-pane-->
+
         </div>
-        <!--/tab-content-->
+
 
     </div>
-    <!--/col-9-->
+
 </div>
-<!--/row-->
+
 
 <script>
 
