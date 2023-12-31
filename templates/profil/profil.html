@@ -203,6 +203,16 @@
 <script>
 
 async function uloz_nastavenia() {
+            if(document.getElementById('email').value ==='' && document.getElementById('location').value ===''
+            && document.getElementById('datum_narodenia').value ==='{{ profil.birth_date|date:'Y-m-d' }}'
+            && document.getElementById('password').value ==='' && document.getElementById('password2').value ===''){
+                return true;
+            }
+            if (document.getElementById('password').value!==document.getElementById('password2').value){
+                alert("Nové heslo a overenie nového hesla sa nezhoduje. Skúste prosím znovu.");
+                return true;
+            }
+
           let user = {
           email: document.getElementById('email').value,
           location: document.getElementById('location').value,
@@ -221,13 +231,20 @@ async function uloz_nastavenia() {
         });
 
         if (response.ok && response.status === 201){
-            alert("Príspevok úspešne uverejnený");
-            //location.reload();
+            alert("Profil úspešne aktualizovaný !");
+            location.reload();
         }
         else if (response.status === 301) {
             response.json().then(data => {
-                alert(JSON.stringify(data));
-                                        });
+                let json = JSON.parse(JSON.stringify(data));
+                let vystup = "Zmeny neboli uložené z nasledujúcich dôvodov: ";
+                for (var key in json) {
+                    if (json.hasOwnProperty(key)) {
+                      vystup = vystup + "\n" + json[key];
+                    }
+                }
+                alert(vystup);
+            });
         }
         else {
             alert("Niekde nastala chyba. Skúste znovu");

@@ -10,6 +10,7 @@ import geocoder
 import random
 import json
 from django.core.serializers import json as json_ser
+from django.utils.dateparse import parse_date
 from django.views.decorators.csrf import csrf_exempt
 from folium import plugins
 from django.db import connection
@@ -436,6 +437,12 @@ def api_request(request):
                 response_data.pop("password1", None)
                 response_data.pop("password2", None)
                 if response_data == {}:
+                    request.user.email = email
+                    profilcek.location = location
+                    if parse_date(dob) is not None:
+                        profilcek.birth_date = parse_date(dob)
+                    request.user.save()
+                    profilcek.save()
                     if passwd!="" and passwd==passwd2:
                         request.user.set_password(passwd)
                         request.user.save()

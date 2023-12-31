@@ -49,5 +49,5 @@ class NewUserForm_valid_check(UserCreationForm):
         dob = self.cleaned_data['date_of_birth']
         today = date.today()
         if (dob.year + 18, dob.month, dob.day) > (today.year, today.month, today.day):
-            raise forms.ValidationError('Registrácia nie je povolená osobám mladším ako 18 rokov.')
+            raise forms.ValidationError('Pôsobenie na platforme nie je povolené osobám mladším ako 18 rokov.')
         return dob
