@@ -35,3 +35,22 @@ notifikácie o diskusií  budú chodiť len tam, kde nie je null
 v administrácií sa bude dať nastaviť úroven diskusie (skupinová, podskupinová, objktová, viacero objektob spoločná diskusia) na základe toho sa v objektoch prepíše id
 
 diskusia odbery slúžia na prihlásenie sa na odber
+
+pridať správy do profilu
+
+diskusia nastavenia (anonym read, write etc)
+
+spraviť karmu na prispevky
+
+pozrieť sa aj na odbery
+
+načítavanie mapy dať do stredu obrazovky s nejakým gifom
+
+do profilu pridať info či spravuje systémové vrstvy (napríklad další group list)
+
+admin_object_create - diskusia premenit na nový formát
+
+do navbaru pridať fotku s odklikom na  vlastný profil
+pomenit fotky vsade mozne podla ikonky
+
+kos v administracií prístupny len adminovi

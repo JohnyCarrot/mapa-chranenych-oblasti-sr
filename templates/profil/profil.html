@@ -118,9 +118,9 @@
 
                 <div class="profile-details">
                     <ul class="fa-ul">
-                        <li><i class="fa-li fa fa-truck"></i>Orders: <span>456</span></li>
-                        <li><i class="fa-li fa fa-comment"></i>Posts: <span>828</span></li>
-                        <li><i class="fa-li fa fa-tasks"></i>Tasks done: <span>1024</span></li>
+                        <li><i class="fa-li fa fa-user-group"></i>Počet priateľov: <span>{{ pocet_priatelov }}</span></li>
+                        <li><i class="fa-li fa fa-vector-square"></i>Počet objektov: <span>{{ vlastne_objekty_pocet }}</span></li>
+                        <li><i class="fa-li fa fa-comment"></i>Počet komentárov: <span>{{ pocet_prispevkov }}</span></li>
                     </ul>
                 </div>
 
@@ -135,7 +135,6 @@
 
 
         </div>
-        <!--/col-3-->
         <div class="col-sm-9">
         {% if uzivatel.username == user.username %}
             <ul class="nav nav-tabs" id="myTab">
@@ -194,19 +193,23 @@
                     </div>
 
                 </div>
-                <!--/tab-pane-->
                 <div class="tab-pane" id="messages">
 
                     <h2></h2>
 
                     <ul class="list-group">
                         <li class="list-group-item text-muted">Notifikácie</li>
-                        <li class="list-group-item text-right"><a href="#" class="pull-left">Blabla</a> 22.3.2214</li>
-
+                                {% for notifikacia in notifikacie %}
+                        <li class="list-group-item text-right">
+                            <div class="float-left">
+                                {{ notifikacia.odosielatel }} {{ notifikacia.sprava|safe }}
+                            </div>
+                            {{ notifikacia.timestamp }}
+                        </li>
+                                {% endfor %}
                     </ul>
 
                 </div>
-                <!--/tab-pane-->
                 <div class="tab-pane" id="settings">
                         <br>
                     <form class="form" action="#" method="post" id="registrationForm">

@@ -274,8 +274,11 @@ def index(requests):
         podskupina_noveho_objektu.spravca = requests.user.username
         podskupina_noveho_objektu.skupina = Skupiny.objects.get(id=vrat_skupinu_vlastnych_objektov_uzivatela(requests.user.username))
         podskupina_noveho_objektu.save()
+        diskusia = Diskusia()
+        diskusia.spravca = requests.user.username
+        diskusia.save()
         INSERT_STATEMENT = 'INSERT INTO objekty (meno, style,html,diskusia,podskupina,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
-        cur.execute(INSERT_STATEMENT, (requests.GET.get('new_object_name'),None,"",0,podskupina_noveho_objektu.id,str(dictData['geometry'])   )  )
+        cur.execute(INSERT_STATEMENT, (requests.GET.get('new_object_name'),None,"",diskusia.pk,podskupina_noveho_objektu.id,str(dictData['geometry'])   )  )
         return HttpResponseRedirect(requests.path_info)
 
     return render(requests, 'index/index.html')
@@ -345,8 +348,16 @@ def profil(requests):
         context = {}
         uzivatel = User.objects.get(username=requests.GET['u'])
         profil = Profile.objects.get(user=uzivatel)
+        notifikacie = Notifikacie.objects.filter(prijimatel=requests.user)
+        vlastne_objekty_pocet = len(Podskupiny.objects.filter(spravca=uzivatel.username))
+        pocet_priatelov = len(Friend.objects.friends(uzivatel))
+        diskusia_pocet = len(Diskusny_prispevok.objects.filter(user=uzivatel))
         context['uzivatel'] = uzivatel
         context['profil'] = profil
+        context['notifikacie'] = notifikacie
+        context['vlastne_objekty_pocet'] = vlastne_objekty_pocet
+        context['pocet_priatelov'] = pocet_priatelov
+        context['pocet_prispevkov'] = diskusia_pocet
         return render(requests, 'profil/profil.html',context)
     else:
         return HttpResponse("Profil neexistuje")
