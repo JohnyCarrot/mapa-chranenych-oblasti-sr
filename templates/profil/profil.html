@@ -39,34 +39,34 @@
       <div class="modal-body">
           <div class="form-group">
             <label for="zmena_popisu_text_area">Nový popis:</label>
-            <textarea class="form-control" id="zmena_popisu_text_area" placeholder="{{ profil.bio }}" rows="3"></textarea>
+            <textarea class="form-control" id="zmena_popisu_text_area" rows="3">{{ profil.bio }}</textarea>
           </div>
 
           <div class="form-group">
             <label for="zmena_popisu_web_url">Odkaz na web stránku</label>
-            <input type="text" class="form-control" id="zmena_popisu_web_url" placeholder="{{ profil.website_url}}">
+            <input type="url" class="form-control" id="zmena_popisu_web_url" placeholder="{{ profil.website_url}}">
           </div>
           <div class="form-group">
             <label for="zmena_popisu_fb_url">Facebook</label>
-            <input type="text" class="form-control" id="zmena_popisu_fb_url" placeholder="{{ profil.facebook_url}}">
+            <input type="url" class="form-control" id="zmena_popisu_fb_url" placeholder="{{ profil.facebook_url}}">
           </div>
           <div class="form-group">
             <label for="zmena_popisu_ig_url">Instagram</label>
-            <input type="text" class="form-control" id="zmena_popisu_ig_url" placeholder="{{ profil.instagram_url}}">
+            <input type="url" class="form-control" id="zmena_popisu_ig_url" placeholder="{{ profil.instagram_url}}">
           </div>
           <div class="form-group">
             <label for="zmena_popisu_yt_url">Youtube</label>
-            <input type="text" class="form-control" id="zmena_popisu_yt_url" placeholder="{{ profil.youtube_url}}">
+            <input type="url" class="form-control" id="zmena_popisu_yt_url" placeholder="{{ profil.youtube_url}}">
           </div>
           <div class="form-group">
             <label for="zmena_popisu_li_url">Linked in</label>
-            <input type="text" class="form-control" id="zmena_popisu_li_url" placeholder="{{ profil.linked_in_url}}">
+            <input type="url" class="form-control" id="zmena_popisu_li_url" placeholder="{{ profil.linked_in_url}}">
           </div>
 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-info" data-dismiss="modal">Zatvoriť</button>
-        <button type="button" class="btn btn-success">Uložiť</button>
+        <button type="button" class="btn btn-success" onclick="uloz_popis()">Uložiť</button>
       </div>
     </div>
   </div>
@@ -147,7 +147,7 @@
                         <br>
                     {% if profil.bio %}
                     <div>
-                        Lepší výber lepšie ceny
+                        {{ profil.bio }}
                     </div>
 
                     <hr>
@@ -169,23 +169,23 @@
                             <ul class="fa-ul">
                                 {% if profil.website_url %}
                                 <li><i class="fa-solid fa-link fa-fw"></i>
-                                    <a href="#">Web</a></li>
+                                    <a href="{{ profil.website_url }}" target=”_blank”>Web</a></li>
                                 {% endif %}
                             {% if profil.facebook_url %}
                                 <li><i class="fa-brands fa-square-facebook fa-fw"></i></i>
-                                    <a href="#">Facebook</a></li>
+                                    <a href="{{ profil.facebook_url }}" target=”_blank”>Facebook</a></li>
                             {% endif %}
                             {% if profil.instagram_url %}
                                 <li><i class="fa-brands fa-square-instagram fa-fw"></i>
-                                    <a href="#">Instagram</a></li>
+                                    <a href="{{ profil.instagram_url }}" target=”_blank”>Instagram</a></li>
                             {% endif %}
                             {% if profil.linked_in_url %}
                                 <li><i class="fa-brands fa-linkedin fa-fw"></i>
-                                    <a href="#">Linked in</a></li>
+                                    <a href="{{ profil.linked_in_url }}" target=”_blank”>Linked in</a></li>
                             {% endif %}
                             {% if profil.youtube_url %}
                                 <li><i class="fa-brands fa-square-youtube fa-fw"></i>
-                                    <a href="#">Youtube</a></li>
+                                    <a href="{{ profil.youtube_url }}" target=”_blank”>Youtube</a></li>
                             {% endif %}
                             </ul>
                         </div>
@@ -317,6 +317,74 @@ async function uloz_nastavenia() {
                 alert(vystup);
             });
         }
+        else {
+            alert("Niekde nastala chyba. Skúste znovu");
+        }
+        return true;
+}
+
+function isValidHttpUrl(string) {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+async function uloz_popis() {
+            if(document.getElementById('zmena_popisu_text_area').value ==='{{ profil.bio }}' && document.getElementById('zmena_popisu_web_url').value ===''
+            && document.getElementById('zmena_popisu_fb_url').value==='' && document.getElementById('zmena_popisu_ig_url').value===''
+            && document.getElementById('zmena_popisu_yt_url').value==='' && document.getElementById('zmena_popisu_li_url').value===''){
+                return true;
+            }
+
+            if(document.getElementById('zmena_popisu_web_url').value !=='' &&
+                isValidHttpUrl(document.getElementById('zmena_popisu_web_url').value)===false){
+                alert("Odkaz na webstránku nie je valídna URL adresa."); return;}
+
+            if(document.getElementById('zmena_popisu_fb_url').value !=='' &&
+                isValidHttpUrl(document.getElementById('zmena_popisu_fb_url').value)===false){
+                alert("Odkaz na facebook nie je valídna URL adresa."); return;}
+
+            if(document.getElementById('zmena_popisu_ig_url').value !=='' &&
+                isValidHttpUrl(document.getElementById('zmena_popisu_ig_url').value)===false){
+                alert("Odkaz na instagram nie je valídna URL adresa."); return;}
+
+            if(document.getElementById('zmena_popisu_yt_url').value !=='' &&
+                isValidHttpUrl(document.getElementById('zmena_popisu_yt_url').value)===false){
+                alert("Odkaz na youtube nie je valídna URL adresa."); return;}
+
+            if(document.getElementById('zmena_popisu_li_url').value !=='' &&
+                isValidHttpUrl(document.getElementById('zmena_popisu_li_url').value)===false){
+                alert("Odkaz na linked in nie je valídna URL adresa."); return;}
+
+          let user = {
+          zmena_popisu_text_area: document.getElementById('zmena_popisu_text_area').value,
+          zmena_popisu_web_url: document.getElementById('zmena_popisu_web_url').value,
+          zmena_popisu_fb_url: document.getElementById('zmena_popisu_fb_url').value,
+          zmena_popisu_ig_url: document.getElementById('zmena_popisu_ig_url').value,
+          zmena_popisu_yt_url: document.getElementById('zmena_popisu_yt_url').value,
+          zmena_popisu_li_url: document.getElementById('zmena_popisu_li_url').value,
+          uzivatel_popisok_ulozit: null,
+        };
+
+        let response = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        });
+
+        if (response.ok && response.status === 201){
+            alert("Popis úspešne aktualizovaný !");
+            location.reload();
+        }
+
         else {
             alert("Niekde nastala chyba. Skúste znovu");
         }

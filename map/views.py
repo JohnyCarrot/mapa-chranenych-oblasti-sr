@@ -416,6 +416,23 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
 
+            if "uzivatel_popisok_ulozit" in body and "zmena_popisu_text_area" in body and "zmena_popisu_web_url" in body:
+                profilcek = Profile.objects.get(user=request.user)
+                if body['zmena_popisu_text_area'] != profilcek.bio:
+                    profilcek.bio = body['zmena_popisu_text_area']
+                if body['zmena_popisu_web_url'] != "":
+                    profilcek.website_url = body['zmena_popisu_web_url']
+                if body['zmena_popisu_fb_url'] != "":
+                    profilcek.facebook_url = body['zmena_popisu_fb_url']
+                if body['zmena_popisu_ig_url'] != "":
+                    profilcek.instagram_url = body['zmena_popisu_ig_url']
+                if body['zmena_popisu_yt_url'] != "":
+                    profilcek.youtube_url = body['zmena_popisu_yt_url']
+                if body['zmena_popisu_li_url'] != "":
+                    profilcek.linked_in_url = body['zmena_popisu_li_url']
+                profilcek.save()
+                return HttpResponse(status=201)
+
             if "uzivatel_nastavenia_ulozit" in body and "email" in body and "location" in body:
                 profilcek = Profile.objects.get(user=request.user)
                 email = body['email']
