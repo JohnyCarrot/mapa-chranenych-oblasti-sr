@@ -416,6 +416,12 @@ def api_request(request):
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
 
+            if "uzivatel_fotografia_ulozit" in body and "fotka_base64" in body:
+                profilcek = Profile.objects.get(user=request.user)
+                profilcek.icon = body['fotka_base64']
+                profilcek.save()
+                return HttpResponse(status=201)
+
             if "uzivatel_popisok_ulozit" in body and "zmena_popisu_text_area" in body and "zmena_popisu_web_url" in body:
                 profilcek = Profile.objects.get(user=request.user)
                 if body['zmena_popisu_text_area'] != profilcek.bio:

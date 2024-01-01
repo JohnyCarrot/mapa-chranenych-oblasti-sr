@@ -77,17 +77,19 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+        <h5 class="modal-title" id="staticBackdropLabel">Zmeniť fotografiu</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        ...
+              <input type="file" name="" id="fileId" accept="image/*" onchange="imageUploaded()">
+                    <br><br>
+
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Understood</button>
+        <button type="button" class="btn btn-info" data-dismiss="modal">Zatvoriť</button>
+        <button type="button" class="btn btn-success" onclick="uloz_fotografiu()">Uložiť</button>
       </div>
     </div>
   </div>
@@ -102,7 +104,7 @@
                         <div class="main-box clearfix">
                 <h2>{{ uzivatel.username }}</h2>
 
-                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="profile-img img-fluid mx-auto">
+                <img src="data:image/png;base64,{{ profil.icon }}" alt="" class="profile-img img-fluid mx-auto">
                 <div class="profile-label">
                     {% if uzivatel.is_superuser %}
                     <span class="tag badge badge-danger">Administrátor</span>
@@ -390,6 +392,56 @@ async function uloz_popis() {
         }
         return true;
 }
+
+var base64String = "";
+function imageUploaded() {
+    base64String = "";
+    let file = document.querySelector(
+        'input[type=file]')['files'][0];
+
+    let reader = new FileReader();
+
+    reader.onload = function () {
+        base64String = reader.result.replace("data:", "")
+            .replace(/^.+,/, "");
+
+        imageBase64Stringsep = base64String;
+
+    }
+    reader.readAsDataURL(file);
+}
+
+async function uloz_fotografiu() {
+            if(base64String ===''){
+                alert("Súbor nebol nahraný, alebo sa ešte čaká na jeho spracovanie.");return true;
+            }
+
+          let user = {
+          fotka_base64: base64String,
+          uzivatel_fotografia_ulozit: null,
+        };
+
+        let response = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        });
+
+        if (response.ok && response.status === 201){
+            alert("Fotografia úspešne aktualizovaná !");
+            location.reload();
+        }
+
+        else {
+            alert("Niekde nastala chyba. Skúste znovu");
+        }
+        return true;
+}
+
+
+
 
 </script>
   </body>
