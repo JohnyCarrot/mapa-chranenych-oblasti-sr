@@ -1,7 +1,7 @@
 from django_unicorn.components import UnicornView
 from django.contrib.auth.models import User
 from friendship.models import Friend, Follow, Block,FriendshipRequest
-from map.models import Notifikacie, Objekty, Podskupiny
+from map.models import Notifikacie, Objekty, Podskupiny, Profile
 from map.views import over_viditelnost
 from difflib import SequenceMatcher
 import json
@@ -24,19 +24,25 @@ class FriendsListView(UnicornView):
     blokovane_osoby_pocet = 0
     zdielane_vrstvy = []
     def mount(self):
-        self.zoznam_priatelov = Friend.objects.friends(self.request.user)
-        for priatel in self.zoznam_priatelov:
+        zoznam_temp = Friend.objects.friends(self.request.user)
+        self.zoznam_priatelov = []
+        for priatel in zoznam_temp:
             if Block.objects.is_blocked(self.request.user, priatel) == True:
-                self.zoznam_priatelov.remove(priatel)
+                pass
+            else:
+                self.zoznam_priatelov.append( (priatel,Profile.objects.get(user__username=priatel.username) )  )
 
         self.zoznam_priatelov_pocet = len(self.zoznam_priatelov)
         self.priatelia_obsah = True
 
     def prepni_na_priatelov(self):
-        self.zoznam_priatelov = Friend.objects.friends(self.request.user)
-        for priatel in self.zoznam_priatelov:
-            if Block.objects.is_blocked(self.request.user,priatel) == True:
-                self.zoznam_priatelov.remove(priatel)
+        zoznam_temp = Friend.objects.friends(self.request.user)
+        self.zoznam_priatelov = []
+        for priatel in zoznam_temp:
+            if Block.objects.is_blocked(self.request.user, priatel) == True:
+                pass
+            else:
+                self.zoznam_priatelov.append( (priatel,Profile.objects.get(user__username=priatel.username) )  )
 
         self.zoznam_priatelov_pocet = len(self.zoznam_priatelov)
         self.priatelia_obsah = True
@@ -45,9 +51,13 @@ class FriendsListView(UnicornView):
         self.blokacie_obsah = False
 
     def prepni_na_ziadosti(self):
-        self.zoznam_ziadosti = Friend.objects.unrejected_requests(user=self.request.user)
+        self.zoznam_ziadosti = []
+        for ziadost in Friend.objects.unrejected_requests(user=self.request.user):
+            self.zoznam_ziadosti.append( (ziadost,Profile.objects.get(user=ziadost.from_user)) )
         self.zoznam_ziadosti_pocet = len(self.zoznam_ziadosti)
-        self.zoznam_odoslanych_ziadosti = Friend.objects.sent_requests(user=self.request.user)
+        self.zoznam_odoslanych_ziadosti = []
+        for odoslane in Friend.objects.sent_requests(user=self.request.user):
+            self.zoznam_odoslanych_ziadosti.append( (odoslane,Profile.objects.get(user=odoslane.to_user)) )
         self.zoznam_odoslanych_ziadosti_pocet = len(self.zoznam_odoslanych_ziadosti)
         self.priatelia_obsah = False
         self.ziadosti_obsah = True
@@ -70,7 +80,9 @@ class FriendsListView(UnicornView):
         self.ziadosti_obsah = False
         self.najst_priatelov_obsah = False
         self.blokacie_obsah = True
-        self.blokovane_osoby = Block.objects.blocking(self.request.user)
+        self.blokovane_osoby = []
+        for osoba in Block.objects.blocking(self.request.user):
+            self.blokovane_osoby.append( (osoba,Profile.objects.get(user=osoba)) )
         self.blokovane_osoby_pocet = len(self.blokovane_osoby)
 
     def zablokuj_osobu(self,id_blokovaneho):
@@ -128,7 +140,7 @@ class FriendsListView(UnicornView):
                     uz_odoslane = 2
                 if Block.objects.is_blocked(self.request.user, uzivatel) == True:
                     uz_odoslane = 3
-                self.hladane_osoby.append(  (uzivatel,uz_odoslane)  )
+                self.hladane_osoby.append(  (uzivatel,uz_odoslane,Profile.objects.get(user=uzivatel))  )
 
     def poziadat_o_priatelstvo(self,other_user_pk):
         other_user = User.objects.get(pk=other_user_pk)

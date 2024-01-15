@@ -1,7 +1,7 @@
 import json
 
 from django_unicorn.components import UnicornView
-from map.models import Diskusia,Diskusny_prispevok
+from map.models import Diskusia,Diskusny_prispevok,Profile
 
 class DiskusiaPrispevkyView(UnicornView):
     prispevky = []
@@ -15,6 +15,6 @@ class DiskusiaPrispevkyView(UnicornView):
         if self.id_diskusie !="":
             diskusia = Diskusia.objects.get(id=self.id_diskusie)
             for prispevok in Diskusny_prispevok.objects.filter(diskusia=diskusia):
-                self.prispevky.append(prispevok)
+                self.prispevky.append(  (prispevok,Profile.objects.get(user=prispevok.user)) )
 
 

@@ -67,7 +67,7 @@
 
                             }
                          </script>
-                         {% for priatel in zoznam_priatelov %}
+                         {% for priatel,profil_priatela in zoznam_priatelov %}
 
                           <!-- modal permissions begin-->
                          <div id="modal_opravnenia_{{ priatel.username }}"class="modal fade" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog">
@@ -121,8 +121,8 @@
                         <div class="col-md-6 m-b-2">
                            <div class="p-10 bg-white">
                               <div class="media media-xs overflow-visible">
-                                 <a class="media-left" href="javascript:;">
-                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 <a class="media-left" href="profil?u={{ profil_priatela.user.username }}">
+                                 <img src="data:image/png;base64,{{ profil_priatela.icon }}" alt="" class="media-object img-circle">
                                  </a>
                                  <div class="media-body valign-middle">
                                     <b class="text-inverse">{{ priatel.username }}</b>
@@ -172,13 +172,13 @@
                      <div class="row row-space-2">
 
 
-                         {% for ziadost in zoznam_ziadosti %}
+                         {% for ziadost,profil in zoznam_ziadosti %}
                         <!-- begin col-6 -->
                         <div class="col-md-6 m-b-2">
                            <div class="p-10 bg-white">
                               <div class="media media-xs overflow-visible">
-                                 <a class="media-left" href="javascript:;">
-                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 <a class="media-left" href="profil?u={{ profil.user.username }}">
+                                 <img src="data:image/png;base64,{{ profil.icon }}" alt="" class="media-object img-circle">
                                  </a>
                                  <div class="media-body valign-middle">
                                     <b class="text-inverse">{{ ziadost.from_user.username }}</b>
@@ -218,13 +218,13 @@
                      <div class="row row-space-2">
 
 
-                         {% for odoslana_ziadost in zoznam_odoslanych_ziadosti %}
+                         {% for odoslana_ziadost,profil in zoznam_odoslanych_ziadosti %}
                         <!-- begin col-6 -->
                         <div class="col-md-6 m-b-2">
                            <div class="p-10 bg-white">
                               <div class="media media-xs overflow-visible">
-                                 <a class="media-left" href="javascript:;">
-                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 <a class="media-left" href="profil?u={{ profil.user.username }}">
+                                 <img src="data:image/png;base64,{{ profil.icon }}" alt="" class="media-object img-circle">
                                  </a>
                                  <div class="media-body valign-middle">
                                     <b class="text-inverse">{{ odoslana_ziadost.to_user.username }}</b>
@@ -264,11 +264,11 @@
         </div>
 
 
-                      {% for uzivatel,uz_odoslane in hladane_osoby %}
+                      {% for uzivatel,uz_odoslane,profil in hladane_osoby %}
                           <br>
                           <div class="media media-xs overflow-visible">
-                                 <a class="media-left" href="javascript:;">
-                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 <a class="media-left" href="profil?u={{ profil.user.username }}">
+                                 <img src="data:image/png;base64,{{ profil.icon }}" alt="" class="media-object img-circle">
                                  </a>
                                  <div class="media-body valign-middle">
                                     <b class="text-inverse">{{ uzivatel.username }}</b>
@@ -311,13 +311,13 @@
                      <div class="row row-space-2">
 
 
-                         {% for blokacia in blokovane_osoby %}
+                         {% for blokacia,profil in blokovane_osoby %}
                         <!-- begin col-6 -->
                         <div class="col-md-6 m-b-2">
                            <div class="p-10 bg-white">
                               <div class="media media-xs overflow-visible">
-                                 <a class="media-left" href="javascript:;">
-                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 <a class="media-left" href="profil?u={{ profil.user.username }}">
+                                 <img src="data:image/png;base64,{{ profil.icon }}" alt="" class="media-object img-circle">
                                  </a>
                                  <div class="media-body valign-middle">
                                     <b class="text-inverse">{{ blokacia.username }}</b>
@@ -358,11 +358,11 @@
         </div>
 
 
-                      {% for uzivatel,uz_odoslane in hladane_osoby %}
+                      {% for uzivatel,uz_odoslane,profil in hladane_osoby %}
                           <br>
                           <div class="media media-xs overflow-visible">
-                                 <a class="media-left" href="javascript:;">
-                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="media-object img-circle">
+                                 <a class="media-left" href="profil?u={{ profil.user.username }}">
+                                 <img src="data:image/png;base64,{{ profil.icon }}" alt="" class="media-object img-circle">
                                  </a>
                                  <div class="media-body valign-middle">
                                     <b class="text-inverse">{{ uzivatel.username }}</b>
