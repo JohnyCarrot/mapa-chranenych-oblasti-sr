@@ -1,15 +1,10 @@
-používatelia aktualizujuci vrstvy
 možnodť vlastného výletu na mape
-vlastný bod s popisom  a diskusiou
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
 
 Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checknut cez checkbox aj sys vrstvy (zrejme v nastaveniach mapy)
 
 pozrieť sa na "tooltips" a preložiť do slovenčiny
 
-zoradit hladanie užívatelov
-
-pridať notifikácie do priatelov
 
 Porozmýšľať nad fungovaním blokácie
 
@@ -20,10 +15,6 @@ vyhrať sa s popup stylom
 
 informácia o stránke S v prihlásení (nejaké logo etc)
 
-
-notifikácie na zdieľanie  etc dorobiť
-
-zmena html sa prejaví až po obnovení mapy
 
 
 mazanie / premenovanie skupiny / podskupin
@@ -44,16 +35,10 @@ spraviť karmu na prispevky
 
 pozrieť sa aj na odbery
 
-načítavanie mapy dať do stredu obrazovky s nejakým gifom
-
 do profilu pridať info či spravuje systémové vrstvy (napríklad další group list)
 
-admin_object_create - diskusia premenit na nový formát
 
 do navbaru pridať fotku s odklikom na  vlastný profil
-pomenit fotky vsade mozne podla ikonky
 
-kos v administracií prístupny len adminovi
 
-načítavanie - fotka namiesto textu, aby užívateľ "nevidel" načítavanie .. viac profesionality
-načítavanie - fotka "vyšedená" a cez to loading bar
+loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....

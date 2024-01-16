@@ -14,6 +14,7 @@
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
+      {% load static %}<script src="{% static 'index/progressbar.js' %}"></script>
       {% unicorn_scripts %}
       <!-- navbar závislosti -->
           {% load static %}<link rel="stylesheet" href="{% static 'navbar/style.css' %}" >
@@ -49,8 +50,9 @@
 
             <div id="map">
 
-{% load static %}<img src="{% static 'index/mapa_cista_blur_lunapic.png' %}" width="100%" height="100%" >
+{% load static %}<img style="position: relative;" src="{% static 'index/mapa_cista_blur_lunapic.png' %}" width="100%" height="100%" >
 
+                <div id="loading-bar-div" style="position: absolute; top: 50%; text-align: center; width: 100%;"></div>
 
 </div>
           </div>
@@ -84,6 +86,40 @@ function map_preview_update(html){
 }
 
 async function daj_mapu_celu(){
+    let bar = new ProgressBar.Line('#loading-bar-div', {
+  strokeWidth: 3,
+  easing: 'easeInOut',
+  duration: 15400,
+  color: '#FFEA82',
+  trailColor: '#eee',
+  trailWidth: 1,
+  svgStyle: {width: '45%', height: '1.5em'},
+  text: {
+        style: {
+            // Text color.
+            // Default: same as stroke color (options.color)
+            color: '#f00',
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            padding: 0,
+            margin: 0,
+            // You can specify styles which will be browser prefixed
+            transform: {
+                prefix: true,
+                value: 'translate(-50%, -50%)'
+            }
+        },
+    autoStyleContainer: false
+  },
+  from: {color: '#FFEA82'},
+  to: {color: '#ED6A5A'},
+  step: (state, bar) => {
+    bar.setText(Math.round(bar.value() * 100) + ' %');
+  }
+});
+
+bar.animate(1.0);  // Number from 0.0 to 1.0
     //map_preview_update('Načítavanie mapy....');
     let user = {
           //daj_mapu_celu: null
