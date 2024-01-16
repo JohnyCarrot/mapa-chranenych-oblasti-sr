@@ -54,3 +54,5 @@ do navbaru pridať fotku s odklikom na  vlastný profil
 pomenit fotky vsade mozne podla ikonky
 
 kos v administracií prístupny len adminovi
+
+načítavanie - fotka namiesto textu, aby užívateľ "nevidel" načítavanie .. viac profesionality
