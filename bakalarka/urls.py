@@ -31,6 +31,7 @@ urlpatterns = [
     path('bin',map_views.user_bin, name='bin'),
     path('profil',map_views.profil, name='profil'),
     path('mapa',map_views.render_mapy),
+    path('mapa_cista',map_views.render_mapy_cela),
     path('api',map_views.api_request),
     path('api_file',map_views.api_request_file),
     path('administracia',map_views.administracia),

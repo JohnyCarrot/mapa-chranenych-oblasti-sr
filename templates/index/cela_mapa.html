@@ -15,14 +15,11 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
       {% unicorn_scripts %}
-      <!-- navbar závislosti -->
-          {% load static %}<link rel="stylesheet" href="{% static 'navbar/style.css' %}" >
-      <!-- navbar závislosti koniec-->
+
 
     <title>Mapa chránených oblastí SR</title>
   </head>
   <body onload="daj_mapu_celu()">
-    {% include "navbar.html" with navbar_administracia=navbar_administracia %}
   <style>
     #bodyWrapper {
         max-width: 100vw;
@@ -39,7 +36,7 @@
         flex: 1 0 auto;
         overflow: hidden;
     }
-    #map { height: calc(100vh - 56px); }
+    #map { height: calc(100vh); }
 </style>
     <main id="bodyWrapper">
 
@@ -77,7 +74,7 @@ function map_preview_update(html){
 }
 
 async function daj_mapu_celu(){
-    map_preview_update('{% load static %}<img src="{% static 'index/mapa_cista_png.png' %}" width=100% height=100% >'); return;
+    map_preview_update('Načítavanie mapy....');
     let user = {
           //daj_mapu_celu: null
         };

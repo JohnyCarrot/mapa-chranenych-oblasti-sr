@@ -335,6 +335,10 @@ def render_mapy(requests):
     print(f"---celá stránka %s seconds ---" % (time.time() - start_time))
     return HttpResponse(m._repr_html_(), content_type="text/plain")
 
+
+def render_mapy_cela(requests):
+    return render(requests, 'index/cela_mapa.html')
+
 # Koniec mapy, začiatok diskusného fóra
 def forum(requests):
     context = {}
