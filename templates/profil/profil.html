@@ -100,18 +100,22 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Poslať správu</h5>
+        <h5 class="modal-title" id="staticBackdropLabel">Poslať správu užívateľovi {{ uzivatel.username }} </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
 
+          <div class="form-group">
+            <label for="nova_sprava_text_area">Správa:</label>
+            <textarea class="form-control" id="nova_sprava_text_area" rows="3"></textarea>
+          </div>
 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-info" data-dismiss="modal">Zatvoriť</button>
-        <button type="button" class="btn btn-success" onclick="uloz_fotografiu()">Uložiť</button>
+        <button type="button" class="btn btn-success" onclick="posli_novu_spravu()">Odoslať</button>
       </div>
     </div>
   </div>
@@ -147,9 +151,12 @@
                 </div>
 
                 <div class="profile-message-btn mx-auto text-xs-center">
+                    {% if uzivatel.username != user.username %}
+
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#poslat_spravu">
                         <i class="fa fa-envelope"></i> Poslať správu
                     </button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -217,10 +224,24 @@
                 </div>
                 <div class="tab-pane" id="messages">
 
-                    <h2></h2>
-
+                                        <ul class="list-group">
+                                        {% if spravy %}
+                        <li class="list-group-item text-muted">Správy</li>
+                                        {% endif %}
+                                {% for sprava in spravy %}
+                        <li class="list-group-item text-right">
+                            <div class="float-left">
+                                {{ sprava.odosielatel }} {{ sprava.sprava|safe }}
+                            </div>
+                            {{ sprava.timestamp }}
+                        </li>
+                                {% endfor %}
+                    </ul>
+                        <br>
                     <ul class="list-group">
+                            {% if notifikacie %}
                         <li class="list-group-item text-muted">Notifikácie</li>
+                            {% endif %}
                                 {% for notifikacia in notifikacie %}
                         <li class="list-group-item text-right">
                             <div class="float-left">
@@ -465,6 +486,36 @@ async function uloz_fotografiu() {
         return true;
 }
 
+async function posli_novu_spravu(){
+    if (document.getElementById('nova_sprava_text_area').value === ''){
+        alert("Správa nemôže byť prázdna");return true;
+    }
+
+              let user = {
+          nova_sprava: document.getElementById('nova_sprava_text_area').value,
+          nova_sprava_prijemca: '{{ uzivatel.username }}',
+        };
+
+        let response = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        });
+
+        if (response.ok && response.status === 201){
+            alert("Správa úspešne odoslaná !");
+            location.reload();
+        }
+
+        else {
+            alert("Niekde nastala chyba. Skúste znovu");
+        }
+        return true;
+
+
+}
 
 
 

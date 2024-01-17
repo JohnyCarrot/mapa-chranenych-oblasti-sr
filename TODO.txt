@@ -5,20 +5,13 @@ Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checkn
 
 pozrieť sa na "tooltips" a preložiť do slovenčiny
 
-
-Porozmýšľať nad fungovaním blokácie
-
 Pridať premenovanie do administrácie
 
 vyhrať sa s popup stylom
 
-
 informácia o stránke S v prihlásení (nejaké logo etc)
 
-
-
 mazanie / premenovanie skupiny / podskupin
-
 
 v administrácií vysypať kôš / celkovo mazať môže len admin
 notifikácie o diskusií  budú chodiť len tam, kde nie je null
@@ -27,8 +20,6 @@ v administrácií sa bude dať nastaviť úroven diskusie (skupinová, podskupin
 
 diskusia odbery slúžia na prihlásenie sa na odber
 
-pridať správy do profilu
-
 diskusia nastavenia (anonym read, write etc)
 
 spraviť karmu na prispevky
@@ -36,6 +27,5 @@ spraviť karmu na prispevky
 pozrieť sa aj na odbery
 
 do profilu pridať info či spravuje systémové vrstvy (napríklad další group list)
-
 
 loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....

@@ -27,7 +27,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from friendship.models import Friend, Follow, Block, FriendshipRequest, FriendshipManager
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Skupiny,Podskupiny,Objekty, Profile, Viditelnost_mapa, Notifikacie, Diskusia, Diskusny_prispevok
+from .models import Skupiny, Podskupiny, Objekty, Profile, Viditelnost_mapa, Notifikacie, Diskusia, Diskusny_prispevok, \
+    Sprava
 from django.contrib.gis.geos import GEOSGeometry
 cur = connection.cursor()
 
@@ -348,7 +349,7 @@ def forum(requests):
 
 @login_required
 def profil(requests):
-    if "u" in requests.GET and User.objects.filter(username=requests.GET['u']).exists():
+    if "u" in requests.GET and User.objects.filter(username=requests.GET['u']).exists() and Block.objects.is_blocked(User.objects.get(username=requests.GET['u']), requests.user) == False:
         context = {}
         uzivatel = User.objects.get(username=requests.GET['u'])
         profil = Profile.objects.get(user=uzivatel)
@@ -356,9 +357,11 @@ def profil(requests):
         vlastne_objekty_pocet = len(Podskupiny.objects.filter(spravca=uzivatel.username))
         pocet_priatelov = len(Friend.objects.friends(uzivatel))
         diskusia_pocet = len(Diskusny_prispevok.objects.filter(user=uzivatel))
+        spravy = Sprava.objects.filter(prijimatel=requests.user)
         context['uzivatel'] = uzivatel
         context['profil'] = profil
         context['notifikacie'] = notifikacie
+        context['spravy'] = spravy
         context['vlastne_objekty_pocet'] = vlastne_objekty_pocet
         context['pocet_priatelov'] = pocet_priatelov
         context['pocet_prispevkov'] = diskusia_pocet
@@ -430,6 +433,20 @@ def api_request(request):
                 mapa_nastavenia.stupen5 = body['stupen5']
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
+
+            if "nova_sprava" in body and "nova_sprava_prijemca" in body:
+                sprava = Sprava()
+                sprava.prijimatel = User.objects.get(username=body['nova_sprava_prijemca'])
+                sprava.odosielatel = request.user
+                sprava.sprava = body['nova_sprava']
+                notifikacia = Notifikacie()
+                notifikacia.prijimatel = User.objects.get(username=body['nova_sprava_prijemca'])
+                notifikacia.odosielatel = request.user
+                notifikacia.sprava = f"s Vám poslal <a href='profil?u={User.objects.get(username=body['nova_sprava_prijemca']).username}'><b>správu</b></a>"
+                sprava.save()
+                notifikacia.save()
+                return HttpResponse(status=201)
+
 
             if "uzivatel_fotografia_ulozit" in body and "fotka_base64" in body:
                 profilcek = Profile.objects.get(user=request.user)
