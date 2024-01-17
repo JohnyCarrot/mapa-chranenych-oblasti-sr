@@ -38,7 +38,4 @@ pozrieť sa aj na odbery
 do profilu pridať info či spravuje systémové vrstvy (napríklad další group list)
 
 
-do navbaru pridať fotku s odklikom na  vlastný profil
-
-
 loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....

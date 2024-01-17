@@ -114,7 +114,12 @@ class Notifikacie(models.Model):
     timestamp = models.DateTimeField(default=timezone.now,null=False)
     videne = models.BooleanField(default=False)
 
-
+class Sprava(models.Model):
+    odosielatel = models.ForeignKey(User, on_delete=models.CASCADE,related_name='odosielatel_sprava')
+    prijimatel = models.ForeignKey(User, on_delete=models.CASCADE,related_name='prijimatel_sprava')
+    sprava = models.TextField(blank=True, null=False,default="")
+    timestamp = models.DateTimeField(default=timezone.now,null=False)
+    videne = models.BooleanField(default=False)
 
 
 
