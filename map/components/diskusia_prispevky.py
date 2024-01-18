@@ -36,7 +36,31 @@ class DiskusiaPrispevkyView(UnicornView):
         return karma
 
     def zorad_popularne(self):
-        self.prispevky.sort(key=lambda s: s[2])
+        self.prispevky = []
+        diskusia = Diskusia.objects.get(id=self.id_diskusie)
+        for prispevok in Diskusny_prispevok.objects.filter(diskusia=diskusia):
+            karma = self.zisti_karmu(prispevok.karma)
+            upvoted = False
+            downvoted = False
+            if self.request.user.username in prispevok.karma:
+                if prispevok.karma[self.request.user.username] == "+":
+                    upvoted = True
+                elif prispevok.karma[self.request.user.username] == "-":
+                    downvoted = True
+            self.prispevky.append((prispevok, Profile.objects.get(user=prispevok.user), karma, upvoted, downvoted))
+        self.prispevky.sort(key=lambda s: s[2],reverse=True)
 
     def zorad_chronologicky(self):
-        self.prispevky.sort(key=lambda s: s[0]['timestamp'])
+        self.prispevky = []
+        diskusia = Diskusia.objects.get(id=self.id_diskusie)
+        for prispevok in Diskusny_prispevok.objects.filter(diskusia=diskusia):
+            karma = self.zisti_karmu(prispevok.karma)
+            upvoted = False
+            downvoted = False
+            if self.request.user.username in prispevok.karma:
+                if prispevok.karma[self.request.user.username] == "+":
+                    upvoted = True
+                elif prispevok.karma[self.request.user.username] == "-":
+                    downvoted = True
+            self.prispevky.append((prispevok, Profile.objects.get(user=prispevok.user), karma, upvoted, downvoted))
+        self.prispevky.sort(key=lambda s: s[0].timestamp)

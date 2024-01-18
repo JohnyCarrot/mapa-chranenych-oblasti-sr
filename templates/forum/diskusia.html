@@ -263,19 +263,6 @@
 }
 
 
-
-function zoradenie_prispevkov_f(){
-
-    if (document.getElementById('zoradenie').value === '1'){
-        Unicorn.call('diskusia_prispevky', 'zorad_popularne');
-    }
-
-        if (document.getElementById('zoradenie').value === '0'){
-        Unicorn.call('diskusia_prispevky', 'zorad_chronologicky');
-    }
-
-    return true;
-}
   </script>
 
   <div class="container" style="margin-right: 20%">
@@ -311,5 +298,23 @@ function zoradenie_prispevkov_f(){
 
 </div>
 </div>
+
+
+<script>
+function zoradenie_prispevkov_f(){
+
+if (document.getElementById('zoradenie').value === '1'){
+    Unicorn.call('diskusia_prispevky', 'zorad_popularne');
+}
+
+if (document.getElementById('zoradenie').value === '0'){
+    Unicorn.call('diskusia_prispevky', 'zorad_chronologicky');
+}
+
+return true;
+}
+
+
+</script>
   </body>
 </html>
