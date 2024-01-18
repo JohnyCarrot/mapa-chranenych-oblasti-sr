@@ -1,10 +1,11 @@
 <div>
-    {% for prispevok,profil_autora in prispevky %}
+    {% for prispevok,profil_autora,karma,upvoted,downvoted in prispevky %}
                     <div class="card mb-2">
                     <div class="card-body">
                         <div class="media forum-item">
+
                             <a href="profil?u={{ profil_autora.user.username }}" class="card-link">
-                                <img src="data:image/png;base64,{{ profil_autora.icon }}" class="rounded-circle" width="50" alt="User" />
+                                <img src="data:image/png;base64,{{ profil_autora.icon }}" class="rounded-circle" width="50" height="50" alt="User" />
                             </a>
                             <div class="media-body ml-3">
                                 <a href="profil?u={{ profil_autora.user.username }}" class="text-secondary">{{ prispevok.user.username }}</a>
@@ -14,11 +15,20 @@
                                 </div>
                             </div>
                             <div class="text-muted small text-center">
-                                <span class="d-none d-sm-inline-block"><i class="far fa-eye"></i> 0</span>
-                                <span><i class="far fa-comment ml-2"></i> 0</span>
+
+                                <div style="position: relative;top: -1em;" id="{{ prispevok.pk }}" class="upvotejs">
+                                                <a class="upvote {% if upvoted %}upvote-on{% endif %}"></a>
+                                                <span class="count">{{ karma }}</span>
+                                                <a class="downvote {% if downvoted %}downvote-on{% endif %}"></a>
+                                            </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
+
+        {% if user.is_authenticated %}
+        <script>Upvote.create('{{prispevok.pk}}', {callback: function(data){vote_posli(data);} });</script>
+        {% endif %}
     {% endfor %}
 </div>

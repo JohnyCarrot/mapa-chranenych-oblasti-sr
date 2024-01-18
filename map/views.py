@@ -448,6 +448,18 @@ def api_request(request):
                 return HttpResponse(status=201)
 
 
+            if "id_prispevku" in body and "akcia" in body:
+                prispevok = Diskusny_prispevok.objects.get(id = body['id_prispevku'])
+                karma = ""
+                if body['akcia'] == "upvote":
+                    karma = "+"
+                elif body['akcia'] == "downvote":
+                    karma = "-"
+                prispevok.karma[request.user.username] = karma
+                prispevok.save()
+                return HttpResponse(status=201)
+
+
             if "uzivatel_fotografia_ulozit" in body and "fotka_base64" in body:
                 profilcek = Profile.objects.get(user=request.user)
                 profilcek.icon = body['fotka_base64']
