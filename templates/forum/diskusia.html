@@ -262,6 +262,20 @@
         return true;
 }
 
+
+
+function zoradenie_prispevkov_f(){
+
+    if (document.getElementById('zoradenie').value === '1'){
+        Unicorn.call('diskusia_prispevky', 'zorad_popularne');
+    }
+
+        if (document.getElementById('zoradenie').value === '0'){
+        Unicorn.call('diskusia_prispevky', 'zorad_chronologicky');
+    }
+
+    return true;
+}
   </script>
 
   <div class="container" style="margin-right: 20%">
@@ -272,8 +286,8 @@
 
             <div class="inner-main-header">
                 <a class="nav-link nav-icon rounded-circle nav-link-faded mr-3 d-md-none" href="#" data-toggle="inner-sidebar"><i class="material-icons">arrow_forward_ios</i></a>
-                <select class="custom-select custom-select-sm w-auto mr-1">
-                    <option selected="">Chronologicky</option>
+                <select id="zoradenie" onchange="zoradenie_prispevkov_f()" class="custom-select custom-select-sm w-auto mr-1">
+                    <option selected="" value="0">Chronologicky</option>
                     <option value="1">Populárne</option>
                 </select>
 

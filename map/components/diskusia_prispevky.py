@@ -24,6 +24,7 @@ class DiskusiaPrispevkyView(UnicornView):
                     elif prispevok.karma[self.request.user.username]=="-":
                         downvoted = True
                 self.prispevky.append(  (prispevok,Profile.objects.get(user=prispevok.user),karma,upvoted,downvoted ) )
+            self.prispevky.sort(key=lambda s: s[0].timestamp)
 
     def zisti_karmu(self,karmy):
         karma = 0
@@ -33,3 +34,9 @@ class DiskusiaPrispevkyView(UnicornView):
             elif x=='-':
                 karma-=1
         return karma
+
+    def zorad_popularne(self):
+        self.prispevky.sort(key=lambda s: s[2])
+
+    def zorad_chronologicky(self):
+        self.prispevky.sort(key=lambda s: s[0]['timestamp'])

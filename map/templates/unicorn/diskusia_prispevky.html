@@ -9,7 +9,7 @@
                             </a>
                             <div class="media-body ml-3">
                                 <a href="profil?u={{ profil_autora.user.username }}" class="text-secondary">{{ prispevok.user.username }}</a>
-                                <small class="text-muted ml-2">1 hour ago</small>
+                                <small class="text-muted ml-2">{{ prispevok.timestamp|date:"j. F o G:i" }}</small>
                                 <div class="mt-3 font-size-sm">
                                     {{ prispevok.sprava|safe }}
                                 </div>
