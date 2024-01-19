@@ -13,12 +13,8 @@ informácia o stránke S v prihlásení (nejaké logo etc)
 
 mazanie / premenovanie skupiny / podskupin
 
-v administrácií vysypať kôš / celkovo mazať môže len admin
-notifikácie o diskusií  budú chodiť len tam, kde nie je null
 
 v administrácií sa bude dať nastaviť úroven diskusie (skupinová, podskupinová, objktová, viacero objektob spoločná diskusia) na základe toho sa v objektoch prepíše id
-
-diskusia odbery slúžia na prihlásenie sa na odber
 
 diskusia nastavenia (anonym read, write etc)
 
