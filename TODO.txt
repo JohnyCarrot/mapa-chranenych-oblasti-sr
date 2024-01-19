@@ -22,9 +22,6 @@ diskusia odbery slúžia na prihlásenie sa na odber
 
 diskusia nastavenia (anonym read, write etc)
 
-spraviť karmu na prispevky
-
-pozrieť sa aj na odbery
 
 do profilu pridať info či spravuje systémové vrstvy (napríklad další group list)
 

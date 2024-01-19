@@ -16,6 +16,7 @@
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
       {% load static %}<link rel="stylesheet" href="{% static 'forum/upvotejs.css' %}" >
       {% load static %}<script src="{% static 'forum/upvotejs.vanilla.js' %}"></script>
       {% unicorn_scripts %}
@@ -278,6 +279,14 @@
                     <option value="1">Populárne</option>
                 </select>
 
+                {% if user.is_authenticated %}
+                    {% if odber == True %}
+                        <i style="margin-left: 1%" class="fa-solid fa-bell fa-lg" onclick="zrusit_odber()"></i>
+                    {% else %}
+                        <i style="margin-left: 1%" class="fa-regular fa-bell fa-lg" onclick="zacat_odber()"></i>
+                    {% endif %}
+                {% endif %}
+
                                 <button onclick="summer_note_zapni()" style="width: auto;position: absolute;left: 80%" class="btn btn-primary has-icon btn-block btn-sm" type="button" data-toggle="modal" data-target="#staticBackdrop">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus mr-2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -312,6 +321,52 @@ if (document.getElementById('zoradenie').value === '0'){
 }
 
 return true;
+}
+
+async function zacat_odber(){
+    let user = {
+          zacat_odber: '{{ diskusia.pk }}',
+        };
+
+        let response = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        });
+
+        if (response.ok && response.status === 201){
+            alert("Odber aktívny. Teraz budete dostávať notifikácie o najnovších príspevkoch.");
+            location.reload();
+        }
+        else {
+            alert("Niekde nastala chyba. Skúste znovu");
+        }
+        return true;
+}
+
+async function zrusit_odber(){
+    let user = {
+          zrusit_odber: '{{ diskusia.pk }}',
+        };
+
+        let response = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        });
+
+        if (response.ok && response.status === 201){
+            alert("Odber zrušený. Už nebudete dostávať notifikácie o najnovších príspevkoch v tejto diskusií.");
+            location.reload();
+        }
+        else {
+            alert("Niekde nastala chyba. Skúste znovu");
+        }
+        return true;
 }
 
 

@@ -344,7 +344,13 @@ def render_mapy_cela(requests):
 def forum(requests):
     context = {}
     if "q" in requests.GET:
-        context['diskusia'] = Diskusia.objects.get(id = requests.GET.get('q'))
+        diskusia = Diskusia.objects.get(id = requests.GET.get('q'))
+        context['diskusia'] = diskusia
+        if requests.user.is_authenticated:
+            if requests.user.username in diskusia.odbery and diskusia.odbery[requests.user.username] == True:
+                context['odber'] = True
+            else:
+                context['odber'] = False
     return render(requests, 'forum/diskusia.html',context)
 
 @login_required
@@ -460,6 +466,18 @@ def api_request(request):
                 return HttpResponse(status=201)
 
 
+            if "zacat_odber" in body:
+                diskusia = Diskusia.objects.get(id = body['zacat_odber'])
+                diskusia.odbery[request.user.username] = True
+                diskusia.save()
+                return HttpResponse(status=201)
+
+            if "zrusit_odber" in body:
+                diskusia = Diskusia.objects.get(id = body['zrusit_odber'])
+                diskusia.odbery[request.user.username] = False
+                diskusia.save()
+                return HttpResponse(status=201)
+
             if "uzivatel_fotografia_ulozit" in body and "fotka_base64" in body:
                 profilcek = Profile.objects.get(user=request.user)
                 profilcek.icon = body['fotka_base64']
@@ -523,6 +541,13 @@ def api_request(request):
                 novy_prispevok.sprava = body['html']
                 novy_prispevok.user = request.user
                 novy_prispevok.save()
+                for meno in list(diskusia.odbery.keys()):
+                    if diskusia.odbery[meno] == True:
+                        notifikacia = Notifikacie()
+                        notifikacia.prijimatel = User.objects.get(username=meno)
+                        notifikacia.odosielatel = request.user
+                        notifikacia.sprava = f"V odoberanej <a href='diskusia?q={diskusia.id}'>diskusií</a> pribudol nový príspevok."
+                        notifikacia.save()
                 return HttpResponse(status=201)
             if "objekt_zmazanie_navzdy" in body and "objekt_id" in body:
                 Objekty.objects.get(id=body['objekt_id']).delete()
