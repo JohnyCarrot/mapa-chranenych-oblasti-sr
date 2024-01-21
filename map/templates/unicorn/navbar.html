@@ -1,10 +1,12 @@
 <div unicorn:poll="update">
 
 
-                {% for notification in notifications_unread reversed %}
+                {% for notification,profil in notifications_unread reversed %}
             	<li>
-            		<div class="col-md-3 col-sm-3 col-xs-3"><div class="notify-img" style="margin-top: 3px;float: left;display: inline-block;width: 45px;height: 45px;margin: 8px 0px 8px 0px;"><img src="http://placehold.it/45x45" alt=""></div></div>
-            		<div class="col-md-9 col-sm-9 col-xs-9" style="margin-left: 60px">
+                    {% if profil %}
+            		<div class="col-md-3 col-sm-3 col-xs-3"><div class="notify-img" style="margin-top: 3px;float: left;display: inline-block;width: 45px;height: 45px;margin: 8px 0px 8px 0px;"><img src="data:image/png;base64,{{ profil.icon }}" alt="" width="45px" height="45px"></div></div>
+            		{% endif %}
+                    <div class="col-md-9 col-sm-9 col-xs-9" style="margin-left: 60px">
                         <a href="">{{ notification.odosielatel }}</a>
                         <p style="margin-bottom: auto;">{{ notification.sprava|safe }}</p>
                         <a u:click="videne({{ notification.id }})" onclick="Unicorn.call('navbar_bell_icon_count', 'dekrement');" class="rIcon" style="float: right;color: #999;"><i class="fas fa-eye"></i></a>

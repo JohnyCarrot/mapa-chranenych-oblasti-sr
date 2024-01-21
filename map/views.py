@@ -448,7 +448,7 @@ def api_request(request):
                 notifikacia = Notifikacie()
                 notifikacia.prijimatel = User.objects.get(username=body['nova_sprava_prijemca'])
                 notifikacia.odosielatel = request.user
-                notifikacia.sprava = f"s Vám poslal <a href='profil?u={User.objects.get(username=body['nova_sprava_prijemca']).username}'><b>správu</b></a>"
+                notifikacia.sprava = f"Vám poslal <a href='profil?u={User.objects.get(username=body['nova_sprava_prijemca']).username}'><b>správu</b></a>"
                 sprava.save()
                 notifikacia.save()
                 return HttpResponse(status=201)
@@ -546,7 +546,7 @@ def api_request(request):
                         notifikacia = Notifikacie()
                         notifikacia.prijimatel = User.objects.get(username=meno)
                         notifikacia.odosielatel = request.user
-                        notifikacia.sprava = f"V odoberanej <a href='diskusia?q={diskusia.id}'>diskusií</a> pribudol nový príspevok."
+                        notifikacia.sprava = f"V odoberanej <a href='diskusia?q={diskusia.id}'>diskusií</a> uverejnil nový príspevok."
                         notifikacia.save()
                 return HttpResponse(status=201)
             if "objekt_zmazanie_navzdy" in body and "objekt_id" in body:

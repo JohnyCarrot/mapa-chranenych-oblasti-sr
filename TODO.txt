@@ -22,3 +22,4 @@ diskusia nastavenia (anonym read, write etc)
 do profilu pridať info či spravuje systémové vrstvy (napríklad další group list)
 
 loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....
+
