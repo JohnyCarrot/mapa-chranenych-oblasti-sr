@@ -453,6 +453,44 @@ def api_request(request):
                 notifikacia.save()
                 return HttpResponse(status=201)
 
+            if "novy_nazov_skupiny" in body and "skupina_id" in body:
+                if len(body["novy_nazov_skupiny"]) ==0:
+                    return HttpResponse(status=303)
+                for skupina in Skupiny.objects.all():
+                    if skupina.meno.lower() == str(body['novy_nazov_skupiny']).lower():
+                        return HttpResponse(status=304)
+                skupina = Skupiny.objects.get(id=body['skupina_id'])
+                skupina.meno = str(body['novy_nazov_skupiny'])
+                skupina.save()
+                return HttpResponse(status=201)
+
+
+            if "novy_nazov_podskupiny" in body and "podskupina_id" in body:
+                if len(body["novy_nazov_podskupiny"]) ==0:
+                    return HttpResponse(status=303)
+                for podskupina in Podskupiny.objects.all():
+                    if podskupina.meno.lower() == str(body['novy_nazov_podskupiny']).lower():
+                        return HttpResponse(status=304)
+                podskupina = Podskupiny.objects.get(id=body['podskupina_id'])
+                podskupina.meno = str(body['novy_nazov_podskupiny'])
+                podskupina.save()
+                return HttpResponse(status=201)
+
+            if "zmaz_skupinu_skupina_id" in body:
+                skupina = Skupiny.objects.get(id = body['zmaz_skupinu_skupina_id'])
+                for podskupina in Podskupiny.objects.filter(skupina = skupina):
+                    for objekt in Objekty.objects.filter(podskupina = podskupina):
+                        objekt.delete()
+                    podskupina.delete()
+                skupina.delete()
+                return HttpResponse(status=201)
+
+            if "zmaz_podskupinu_podskupina_id" in body:
+                podskupina = Podskupiny.objects.get(id = body['zmaz_podskupinu_podskupina_id'])
+                for objekt in Objekty.objects.filter(podskupina = podskupina):
+                    objekt.delete()
+                podskupina.delete()
+                return HttpResponse(status=201)
 
             if "id_prispevku" in body and "akcia" in body:
                 prispevok = Diskusny_prispevok.objects.get(id = body['id_prispevku'])

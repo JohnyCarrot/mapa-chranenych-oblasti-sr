@@ -23,7 +23,7 @@ class Diskusia(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
     anonym_read = models.BooleanField(default=True) #Ak True, môže vidieť každý, inak len ten čo má r vo viditelnosti
     anonym_write = models.BigIntegerField(default=0, null=False) #0 - všetci,1 - R, 2 - W; všetci čo majú R,W permisiu ....
-    spravca = models.TextField(blank=True, null=True)
+    spravca = models.TextField(blank=True, null=True) #Ak null tak musí byť superuser
     odbery = models.JSONField(blank=True, null=True, default=dict) #odbery notifikácií, meno: true / false
     aktivna = models.BooleanField(default=True) #Ak false diskusia bude archuvovaná, teda akoby neexistovala (vidí iba správca)
 
@@ -99,11 +99,6 @@ class Profile(models.Model):
     @property
     def vek(self):
         return int((datetime.now().date() - self.birth_date).days / 365.25)
-
-class zdielanie_objektu(models.Model):
-    zdielane_s = models.ForeignKey(User, on_delete=models.CASCADE)
-    objekt = models.ForeignKey(Objekty, on_delete=models.CASCADE)
-    zapis = models.BooleanField(default=False)
 
 
 class Notifikacie(models.Model):

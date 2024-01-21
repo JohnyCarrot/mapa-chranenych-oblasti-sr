@@ -5,16 +5,12 @@ Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checkn
 
 pozrieť sa na "tooltips" a preložiť do slovenčiny
 
-Pridať premenovanie do administrácie
+v administrácií etc všetko anglické do slovenčiny
 
 vyhrať sa s popup stylom
 
 informácia o stránke S v prihlásení (nejaké logo etc)
 
-mazanie / premenovanie skupiny / podskupin
-
-
-v administrácií sa bude dať nastaviť úroven diskusie (skupinová, podskupinová, objktová, viacero objektob spoločná diskusia) na základe toho sa v objektoch prepíše id
 
 diskusia nastavenia (anonym read, write etc)
 
@@ -23,3 +19,4 @@ do profilu pridať info či spravuje systémové vrstvy (napríklad další grou
 
 loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....
 
+pridať užívateľské skupiny

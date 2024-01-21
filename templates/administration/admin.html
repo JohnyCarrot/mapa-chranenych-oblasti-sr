@@ -671,6 +671,11 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
     {% if sys_skupiny_list|length > 0 %}
     <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#pridat_podskupinuModal">Pridať podskupinu</button>
     {% endif %}
+
+    <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#upravit_skupinuModal">Upraviť skupinu</button>
+    {% if sys_skupiny_list|length > 0 %}
+    <button class = "btn btn-primary btn-sm" data-toggle="modal" data-target="#upravit_podskupinuModal">Upraviť podskupinu</button>
+    {% endif %}
     <br>
 {% endif %}
 
@@ -830,6 +835,178 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
   </div>
 </div>
 <!-- Pridať podskupinu koniec-->
+
+
+
+<!-- Upraviť skupinu -->
+<div class="modal fade" id="upravit_skupinuModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="upravit_skupinuModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="upravit_skupinuModalLabel">Upraviť skupinu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+                  <form id="uprav_skupinuform" method="post" action="api">
+            <label for="uprav-skupina-pre-podskupinu">Vyber skupinu:</label>
+            <select id="uprav-skupina-pre-podskupinu" name="skupina">
+                {% for skupina,permska,permska_temp in sys_skupiny_list %}
+              <option value="{{ skupina.id }}" >{{ skupina.meno }}</option>
+                {% endfor %}
+            </select>
+                      <br>
+          <label for="upravit_nazov_skupiny">Nový názov skupiny:</label>
+          <input type="text" class="form-control" id="upravit_nazov_skupiny" name="nazov_skupiny">
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger" style="margin-right: 22%" onclick="
+        let inputs_uprav_skupina = document.getElementById('uprav_skupinuform').elements;
+            let dejta_nova_skupina = {
+          zmaz_skupinu_skupina_id: inputs_uprav_skupina['skupina'].value,
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                201: function() {
+                    alert('Skupina úspešne zmazaná');
+                    location.reload();
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Zmazať skupinu</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zatvoriť</button>
+        <button type="button" class="btn btn-primary" onclick="
+        let inputs_uprav_skupina = document.getElementById('uprav_skupinuform').elements;
+            let dejta_nova_skupina = {
+          novy_nazov_skupiny: inputs_uprav_skupina['nazov_skupiny'].value,
+          skupina_id: inputs_uprav_skupina['skupina'].value,
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                304: function() {
+                  alert('Chyba: Skupina s týmto názvom už existuje');
+                },
+                303: function() {
+                  alert('Chyba: Názov skupiny nemôže byť prázdny');
+                },
+                201: function() {
+                    alert('Názov skupiny úspešne zmenený');
+                    location.reload();
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Uložiť názov</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Upraviť skupinu koniec-->
+    <!-- Upraviť podskupinu -->
+<div class="modal fade" id="upravit_podskupinuModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="upravit_podskupinuModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="upravit_podskupinuModalLabel">Upraviť podskupinu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+                  <form id="uprav_podskupinuform" method="post" action="api">
+            <label for="uprav-podskupina-pre-podskupinu">Vyber podskupinu:</label>
+            <select id="uprav-podskupina-pre-podskupinu" name="skupina">
+            {% for skupina,permska,permska_temp in sys_skupiny_list %}
+                {% for key,podskupiny in sys_podskupiny_dict.items %}
+                    {% if key == skupina.id %}
+                        {% for podskupina,permska_podskupina in podskupiny %}
+                                <option value="{{ podskupina.id }}" >{{ podskupina.meno }} ({{ skupina.meno }})</option>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            </select>
+                      <br>
+          <label for="upravit_nazov_podskupiny">Nový názov podskupiny:</label>
+          <input type="text" class="form-control" id="upravit_nazov_podskupiny" name="nazov_podskupiny">
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger" style="margin-right: 19%" onclick="
+        let inputs_uprav_skupina = document.getElementById('uprav_podskupinuform').elements;
+            let dejta_nova_skupina = {
+          zmaz_podskupinu_podskupina_id: inputs_uprav_skupina['skupina'].value,
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                201: function() {
+                    alert('Podskupina úspešne zmazaná');
+                    location.reload();
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Zmazať podskupinu</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zatvoriť</button>
+        <button type="button" class="btn btn-primary" onclick="
+        let inputs_uprav_skupina = document.getElementById('uprav_podskupinuform').elements;
+            let dejta_nova_skupina = {
+          novy_nazov_podskupiny: inputs_uprav_skupina['nazov_podskupiny'].value,
+          podskupina_id: inputs_uprav_skupina['skupina'].value,
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                304: function() {
+                  alert('Chyba: Podskupina s týmto názvom už existuje');
+                },
+                303: function() {
+                  alert('Chyba: Názov podskupiny nemôže byť prázdny');
+                },
+                201: function() {
+                    alert('Názov podskupiny úspešne zmenený');
+                    location.reload();
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Uložiť názov</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Pridať podskupinu koniec-->
+
+
+
+
+
+
+
+
+
+
+
 {% for key,value in get_data.items %}
     {% if key == 'openmodal_groupadd_sucess' and value == '1' %}
         <!-- Modal -->
