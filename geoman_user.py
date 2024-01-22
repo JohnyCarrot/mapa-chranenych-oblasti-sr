@@ -768,7 +768,7 @@ function uprav_vrstvu_uloz_iframe(){
                             document.getElementById('Singlezmena-pozadie').style.backgroundColor = "white";
                             document.getElementById('Singlelayer_opacity_fill').outerHTML = document.getElementById('Singlelayer_opacity_fill').outerHTML;
                             document.getElementById('Singlelayer_opacity_label_fill').innerHTML = "-";
-        
+                            parent.location.reload();
 
 
 }        

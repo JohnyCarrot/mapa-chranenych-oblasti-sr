@@ -126,7 +126,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 
         if(objekt.podskupina_id!=podskupina.id and zdielane == False):
             continue
-        if (objekt.diskusia.aktivna): html+=f"""<a href="http://127.0.0.1:8000/diskusia?q={objekt.diskusia.id}" target="_blank" rel="noopener noreferrer">Diskusia</a>"""
+        if (objekt.diskusia.aktivna): html+=f"""<a href="http://127.0.0.1:8000/diskusia?q={objekt.diskusia.id}" target="_blank" rel="noopener noreferrer">Diskusia</a><br>"""
         if (uzivatel != None and zdielane == False and podskupina.spravca == uzivatel.username):
             html+=f"""
                     <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">

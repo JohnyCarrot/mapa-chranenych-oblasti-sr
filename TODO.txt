@@ -11,10 +11,6 @@ vyhrať sa s popup stylom
 
 informácia o stránke S v prihlásení (nejaké logo etc)
 
-diskusia nastavenia (anonym read, write etc)
-
 loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....
 
 pridať užívateľské skupiny
-
-skontrolovač či si užívatelia môžu meniť viditelnost tak ako administrátori
