@@ -374,6 +374,12 @@ def forum(requests):
     return render(requests, 'forum/diskusia.html',context)
 
 @login_required
+def skupiny_request(requests):
+    context = {'navbar_administracia': navbar_zapni_administraciu(requests.user)}
+
+    return render(requests, 'skupiny/skupiny.html',context)
+
+@login_required
 def profil(requests):
     if "u" in requests.GET and User.objects.filter(username=requests.GET['u']).exists() and Block.objects.is_blocked(User.objects.get(username=requests.GET['u']), requests.user) == False:
         context = {}

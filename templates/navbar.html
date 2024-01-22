@@ -12,6 +12,9 @@
         <a class="nav-link" href="{% url 'index' %}">Mapa <span class="sr-only">(current)</span></a>
       </li>
         {% if user.is_authenticated %}
+            <li class="nav-item {% if request.resolver_match.url_name == 'skupiny' %}active{% endif %}">
+        <a class="nav-link" href="/skupiny">Skupiny</a>
+      </li>
         <li class="nav-item {% if request.resolver_match.url_name == 'friends' %}active{% endif %}">
         <a class="nav-link" href="/friends">Priatelia</a>
       </li>

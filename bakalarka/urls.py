@@ -27,6 +27,7 @@ urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path('',map_views.index,name='index'),
     path('diskusia',map_views.forum,name='forum'),
+    path('skupiny',map_views.skupiny_request,name='skupiny'),
     path('test',map_views.test),
     path('bin',map_views.user_bin, name='bin'),
     path('profil',map_views.profil, name='profil'),
