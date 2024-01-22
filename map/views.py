@@ -351,6 +351,26 @@ def forum(requests):
                 context['odber'] = True
             else:
                 context['odber'] = False
+        if requests.user.is_authenticated and ( requests.user.is_superuser or requests.user.username == diskusia.spravca ):
+            context['spravca'] = True
+        else:
+            context['spravca'] = False
+
+        objekt = Objekty.objects.get(diskusia=diskusia)
+        viditelnost = objekt.podskupina.viditelnost
+        if diskusia.anonym_read == False and over_viditelnost(viditelnost,requests.user.is_authenticated,requests.user.username) == False and (requests.user.username != diskusia.spravca or requests.user.username==""):
+            if requests.user.is_superuser == False:
+                return HttpResponse("Nemáte oprávnenie nahliadať do tejto diskusie")
+
+        context['zapis'] = False
+        if diskusia.anonym_write ==0:
+            context['zapis'] = True
+        elif diskusia.anonym_write ==1 and over_viditelnost(viditelnost,requests.user.is_authenticated,requests.user.username):
+            context['zapis'] = True
+        elif diskusia.anonym_write ==2 and over_viditelnost(viditelnost,requests.user.is_authenticated,requests.user.username,permisia="w"):
+            context['zapis'] = True
+        if requests.user.is_superuser:
+            context['zapis'] = True
     return render(requests, 'forum/diskusia.html',context)
 
 @login_required
@@ -462,6 +482,13 @@ def api_request(request):
                 skupina = Skupiny.objects.get(id=body['skupina_id'])
                 skupina.meno = str(body['novy_nazov_skupiny'])
                 skupina.save()
+                return HttpResponse(status=201)
+
+            if "diskusia_id" in body and "anonym_read" in body and "anonym_write" in body:
+                diskusia = Diskusia.objects.get(id = body['diskusia_id'])
+                diskusia.anonym_read = body['anonym_read']
+                diskusia.anonym_write = body['anonym_write']
+                diskusia.save()
                 return HttpResponse(status=201)
 
 

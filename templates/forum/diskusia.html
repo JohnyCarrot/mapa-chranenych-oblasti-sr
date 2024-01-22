@@ -179,6 +179,65 @@
   </div>
 </div>
 
+  <!-- Modal nastavenia -->
+<div class="modal fade" id="nastavenia-staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Nastavenia diskusie</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="nastavenia-formular">
+          <div class="form-group">
+            <label>Čítanie diskusie</label>
+                <select class="form-control" name="citanie-nastavenie">
+                  <option value="1" {% if diskusia.anonym_read == True %}selected{% endif %}>Každý</option>
+                  <option value="0" {% if diskusia.anonym_read == False %}selected{% endif %}>Podľa nastavenia skupiny</option>
+                </select>
+              <small class="form-text text-muted">Každý - úplne každý, kto má prístup k odkazu</small>
+              <small class="form-text text-muted">Podľa nastavenia skupiny - každý, kto dokáže vidieť oblasť v mape.</small>
+          </div>
+          <div class="form-group">
+            <label>Prispievanie do diskusie</label>
+                <select class="form-control" name="zapis-nastavenie">
+                  <option value="0" {% if diskusia.anonym_write == 0 %}selected{% endif %} >Každý</option>
+                  <option value="1" {% if diskusia.anonym_write == 1 %}selected{% endif %} >Každý, kto môže vidieť oblasť na mape</option>
+                  <option value="2" {% if diskusia.anonym_write == 2 %}selected{% endif %} >Každý, kto môže upraviť oblasť na mape</option>
+                </select>
+          </div>
+    </form>
+      </div>
+      <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="
+        let inputs_uprav_skupina = document.getElementById('nastavenia-formular').elements;
+            let dejta_nova_skupina = {
+          anonym_read: inputs_uprav_skupina['citanie-nastavenie'].value,
+          anonym_write: inputs_uprav_skupina['zapis-nastavenie'].value,
+          diskusia_id: '{{ diskusia.pk }}',
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                201: function() {
+                    alert('Nastavenia diskusie úspešne zmenené');
+                    location.reload();
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Uložiť</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Zrušiť</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <script>
       var posledne_html_z_editora = "";
 
@@ -287,6 +346,13 @@
                     {% endif %}
                 {% endif %}
 
+                {% if spravca %}
+                	<i style="margin-left: 1%" class="fa-solid fa-gear fa-lg" data-toggle="modal" data-target="#nastavenia-staticBackdrop"></i>
+                {% endif %}
+
+            {% if zapis == True %}
+
+
                                 <button onclick="summer_note_zapni()" style="width: auto;position: absolute;left: 80%" class="btn btn-primary has-icon btn-block btn-sm" type="button" data-toggle="modal" data-target="#staticBackdrop">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus mr-2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -294,7 +360,7 @@
                     </svg>
                     Nový príspevok
                 </button>
-
+            {% endif %}
             </div>
 
             <div class="inner-main-body p-2 p-sm-3 forum-content" style="overflow-y:unset;">
