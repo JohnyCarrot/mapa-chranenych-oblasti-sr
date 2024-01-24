@@ -1,3 +1,120 @@
 <div>
-    <!-- put component code here -->
+    {% if stranka_skupiny %}
+        <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+    <div class="container" style="margin-left: 10%;margin-top: 2%;">
+      <div class="row">
+        <!-- Main content -->
+        <div class="col-lg-9 mb-3">
+        {% for skupina in skupiny %}
+
+          <!-- Skupina -->
+          <div class="card row-hover pos-relative py-3 px-3 mb-3 border-warning border-top-0 border-right-0 border-bottom-0 rounded-0">
+            <div class="row align-items-center">
+              <div class="col-md-8 mb-3 mb-sm-0">
+                <h5>
+                  <a href="#" class="text-primary">{{ skupina.meno }}</a>
+                </h5>
+                <p class="text-sm"><span class="op-6">Posted</span> <a class="text-black" href="#">20 minutes</a> <span class="op-6">ago by</span> <a class="text-black" href="#">KenyeW</a></p>
+                <div class="text-sm op-5"> <a class="text-black mr-2" href="#">#C++</a> <a class="text-black mr-2" href="#">#AppStrap Theme</a> <a class="text-black mr-2" href="#">#Wordpress</a> </div>
+              </div>
+              <div class="col-md-4 op-7">
+                <div class="row text-center op-7">
+                  <div class="col px-1"> <i class="ion-connection-bars icon-1x"></i> <span class="d-block text-sm">141 Votes</span> </div>
+                  <div class="col px-1"> <i class="ion-ios-chatboxes-outline icon-1x"></i> <span class="d-block text-sm">122 Replys</span> </div>
+                  <div class="col px-1"> <i class="ion-ios-eye-outline icon-1x"></i> <span class="d-block text-sm">290 Views</span> </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /Skupina -->
+        {% empty %}
+            Nie ste v žiadnej skupine
+        {% endfor %}
+        </div>
+
+      </div>
+    </div>
+    {% endif %}
+
+
+    {% if stranka_najst_skupinu %}
+    	D.O.B.R.EE
+    {% endif %}
+
+
+    {% if vytvorit_skupinu %}
+<div class="container-fluid">
+
+<div class="container">
+  <!-- Title -->
+  <div class="d-flex justify-content-between align-items-lg-center py-3 flex-column flex-lg-row">
+    <h2 class="h5 mb-3 mb-lg-0">Nová skupina</h2>
+    <div class="hstack gap-3">
+      <button class="btn btn-primary btn-sm btn-icon-text"><i class="bi bi-save"></i> <span class="text">Uložiť</span></button>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-lg-8">
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Názov skupiny</label>
+            <input type="text" id="nova-nazov-skupiny" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Popis</label>
+            <input type="text" id="nova-popis-skupiny" class="form-control">
+          </div>
+          <div class="row">
+
+
+          </div>
+          <div class="row">
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <ul class="list-group list-group-flush mx-n2">
+            <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
+              <div class="ms-2 me-auto">
+                <h6 class="mb-0">Verejne dostupná</h6>
+                <small>Ktokoľvek môže skupinu vyhľadať a prezerať.</small>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" id="nova-verejne-dostupna" type="checkbox" role="switch" checked>
+              </div>
+            </li>
+
+            <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
+              <div class="ms-2 me-auto">
+                <h6 class="mb-0">Pre každého</h6>
+                <small>Ktokoľvek sa môže do skupiny pridať.</small>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" id="nova-ktokolvek-pridat" type="checkbox" role="switch" checked>
+              </div>
+            </li>
+
+
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+    {% endif %}
 </div>
