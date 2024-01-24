@@ -490,6 +490,28 @@ def api_request(request):
                 skupina.save()
                 return HttpResponse(status=201)
 
+            if "nazov_skupiny_novy" in body and "popis_skupiny_novy" in body and "dostupnost" in body:
+                if len(body["nazov_skupiny_novy"]) ==0:
+                    return HttpResponse(status=303)
+                for skupina in Skupiny.objects.all():
+                    if skupina.meno.lower() == str(body['nazov_skupiny_novy']).lower():
+                        return HttpResponse(status=304)
+                skupina = Skupiny()
+                viditelnost = Viditelnost_mapa()
+                dostupnost = ""
+                if body['dostupnost']:
+                    dostupnost+="r"
+                if body['pridat_ktokolvek']:
+                    dostupnost+="w"
+                viditelnost.globalne = dostupnost
+                viditelnost.save()
+                skupina.meno = str(body['nazov_skupiny_novy'])
+                skupina.spravca = request.user.username
+                skupina.nastavenia = json.dumps({"popis": body['popis_skupiny_novy']})
+                skupina.viditelnost = viditelnost
+                skupina.save()
+                return HttpResponse(status=201)
+
             if "diskusia_id" in body and "anonym_read" in body and "anonym_write" in body:
                 diskusia = Diskusia.objects.get(id = body['diskusia_id'])
                 diskusia.anonym_read = body['anonym_read']

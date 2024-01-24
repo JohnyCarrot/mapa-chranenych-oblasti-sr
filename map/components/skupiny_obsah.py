@@ -1,7 +1,7 @@
 from django_unicorn.components import UnicornView
 from map.views import over_viditelnost
 from map.models import Skupiny
-
+import json
 class SkupinyObsahView(UnicornView):
     stranka_skupiny = True
     stranka_najst_skupinu = False
@@ -13,10 +13,14 @@ class SkupinyObsahView(UnicornView):
     def nahraj_skupiny(self):
         self.skupiny.clear()
         for skupina in Skupiny.objects.filter(spravca__isnull=False):
-            if over_viditelnost(skupina.viditelnost,self.request.user.is_authenticated,self.request.user.username):
+            if over_viditelnost(skupina.viditelnost,self.request.user.is_authenticated,self.request.user.username) or skupina.spravca == self.request.user.username:
                 if skupina.nastavenia is not None and ("shared" in skupina.nastavenia or "own" in skupina.nastavenia):
                     continue
-                self.skupiny.append(skupina)
+
+                if skupina.nastavenia is not None and "popis" in json.loads(skupina.nastavenia):
+                    self.skupiny.append( (skupina, json.loads(skupina.nastavenia)['popis']  )  )
+                else:
+                    self.skupiny.append((skupina, None))
 
     def prepni_na_skupiny(self):
         self.nahraj_skupiny()

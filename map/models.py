@@ -40,7 +40,7 @@ class Skupiny(models.Model):
     meno = models.TextField(blank=True, null=True)
     spravca = models.TextField(blank=True, null=True)
     viditelnost = models.ForeignKey(Viditelnost_mapa, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "viditelnost")  #
-    nastavenia = models.JSONField(blank=True, null=True)  #
+    nastavenia = models.JSONField(blank=True, null=True)  #popis,own,shared
     priorita = models.BigIntegerField(default=None, null=True)
 
     class Meta:

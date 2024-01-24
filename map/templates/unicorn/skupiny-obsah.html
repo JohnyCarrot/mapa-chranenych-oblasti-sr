@@ -1,11 +1,10 @@
 <div>
     {% if stranka_skupiny %}
-        <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
     <div class="container" style="margin-left: 10%;margin-top: 2%;">
       <div class="row">
         <!-- Main content -->
         <div class="col-lg-9 mb-3">
-        {% for skupina in skupiny %}
+        {% for skupina,popis in skupiny %}
 
           <!-- Skupina -->
           <div class="card row-hover pos-relative py-3 px-3 mb-3 border-warning border-top-0 border-right-0 border-bottom-0 rounded-0">
@@ -14,14 +13,18 @@
                 <h5>
                   <a href="#" class="text-primary">{{ skupina.meno }}</a>
                 </h5>
-                <p class="text-sm"><span class="op-6">Posted</span> <a class="text-black" href="#">20 minutes</a> <span class="op-6">ago by</span> <a class="text-black" href="#">KenyeW</a></p>
-                <div class="text-sm op-5"> <a class="text-black mr-2" href="#">#C++</a> <a class="text-black mr-2" href="#">#AppStrap Theme</a> <a class="text-black mr-2" href="#">#Wordpress</a> </div>
+                <p class="text-sm">Správca: <a class="text-black" href="profil?u={{ skupina.spravca }}">{{ skupina.spravca }}</a></p>
+                <div class="text-sm op-5">
+                {% if popis %}
+                	{{ popis }}
+                {% endif %}
+                </div>
               </div>
               <div class="col-md-4 op-7">
                 <div class="row text-center op-7">
-                  <div class="col px-1"> <i class="ion-connection-bars icon-1x"></i> <span class="d-block text-sm">141 Votes</span> </div>
-                  <div class="col px-1"> <i class="ion-ios-chatboxes-outline icon-1x"></i> <span class="d-block text-sm">122 Replys</span> </div>
-                  <div class="col px-1"> <i class="ion-ios-eye-outline icon-1x"></i> <span class="d-block text-sm">290 Views</span> </div>
+                  <div class="col px-1"> <i class="fa fa-users fa-lg"></i> <span class="d-block text-sm">141 členov</span> </div>
+                  <div class="col px-1"> <i class="fa fa-comments fa-lg"></i> <span class="d-block text-sm">122 postov</span> </div>
+                  <div class="col px-1"> <i class="fa fa-layer-group fa-lg"></i> <span class="d-block text-sm">290 vrstiev</span> </div>
                 </div>
               </div>
             </div>
@@ -50,7 +53,38 @@
   <div class="d-flex justify-content-between align-items-lg-center py-3 flex-column flex-lg-row">
     <h2 class="h5 mb-3 mb-lg-0">Nová skupina</h2>
     <div class="hstack gap-3">
-      <button class="btn btn-primary btn-sm btn-icon-text"><i class="bi bi-save"></i> <span class="text">Uložiť</span></button>
+      <button class="btn btn-primary btn-sm btn-icon-text" onclick="
+
+        let nazov_novej_skupiny = document.getElementById('nova-nazov-skupiny');
+        let popis_novej_skupiny = document.getElementById('nova-popis-skupiny');
+        let verejne_dostupna = document.getElementById('nova-verejne-dostupna');
+        let pridat_ktokolvek = document.getElementById('nova-ktokolvek-pridat');
+
+            let dejta_nova_skupina = {
+          nazov_skupiny_novy: nazov_novej_skupiny.value,
+          popis_skupiny_novy: popis_novej_skupiny.value,
+          dostupnost: verejne_dostupna.checked,
+          pridat_ktokolvek: pridat_ktokolvek.checked,
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                304: function() {
+                  alert('Chyba: Skupina s týmto názvom už existuje');
+                },
+                303: function() {
+                  alert('Chyba: Názov skupiny nemôže byť prázdny');
+                },
+                201: function() {
+                    alert('Skupina úspešne vytvorená');
+                    location.reload();
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });"><i class="bi bi-save"></i> <span class="text">Uložiť</span></button>
     </div>
   </div>
 

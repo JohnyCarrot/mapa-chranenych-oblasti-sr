@@ -17,3 +17,6 @@ skuppiny dat aj tie systemove
 
 skupiny do nastaveni popisok, dostupnost etc
 moznost odhlasit sa zo sys skupin
+
+pre mazanie basic skupiny použiť rovnakú fukciu ako na admin
+do nastavení skupiny dať diskusiu, posty ...
