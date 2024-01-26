@@ -68,6 +68,8 @@ class SkupinyObsahView(UnicornView):
     def pridat_sa_do_skupiny(self,id_skupiny):
         skupina = Skupiny.objects.get(id = id_skupiny)
         skupina.viditelnost.uzivatelia[self.request.user.username] = "r"
+        if over_viditelnost(skupina.viditelnost,self.request.user.is_authenticated,self.request.user.username,permisia="w"):
+            skupina.viditelnost.uzivatelia[self.request.user.username] = "rw"
         skupina.viditelnost.save()
         skupina.save()
 

@@ -35,12 +35,25 @@ class Diskusny_prispevok(models.Model):
     timestamp = models.DateTimeField(default=timezone.now, null=False)
     karma = models.JSONField(blank=True, null=True, default=dict) # meno uzivatela a + / - a nakoniec sa karma sčíta
 
+class Diskusia_skupiny(models.Model):
+    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    #Pripadne pridat spravcov, odbery...
+
+class Diskusny_prispevok_skupiny(models.Model):
+    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    diskusia = models.ForeignKey(Diskusia_skupiny, blank=True, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    sprava = models.TextField(blank=True, null=False, default="") #HTML !!!!
+    timestamp = models.DateTimeField(default=timezone.now, null=False)
+    karma = models.JSONField(blank=True, null=True, default=dict) # meno uzivatela a + / - a nakoniec sa karma sčíta
+
+
 class Skupiny(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
     meno = models.TextField(blank=True, null=True)
     spravca = models.TextField(blank=True, null=True)
     viditelnost = models.ForeignKey(Viditelnost_mapa, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "viditelnost")  #
-    nastavenia = models.JSONField(blank=True, null=True)  #popis,own,shared
+    nastavenia = models.JSONField(blank=True, null=True)  #popis,own,shared,diskusia
     priorita = models.BigIntegerField(default=None, null=True)
 
     class Meta:

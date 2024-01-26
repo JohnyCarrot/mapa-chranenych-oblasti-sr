@@ -13,8 +13,6 @@ informácia o stránke S v prihlásení (nejaké logo etc)
 
 loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....
 
-skuppiny dat aj tie systemove
-
 skupiny do nastaveni popisok, dostupnost etc
 moznost odhlasit sa zo sys skupin
 
@@ -24,3 +22,5 @@ do nastavení skupiny dať diskusiu, posty ...
 priatel zablokovaný sa nedá vyhladat
 zlepšiť vyhladavanie u priatelov
 vyhladavanie u priatelov, text ak sa nepodarí nič nájsť
+
+sys skupiny pridat diskusiu
