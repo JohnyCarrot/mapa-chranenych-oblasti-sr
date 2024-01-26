@@ -31,7 +31,7 @@
           </div>
           <!-- /Skupina -->
         {% empty %}
-            Nie ste v žiadnej skupine
+            <h3 class="text-center">Aktuálne sa nenachádzate v žiadnej skupine.</h3>
         {% endfor %}
         </div>
 
@@ -41,7 +41,43 @@
 
 
     {% if stranka_najst_skupinu %}
-    	D.O.B.R.EE
+                                 <div class="profile-content">
+               <!-- begin tab-content -->
+               <div class="tab-content p-0">
+                  <!-- begin #profile-friends tab -->
+                  <div class="tab-pane fade in active show" id="profile-friends">
+        <div class="input-group">
+          <input unicorn:model="vyhladavacie_pole" type="text" class="form-control rounded" aria-label="Search" aria-describedby="search-addon" />
+          <button unicorn:click="hladaj_skupinu" type="button" class="btn btn-outline-primary" >Hľadať</button>
+        </div>
+                  <br>
+                      <table class="table table-hover">
+
+                       {% for skupina,v_skupine in hladane_skupiny %}
+                           {% if skupina %}
+                            <tr>
+                              <td>{{ skupina.meno }}</td>
+                              <td>{{ skupina.viditelnost.uzivatelia|length }} členov</td>
+                                <td>
+                                {% if v_skupine == False %}
+                                     <button unicorn:click="pridat_sa_do_skupiny('{{ skupina.pk }}')" onclick="alert('Pridanie do skupiny {{ skupina.meno }} bolo úspešné');location.reload();" type="button" class="btn btn-info btn-sm">Pridať sa do skupiny</button>
+                                    {% elif v_skupine %}
+                                     <button type="button" class="btn btn-success btn-sm" disabled><i class="fa-solid fa-check"></i></button>
+
+                                     {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                               <h4>Pre požadovaný dopyt nebola nájdená žiadna skupina.</h4>
+                            {% endif %}
+                      {% endfor %}
+
+                        </table>
+
+
+                          </div>
+               </div>
+                         </div>
     {% endif %}
 
 
@@ -84,7 +120,7 @@
               },
           dataType: 'json',
           contentType : 'application/json'
-        });"><i class="bi bi-save"></i> <span class="text">Uložiť</span></button>
+        });"><i class="bi bi-save"></i> <span class="text">Vytvoriť</span></button>
     </div>
   </div>
 

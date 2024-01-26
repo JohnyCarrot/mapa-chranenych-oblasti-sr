@@ -20,3 +20,7 @@ moznost odhlasit sa zo sys skupin
 
 pre mazanie basic skupiny použiť rovnakú fukciu ako na admin
 do nastavení skupiny dať diskusiu, posty ...
+
+priatel zablokovaný sa nedá vyhladat
+zlepšiť vyhladavanie u priatelov
+vyhladavanie u priatelov, text ak sa nepodarí nič nájsť
