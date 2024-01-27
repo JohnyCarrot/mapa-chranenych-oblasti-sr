@@ -504,13 +504,15 @@ def api_request(request):
                 return HttpResponse(status=201)
 
             if "skupina_diskusia_id" in body and "sprava_skupina_diskusia" in body:
-                if len(body["sprava_skupina_diskusia"]) ==0:
+                if body["sprava_skupina_diskusia"] =='<p><br></p>':
                     return HttpResponse(status=303)
                 diskusia = Diskusia_skupiny.objects.get(id = body['skupina_diskusia_id'])
                 prispevok = Diskusny_prispevok_skupiny()
                 prispevok.diskusia = diskusia
                 prispevok.user = request.user
                 prispevok.sprava = body['sprava_skupina_diskusia']
+                prispevok.save()
+                diskusia.save()
                 return HttpResponse(status=201)
 
             if "nazov_skupiny_novy" in body and "popis_skupiny_novy" in body and "dostupnost" in body:

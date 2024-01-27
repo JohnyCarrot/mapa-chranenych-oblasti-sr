@@ -45,7 +45,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-md-6 gedf-main">
+            <div class="col-md-8 gedf-main">
 
                 <!--- \\\\\\\Príspevok-->
                 <div class="card gedf-card">
@@ -58,6 +58,14 @@
                             <li class="nav-item">
                                 <a class="nav-link" id="images-tab" data-toggle="tab" role="tab" aria-controls="images" aria-selected="false" href="#images">Mapa</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="clenovia-tab" data-toggle="tab" role="tab" aria-controls="clenovia" aria-selected="false" href="#clenovia">Členovia</a>
+                            </li>
+                            {% if skupina.spravca == user.username %}
+                                <li class="nav-item">
+                                <a class="nav-link" id="nastavenia-tab" data-toggle="tab" role="tab" aria-controls="nastavenia" aria-selected="false" href="#nastavenia">Nastavenia</a>
+                            </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="card-body">
@@ -104,6 +112,26 @@
                                 </div>
                                 <div class="py-4"></div>
                             </div>
+
+                            <div class="tab-pane fade" id="clenovia" role="tabpanel" aria-labelledby="clenovia-tab">
+                                <div class="form-group">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="customFile">
+                                        <label class="custom-file-label" for="customFile">Sem pôjde mapa / toto sa zmaže</label>
+                                    </div>
+                                </div>
+                                <div class="py-4"></div>
+                            </div>
+
+                            <div class="tab-pane fade" id="nastavenia" role="tabpanel" aria-labelledby="nastavenia-tab">
+                                <div class="form-group">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="customFile">
+                                        <label class="custom-file-label" for="customFile">Sem pôjde mapa / toto sa zmaže</label>
+                                    </div>
+                                </div>
+                                <div class="py-4"></div>
+                            </div>
                         </div>
                         <div class="btn-toolbar justify-content-between">
 
@@ -113,70 +141,11 @@
                 </div>
                 <!-- Príspevok /////-->
                         <br>
-                <!--- \\\\\\\Post-->
-                <div class="card gedf-card">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="mr-2">
-                                    <img class="rounded-circle" width="45" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="">
-                                </div>
-                                <div class="ml-2">
-                                    <div class="h5 m-0">Niekto</div>
-                                    <div class="h7 text-muted">Mark</div>
-                                </div>
-                            </div>
-                            <div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="card-body">
-                        <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>10 min ago</div>
-                        <a class="card-link" href="#">
-                            <h5 class="card-title">Lorem ipsum dolor sit amet, consectetur adip.</h5>
-                        </a>
-
-                        <p class="card-text">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo recusandae nulla rem eos ipsa praesentium esse magnam nemo dolor
-                            sequi fuga quia quaerat cum, obcaecati hic, molestias minima iste voluptates.
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="card-link"><i class="fa fa-gittip"></i> Like</a>
-                        <a href="#" class="card-link"><i class="fa fa-comment"></i> Comment</a>
-                        <a href="#" class="card-link"><i class="fa fa-mail-forward"></i> Share</a>
-                    </div>
-                </div>
-                <!-- Post /////-->
+               {% unicorn 'skupina-diskusia-prispevky' diskusia_id=skupina.diskusia.id %}
 
             </div>
 
 
-            <div class="col-md-3">
-                <div class="card gedf-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                            card's content.</p>
-                        <a href="#" class="card-link">Card link</a>
-                        <a href="#" class="card-link">Another link</a>
-                    </div>
-                </div>
-                <br>
-                <br>
-                <div class="card gedf-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                                card's content.</p>
-                            <a href="#" class="card-link">Card link</a>
-                            <a href="#" class="card-link">Another link</a>
-                        </div>
-                    </div>
-            </div>
         </div>
     </div>
 

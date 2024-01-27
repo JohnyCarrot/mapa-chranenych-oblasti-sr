@@ -1,0 +1,33 @@
+<div>
+                {% for prispevok,profil in prispevky %}
+                <div class="card gedf-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="mr-2">
+                                    <img class="rounded-circle" width="45" height="45" src="data:image/png;base64,{{ profil.icon }}" alt="">
+                                </div>
+                                <div class="ml-2">
+                                    <div class="h5 m-0">{{ prispevok.user.username }}</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="dropdown">
+                                    <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>{{ prispevok.timestamp|date:"j. F o G:i" }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+
+                        <p class="card-text">
+                                {{ prispevok.sprava|safe }}
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link"><i class="fa fa-comment"></i> Komentár</a>
+                    </div>
+                </div>
+                {% endfor %}
+</div>

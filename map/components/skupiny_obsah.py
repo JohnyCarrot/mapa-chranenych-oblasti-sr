@@ -68,7 +68,12 @@ class SkupinyObsahView(UnicornView):
 
     def pridat_sa_do_skupiny(self,id_skupiny):
         skupina = Skupiny.objects.get(id = id_skupiny)
+        if skupina.spravca != self.request.user.username:
+            skupina.viditelnost.uzivatelia[self.request.user.username] = "r"
+        else:
+            skupina.viditelnost.uzivatelia[self.request.user.username] = "rw"
         skupina.diskusia.uzivatelia[self.request.user.username] = "rw"
+        skupina.viditelnost.save()
         skupina.diskusia.save()
         skupina.save()
 
