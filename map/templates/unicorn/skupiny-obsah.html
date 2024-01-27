@@ -4,14 +4,14 @@
       <div class="row">
         <!-- Main content -->
         <div class="col-lg-9 mb-3">
-        {% for skupina,popis in skupiny %}
+        {% for skupina,popis,komenty,vrstvy in skupiny %}
 
           <!-- Skupina -->
           <div class="card row-hover pos-relative py-3 px-3 mb-3 border-warning border-top-0 border-right-0 border-bottom-0 rounded-0">
             <div class="row align-items-center">
               <div class="col-md-8 mb-3 mb-sm-0">
                 <h5>
-                  <a href="#" class="text-primary">{{ skupina.meno }}</a>
+                  <a href="skupina?id={{ skupina.pk }}" class="text-primary">{{ skupina.meno }}</a>
                 </h5>
                 <p class="text-sm">Správca: <a class="text-black" href="profil?u={{ skupina.spravca }}">{{ skupina.spravca }}</a></p>
                 <div class="text-sm op-5">
@@ -22,9 +22,9 @@
               </div>
               <div class="col-md-4 op-7">
                 <div class="row text-center op-7">
-                  <div class="col px-1"> <i class="fa fa-users fa-lg"></i> <span class="d-block text-sm">141 členov</span> </div>
-                  <div class="col px-1"> <i class="fa fa-comments fa-lg"></i> <span class="d-block text-sm">122 postov</span> </div>
-                  <div class="col px-1"> <i class="fa fa-layer-group fa-lg"></i> <span class="d-block text-sm">290 vrstiev</span> </div>
+                  <div class="col px-1"> <i class="fa fa-users fa-lg"></i> <span class="d-block text-sm">{{ skupina.diskusia.uzivatelia|length }} členov</span> </div>
+                  <div class="col px-1"> <i class="fa fa-comments fa-lg"></i> <span class="d-block text-sm">{{ komenty }} postov</span> </div>
+                  <div class="col px-1"> <i class="fa fa-layer-group fa-lg"></i> <span class="d-block text-sm">{{ vrstvy }} vrstiev</span> </div>
                 </div>
               </div>
             </div>
@@ -56,13 +56,16 @@
                        {% for skupina,v_skupine in hladane_skupiny %}
                            {% if skupina %}
                             <tr>
-                              <td>{{ skupina.meno }}</td>
-                              <td>{{ skupina.viditelnost.uzivatelia|length }} členov</td>
+                              <td><a href="skupina?id={{ skupina.pk }}">{{ skupina.meno }}</a></td>
+                              <td>{{ skupina.diskusia.uzivatelia|length }} členov</td>
                                 <td>
-                                {% if v_skupine == False %}
+                                {% if v_skupine == 0 %}
                                      <button unicorn:click="pridat_sa_do_skupiny('{{ skupina.pk }}')" onclick="alert('Pridanie do skupiny {{ skupina.meno }} bolo úspešné');location.reload();" type="button" class="btn btn-info btn-sm">Pridať sa do skupiny</button>
-                                    {% elif v_skupine %}
+                                    {% elif v_skupine == 1 %}
                                      <button type="button" class="btn btn-success btn-sm" disabled><i class="fa-solid fa-check"></i></button>
+
+                                    {% elif v_skupine == 2 %}
+                                     <button  type="button" class="btn btn-warning btn-sm">Skupina nie je pre každého</button>
 
                                      {% endif %}
                                 </td>

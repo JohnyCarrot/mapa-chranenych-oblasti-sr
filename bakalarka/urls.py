@@ -28,6 +28,7 @@ urlpatterns = [
     path('',map_views.index,name='index'),
     path('diskusia',map_views.forum,name='forum'),
     path('skupiny',map_views.skupiny_request,name='skupiny'),
+    path('skupina',map_views.skupina_request,name='skupina'),
     path('test',map_views.test),
     path('bin',map_views.user_bin, name='bin'),
     path('profil',map_views.profil, name='profil'),

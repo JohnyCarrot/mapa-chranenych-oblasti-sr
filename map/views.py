@@ -374,10 +374,23 @@ def forum(requests):
     return render(requests, 'forum/diskusia.html',context)
 
 @login_required
-def skupiny_request(requests):
+def skupiny_request(requests): #Nechytať!
     context = {'navbar_administracia': navbar_zapni_administraciu(requests.user)}
-
     return render(requests, 'skupiny/skupiny.html',context)
+
+@login_required
+def skupina_request(requests):
+    context = {'navbar_administracia': navbar_zapni_administraciu(requests.user)}
+    if "id" in requests.GET and Skupiny.objects.get(id=requests.GET['id']).diskusia is not None:
+        skupina = Skupiny.objects.get(id=requests.GET['id'])
+        context['skupina'] = skupina
+        context['popis'] = ""
+        if skupina.nastavenia is not None and "popis" in skupina.nastavenia:
+            context['popis'] = json.loads(skupina.nastavenia)['popis']
+        context['pocet_vrstiev'] = len(Objekty.objects.filter(podskupina__skupina=skupina))
+        context['pocet_clenov'] = len(skupina.diskusia.uzivatelia)
+        return render(requests, 'skupiny/skupina.html',context)
+    return HttpResponse("Diskusia neexistuje")
 
 @login_required
 def profil(requests):
@@ -498,18 +511,23 @@ def api_request(request):
                         return HttpResponse(status=304)
                 skupina = Skupiny()
                 viditelnost = Viditelnost_mapa()
-                dostupnost = ""
-                if body['dostupnost']:
-                    dostupnost+="r"
-                if body['pridat_ktokolvek']:
-                    dostupnost+="w"
-                viditelnost.globalne = dostupnost
+                viditelnost.globalne = ""
+                viditelnost.prihlaseny = ""
+                viditelnost.uzivatelia[request.user.username] = "rw"
                 viditelnost.save()
                 skupina.meno = str(body['nazov_skupiny_novy'])
                 skupina.spravca = request.user.username
                 diskusia = Diskusia_skupiny()
+                diskusia.uzivatelia[request.user.username] = "rw"
+                diskusia.verejna = False
+                diskusia.pre_kazdeho = False
+                if body['dostupnost']:
+                    diskusia.verejna = True
+                if body['pridat_ktokolvek']:
+                    diskusia.pre_kazdeho = True
                 diskusia.save()
-                skupina.nastavenia = json.dumps({"popis": body['popis_skupiny_novy'],"diskusia": str(diskusia.id)})
+                skupina.nastavenia = json.dumps({"popis": body['popis_skupiny_novy']})
+                skupina.diskusia = diskusia
                 skupina.viditelnost = viditelnost
                 skupina.save()
                 return HttpResponse(status=201)

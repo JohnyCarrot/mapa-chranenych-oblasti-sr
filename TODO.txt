@@ -24,3 +24,5 @@ zlepšiť vyhladavanie u priatelov
 vyhladavanie u priatelov, text ak sa nepodarí nič nájsť
 
 sys skupiny pridat diskusiu
+
+anonym diskusia koment, preveriť

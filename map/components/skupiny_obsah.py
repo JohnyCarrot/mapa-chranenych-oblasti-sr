@@ -1,6 +1,6 @@
 from django_unicorn.components import UnicornView
 from map.views import over_viditelnost
-from map.models import Skupiny
+from map.models import Skupiny, Diskusia_skupiny,Diskusny_prispevok_skupiny, Objekty
 import json
 from difflib import SequenceMatcher
 class SkupinyObsahView(UnicornView):
@@ -15,33 +15,34 @@ class SkupinyObsahView(UnicornView):
 
     def hladaj_skupinu(self):
         self.hladane_skupiny.clear()
-        for skupina in Skupiny.objects.filter(spravca__isnull=False):
-            if skupina.nastavenia is not None and ("shared" in skupina.nastavenia or "own" in skupina.nastavenia):
+        for skupina in Skupiny.objects.filter(diskusia__isnull=False):
+            if skupina.diskusia.verejna == False:
                 continue
-            if over_viditelnost(skupina.viditelnost, self.request.user.is_authenticated,
-                                self.request.user.username) == False and self.request.user.username != skupina.spravca: continue
-            if self.request.user.username in skupina.viditelnost.uzivatelia or skupina.spravca ==self.request.user.username:
-                v_skupine = True
+
+            if self.request.user.username in skupina.diskusia.uzivatelia:
+                v_skupine = 1
+            elif skupina.diskusia.pre_kazdeho == False:
+                v_skupine = 2
             else:
-                v_skupine = False
+                v_skupine = 0
             meno = skupina.meno
             if meno.lower().find(self.vyhladavacie_pole.lower()) != -1:
                 self.hladane_skupiny.append( (skupina,v_skupine)  )
             elif self.similar(meno,self.vyhladavacie_pole) > 0.6:
                 self.hladane_skupiny.append( (skupina,v_skupine)  )
+
         if len(self.hladane_skupiny)==0:
             self.hladane_skupiny.append( (None,None) )
     def nahraj_skupiny(self):
         self.skupiny.clear()
-        for skupina in Skupiny.objects.filter(spravca__isnull=False):
-            if self.request.user.username in skupina.viditelnost.uzivatelia or skupina.spravca == self.request.user.username:
-                if skupina.nastavenia is not None and ("shared" in skupina.nastavenia or "own" in skupina.nastavenia):
-                    continue
-
+        for skupina in Skupiny.objects.filter(diskusia__isnull=False):
+            if self.request.user.username in skupina.diskusia.uzivatelia:
+                pocet_komentov = len(Diskusny_prispevok_skupiny.objects.filter(diskusia=skupina.diskusia))
+                pocet_vrstiev = len(Objekty.objects.filter(podskupina__skupina=skupina))
                 if skupina.nastavenia is not None and "popis" in json.loads(skupina.nastavenia):
-                    self.skupiny.append( (skupina, json.loads(skupina.nastavenia)['popis']  )  )
+                    self.skupiny.append( (skupina, json.loads(skupina.nastavenia)['popis'],pocet_komentov,pocet_vrstiev  )  )
                 else:
-                    self.skupiny.append((skupina, None))
+                    self.skupiny.append((skupina, None,pocet_komentov,pocet_vrstiev))
 
     def prepni_na_skupiny(self):
         self.nahraj_skupiny()
@@ -67,10 +68,8 @@ class SkupinyObsahView(UnicornView):
 
     def pridat_sa_do_skupiny(self,id_skupiny):
         skupina = Skupiny.objects.get(id = id_skupiny)
-        skupina.viditelnost.uzivatelia[self.request.user.username] = "r"
-        if over_viditelnost(skupina.viditelnost,self.request.user.is_authenticated,self.request.user.username,permisia="w"):
-            skupina.viditelnost.uzivatelia[self.request.user.username] = "rw"
-        skupina.viditelnost.save()
+        skupina.diskusia.uzivatelia[self.request.user.username] = "rw"
+        skupina.diskusia.save()
         skupina.save()
 
 

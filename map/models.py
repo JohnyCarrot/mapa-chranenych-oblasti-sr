@@ -37,6 +37,9 @@ class Diskusny_prispevok(models.Model):
 
 class Diskusia_skupiny(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    uzivatelia = models.JSONField(blank=True, null=True, default=dict)  # meno uzivatela a r,rw
+    verejna = models.BooleanField(default=True)  # Kazdy moze prezerat a vyhladat
+    pre_kazdeho = models.BooleanField(default=True)  # Kazdy sa moze pridat
     #Pripadne pridat spravcov, odbery...
 
 class Diskusny_prispevok_skupiny(models.Model):
@@ -53,8 +56,9 @@ class Skupiny(models.Model):
     meno = models.TextField(blank=True, null=True)
     spravca = models.TextField(blank=True, null=True)
     viditelnost = models.ForeignKey(Viditelnost_mapa, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "viditelnost")  #
-    nastavenia = models.JSONField(blank=True, null=True)  #popis,own,shared,diskusia
+    nastavenia = models.JSONField(blank=True, null=True)  #popis,own,shared
     priorita = models.BigIntegerField(default=None, null=True)
+    diskusia = models.ForeignKey(Diskusia_skupiny, blank=True, null=True,on_delete=models.CASCADE,to_field='id',db_column = "diskusia")
 
     class Meta:
         managed = False
