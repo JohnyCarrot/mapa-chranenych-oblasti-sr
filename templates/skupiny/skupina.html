@@ -15,7 +15,10 @@
       <!-- navbar závislosti koniec-->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
-
+        <!-- Summernote-->
+      <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+      <!-- Summernote koniec-->
     <title>Skupiny</title>
   </head>
   <body>
@@ -44,16 +47,16 @@
             </div>
             <div class="col-md-6 gedf-main">
 
-                <!--- \\\\\\\Post-->
+                <!--- \\\\\\\Príspevok-->
                 <div class="card gedf-card">
                     <div class="card-header">
                         <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="posts-tab" data-toggle="tab" href="#posts" role="tab" aria-controls="posts" aria-selected="true">Make
-                                    a publication</a>
+                                <a class="nav-link active" id="posts-tab" data-toggle="tab" href="#posts" role="tab" aria-controls="posts" aria-selected="true">
+                                    Príspevok</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="images-tab" data-toggle="tab" role="tab" aria-controls="images" aria-selected="false" href="#images">Images</a>
+                                <a class="nav-link" id="images-tab" data-toggle="tab" role="tab" aria-controls="images" aria-selected="false" href="#images">Mapa</a>
                             </li>
                         </ul>
                     </div>
@@ -61,11 +64,37 @@
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
                                 <div class="form-group">
-                                    <label class="sr-only" for="message">post</label>
-                                    <textarea class="form-control" id="message" rows="3" placeholder="Čo máte na mysli ?"></textarea>
+                                    <label class="sr-only" for="message-sprava">post</label>
+                                    <textarea class="form-control" id="message-sprava" rows="3" placeholder="Čo máte na mysli ?"></textarea>
                                 </div>
-
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-primary" onclick="
+                                            let dejta_nova_skupina = {
+                                          sprava_skupina_diskusia: $('#message-sprava').summernote('code'),
+                                          skupina_diskusia_id: '{{ skupina.diskusia.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                303: function() {
+                                                  alert('Chyba: Príspevok nemôže byť prázdny');
+                                                },
+                                                201: function() {
+                                                    alert('Príspevok úspešne uverejnený');
+                                                    location.reload();
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });">Odoslať</button>
+                                </div>
                             </div>
+
+
+
+
                             <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="images-tab">
                                 <div class="form-group">
                                     <div class="custom-file">
@@ -77,14 +106,12 @@
                             </div>
                         </div>
                         <div class="btn-toolbar justify-content-between">
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary">Odoslať</button>
-                            </div>
+
 
                         </div>
                     </div>
                 </div>
-                <!-- Post /////-->
+                <!-- Príspevok /////-->
                         <br>
                 <!--- \\\\\\\Post-->
                 <div class="card gedf-card">
@@ -100,17 +127,6 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="dropdown">
-                                    <button class="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fa fa-ellipsis-h"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
-                                        <div class="h6 dropdown-header">Configuration</div>
-                                        <a class="dropdown-item" href="#">Save</a>
-                                        <a class="dropdown-item" href="#">Hide</a>
-                                        <a class="dropdown-item" href="#">Report</a>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -164,6 +180,13 @@
         </div>
     </div>
 
+<script>
+$(document).ready(function() {
+  $('#message-sprava').summernote({
+      placeholder: 'Čo máte na mysli ?',                 // set editor height
+    });
+});
+</script>
 
   </body>
 </html>
