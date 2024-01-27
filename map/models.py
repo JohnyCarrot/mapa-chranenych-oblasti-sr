@@ -50,6 +50,14 @@ class Diskusny_prispevok_skupiny(models.Model):
     timestamp = models.DateTimeField(default=timezone.now, null=False)
     karma = models.JSONField(blank=True, null=True, default=dict) # meno uzivatela a + / - a nakoniec sa karma sčíta
 
+class Diskusny_prispevok_skupiny_komentar(models.Model):
+    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    prispevok = models.ForeignKey(Diskusny_prispevok_skupiny, blank=True, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    sprava = models.TextField(blank=True, null=False, default="") #NIE HTML !!!!
+    timestamp = models.DateTimeField(default=timezone.now, null=False)
+    karma = models.JSONField(blank=True, null=True, default=dict) # meno uzivatela a + / - a nakoniec sa karma sčíta
+
 
 class Skupiny(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)

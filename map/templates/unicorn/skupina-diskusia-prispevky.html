@@ -26,8 +26,58 @@
                         </p>
                     </div>
                     <div class="card-footer">
-                        <a href="#" class="card-link"><i class="fa fa-comment"></i> Komentár</a>
+                        <a data-toggle="collapse" href="#collapse{{ prispevok.id }}" role="button" aria-expanded="false" aria-controls="collapse{{ prispevok.id }}" class="card-link"><i class="fa fa-comment"></i> Komentáre</a>
                     </div>
+                    <div class="collapse" id="collapse{{ prispevok.id }}">
+                  <div class="card card-footer">
+
+
+
+
+                <div class="coment-bottom p-2 px-4">
+                    <div class="d-flex flex-row add-comment-section mt-4 mb-4">
+                        <img class="img-fluid img-responsive rounded-circle mr-2" src="data:image/png;base64,{{ ikonka_uzivatel_request }}" height="38" width="38">
+                        <input type="text" id="novy-komentar-input{{ prispevok.id }}" class="form-control mr-3" placeholder="Pridajte Váš komentár">
+                        <button class="btn btn-primary" type="button" onclick="
+            let dejta_nova_skupina = {
+          novy_komentar: document.getElementById('novy-komentar-input{{ prispevok.id }}').value,
+          skupina_prispevok_id: '{{ prispevok.id }}',
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/api',
+          data: JSON.stringify(dejta_nova_skupina),
+            statusCode: {
+                303: function() {
+                  alert('Chyba: Komentár nemôže byť prádzny');
+                },
+                201: function() {
+                    alert('Komentár úspešne pridaný.');
+                    location.reload();
+                }
+              },
+          dataType: 'json',
+          contentType : 'application/json'
+        });">Komentovať</button>
+                    </div>
+                    {% for komentar,profil_koment in komentare %}
+                        {% if komentar.prispevok.id == prispevok.id %}
+                    <div class="commented-section mt-2">
+                        <div class="d-flex flex-row align-items-center commented-user">
+                            <h5 class="mr-2">{{ komentar.user.username }}</h5>
+                            <span class="dot mb-1"></span>
+                            <span class="mb-1 ml-2">{{ komentar.timestamp|date:"j. F o G:i" }}</span>
+                        </div>
+                        <div class="comment-text-sm">
+                            <span>{{ komentar.sprava }}</span>
+                        </div>
+                    </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                    </div>
+                </div>
+
                 </div>
                 {% endfor %}
 </div>

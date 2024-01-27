@@ -28,7 +28,7 @@ from django.contrib.auth import get_user_model
 from friendship.models import Friend, Follow, Block, FriendshipRequest, FriendshipManager
 from django.http import HttpResponseRedirect, HttpResponse
 from .models import Skupiny, Podskupiny, Objekty, Profile, Viditelnost_mapa, Notifikacie, Diskusia, Diskusny_prispevok, \
-    Sprava, Diskusia_skupiny, Diskusny_prispevok_skupiny
+    Sprava, Diskusia_skupiny, Diskusny_prispevok_skupiny, Diskusny_prispevok_skupiny_komentar
 from django.contrib.gis.geos import GEOSGeometry
 cur = connection.cursor()
 
@@ -513,6 +513,19 @@ def api_request(request):
                 prispevok.sprava = body['sprava_skupina_diskusia']
                 prispevok.save()
                 diskusia.save()
+                return HttpResponse(status=201)
+
+
+            if "novy_komentar" in body and "skupina_prispevok_id" in body:
+                if body["novy_komentar"] =='':
+                    return HttpResponse(status=303)
+                prispevok = Diskusny_prispevok_skupiny.objects.get(id = body['skupina_prispevok_id'])
+                komentar = Diskusny_prispevok_skupiny_komentar()
+                komentar.prispevok = prispevok
+                komentar.user = request.user
+                komentar.sprava = body["novy_komentar"]
+                komentar.save()
+
                 return HttpResponse(status=201)
 
             if "nazov_skupiny_novy" in body and "popis_skupiny_novy" in body and "dostupnost" in body:
