@@ -41,12 +41,13 @@ class Draw_custom_skupina(JSCSSMixin, MacroElement):
                     }
         
                   let user = {
+                  podskupina_meno: podskupina_meno,
                   coords: coords,
                   meno: meno,
                   diskusia: diskusia,
                   html: html,
                   podskupina_id: podskupina_id,
-                  skupina_object_create: null
+                  skupina_object_create: '{{ this.skupina_id }}'
                 };
 
                 let response = await fetch('/api', {
@@ -196,6 +197,7 @@ class Draw_custom_skupina(JSCSSMixin, MacroElement):
 
     def __init__(
         self,
+        skupina_id,
         export=False,
         filename="data.geojson",
         position="topleft",
@@ -206,6 +208,7 @@ class Draw_custom_skupina(JSCSSMixin, MacroElement):
     ):
         super().__init__()
         self.podskupiny = podskupiny
+        self.skupina_id = skupina_id
         self._name = "DrawControl"
         self.export = export
         self.filename = filename

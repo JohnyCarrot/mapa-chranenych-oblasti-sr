@@ -417,7 +417,7 @@ def skupina_request(requests):
         fig = branca.element.Figure(height='400px')
         if skupina.spravca == requests.user.username:
             from draw_custom_skupina import Draw_custom_skupina
-            Draw_custom_skupina(podskupiny=podskupiny_id_pre_pridavanie_objektu, export=False,
+            Draw_custom_skupina(skupina_id=skupina.id,podskupiny=podskupiny_id_pre_pridavanie_objektu, export=False,
                               draw_options={"circle": False, "circlemarker": False}).add_to(m)
         fig.add_child(m)
         context['mapa_html'] = fig._repr_html_()
@@ -984,13 +984,55 @@ def api_request(request):
                 if body.get('stupen')!= '0':
                     novy_objekt.stupen_ochrany = int(body.get('stupen'))
                 if body.get('diskusia'):
-                    novy_objekt.diskusia = 1
+                    diskusia = Diskusia()
+                    diskusia.spravca = request.user.username
+                    diskusia.save()
+                    novy_objekt.diskusia = diskusia
                 else:
-                    novy_objekt.diskusia = 0
+                    diskusia = Diskusia()
+                    diskusia.spravca = request.user.username
+                    diskusia.aktivna = False
+                    diskusia.save()
+                    novy_objekt.diskusia = diskusia
                 novy_objekt.html = body.get('html')
 
                 INSERT_STATEMENT = 'INSERT INTO objekty (meno,html,diskusia,podskupina,stupen_ochrany,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
-                cur.execute(INSERT_STATEMENT, (novy_objekt.meno, novy_objekt.html, novy_objekt.diskusia, novy_objekt.podskupina.id,novy_objekt.stupen_ochrany,str(json.loads(body.get('coords'))['geometry'])   ))
+                cur.execute(INSERT_STATEMENT, (novy_objekt.meno, novy_objekt.html, novy_objekt.diskusia.id, novy_objekt.podskupina.id,novy_objekt.stupen_ochrany,str(json.loads(body.get('coords'))['geometry'])   ))
+
+                return HttpResponse(status=201)
+
+            if "skupina_object_create" in body and "coords" in body and "meno" in body and "podskupina_meno" in body:
+                geometria_cela = json.loads(body.get('coords'))
+                novy_objekt = Objekty()
+                novy_objekt.geometry = GEOSGeometry(json.dumps(geometria_cela.get('geometry')))
+                novy_objekt.meno = body.get('meno')
+                if body['podskupina_meno'] =='':
+                    novy_objekt.podskupina = Podskupiny.objects.get(id=body['podskupina_id'])
+                else:
+                    podskupina = Podskupiny()
+                    podskupina.meno = body['podskupina_meno']
+                    podskupina.skupina = Skupiny.objects.get(id = body['skupina_object_create'])
+                    podskupina.spravca = request.user.username
+                    viditelnost = Viditelnost_mapa()
+                    viditelnost.save()
+                    podskupina.viditelnost = viditelnost
+                    podskupina.save()
+                    novy_objekt.podskupina = podskupina
+                if body.get('diskusia'):
+                    diskusia = Diskusia()
+                    diskusia.spravca = request.user.username
+                    diskusia.save()
+                    novy_objekt.diskusia = diskusia
+                else:
+                    diskusia = Diskusia()
+                    diskusia.spravca = request.user.username
+                    diskusia.aktivna = False
+                    diskusia.save()
+                    novy_objekt.diskusia = diskusia
+                novy_objekt.html = body.get('html')
+
+                INSERT_STATEMENT = 'INSERT INTO objekty (meno,html,diskusia,podskupina,stupen_ochrany,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
+                cur.execute(INSERT_STATEMENT, (novy_objekt.meno, novy_objekt.html, novy_objekt.diskusia.id, novy_objekt.podskupina.id,novy_objekt.stupen_ochrany,str(json.loads(body.get('coords'))['geometry'])   ))
 
                 return HttpResponse(status=201)
             if "update_viditelnost_skupina" in body and "skupina_id" in body and "global_read" in body and "global_write" in body and "uzivatelia" in body: #A mnoho ďalšiho :)
