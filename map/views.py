@@ -389,6 +389,38 @@ def skupina_request(requests):
             context['popis'] = json.loads(skupina.nastavenia)['popis']
         context['pocet_vrstiev'] = len(Objekty.objects.filter(podskupina__skupina=skupina))
         context['pocet_clenov'] = len(skupina.diskusia.uzivatelia)
+        m = folium.Map(location=[48.73044030054515, 19.456582270083356],
+                       zoom_start=8,
+                       prefer_canvas=False,
+                       # crs="EPSG3857",
+
+                       )
+        geocoder_vlastne_vyhladanie = []
+        skupiny_v_navigacii = dict()
+        _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
+        _skupina_v_mape.add_to(m)
+        podskupiny_v_mape = []
+        podskupiny_id_pre_pridavanie_objektu = []
+        for podskupina in Podskupiny.objects.all().order_by('priorita'):
+            if skupina.id == podskupina.skupina_id:
+                _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
+                _podskupina_v_mape.add_to(m)
+                pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=requests.user,
+                                            geocoder=geocoder_vlastne_vyhladanie)
+                podskupiny_v_mape.append(_podskupina_v_mape)
+                podskupiny_id_pre_pridavanie_objektu.append(podskupina)
+        skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
+        # mapa nastavenie
+        folium.plugins.Fullscreen().add_to(m)
+        folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
+        folium.plugins.LocateControl(auto_start=False).add_to(m)
+        fig = branca.element.Figure(height='400px')
+        if skupina.spravca == requests.user.username:
+            from draw_custom_skupina import Draw_custom_skupina
+            Draw_custom_skupina(podskupiny=podskupiny_id_pre_pridavanie_objektu, export=False,
+                              draw_options={"circle": False, "circlemarker": False}).add_to(m)
+        fig.add_child(m)
+        context['mapa_html'] = fig._repr_html_()
         return render(requests, 'skupiny/skupina.html',context)
     return HttpResponse("Diskusia neexistuje")
 
