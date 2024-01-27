@@ -417,6 +417,7 @@ def skupina_request(requests):
         fig = branca.element.Figure(height='400px')
         if skupina.spravca == requests.user.username:
             from draw_custom_skupina import Draw_custom_skupina
+            Geoman().add_to(m)
             Draw_custom_skupina(skupina_id=skupina.id,podskupiny=podskupiny_id_pre_pridavanie_objektu, export=False,
                               draw_options={"circle": False, "circlemarker": False}).add_to(m)
         fig.add_child(m)

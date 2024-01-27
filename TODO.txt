@@ -16,8 +16,6 @@ loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorý
 skupiny do nastaveni popisok, dostupnost etc
 moznost odhlasit sa zo sys skupin
 
-pre mazanie basic skupiny použiť rovnakú fukciu ako na admin
-do nastavení skupiny dať diskusiu, posty ...
 
 priatel zablokovaný sa nedá vyhladat
 zlepšiť vyhladavanie u priatelov
@@ -28,3 +26,4 @@ sys skupiny pridat diskusiu
 anonym diskusia koment, preveriť
 
 summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
+mapa pozriet sa na upravu html v geoman uprave aj pri draw custom
