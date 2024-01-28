@@ -127,22 +127,165 @@
                             </div>
 
                             <div class="tab-pane fade" id="clenovia" role="tabpanel" aria-labelledby="clenovia-tab">
-                                <div class="form-group">
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="customFile">
-                                        <label class="custom-file-label" for="customFile">Sem pôjde mapa / toto sa zmaže</label>
-                                    </div>
-                                </div>
+
+
+						<table class="table table-striped" style="width:100%">
+							<thead>
+								<tr>
+									<th></th>
+									<th>Meno</th>
+									<th>Status</th>
+                                    {% if user.username == skupina.spravca %}
+                                     <th>Moderovanie</th>
+                                    {% endif %}
+								</tr>
+							</thead>
+							<tbody>
+                            {% for uzivatelko,profilcoc,zapistok in clenovia_diskusie %}
+								<tr>
+									<td><img src="data:image/png;base64,{{ profilcoc.icon }}" width="32" height="32" class="rounded-circle my-n1" alt="Avatar"></td>
+									<td><a href="profil?u={{ uzivatelko.username }}">{{ uzivatelko.username }}</a></td>
+                                        {% if uzivatelko.username == skupina.spravca %}
+                                        	<td><span class="badge bg-danger">Administrátor</span></td>
+                                        {% elif zapistok %}
+                                            <td><span class="badge bg-warning" >Moderátor</span></td>
+                                        {% else %}
+                                            <td><span class="badge bg-info">Užívateľ</span></td>
+                                        {% endif %}
+
+                                {% if user.username == skupina.spravca %}
+                                        {% if uzivatelko.username == skupina.spravca %}
+                                        	<td></td>
+                                        {% elif zapistok %}
+                                            <td><button class="btn btn-danger btn-sm" onclick="
+                                            let dejta_nova_skupina = {
+                                          nestastnik: '{{ uzivatelko.username }}',
+                                          odobratie_moderovania_skupina_id: '{{ skupina.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                201: function() {
+                                                    alert('Moderovanie úspešne odobraté');
+                                                    location.reload();
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });">Odobrať</button></td>
+                                        {% else %}
+                                            <td><button class="btn btn-success btn-sm" onclick="
+                                            let dejta_nova_skupina = {
+                                          nestastnik: '{{ uzivatelko.username }}',
+                                          umoznenie_moderovania_skupina_id: '{{ skupina.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                201: function() {
+                                                    alert('Moderovanie úspešne udelené');
+                                                    location.reload();
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });">Umožniť</button></td>
+                                        {% endif %}
+                                {% endif %}
+								</tr>
+                            {% endfor %}
+							</tbody>
+						</table>
+
+
                                 <div class="py-4"></div>
                             </div>
 
                             <div class="tab-pane fade" id="nastavenia" role="tabpanel" aria-labelledby="nastavenia-tab">
-                                <div class="form-group">
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="customFile">
-                                        <label class="custom-file-label" for="customFile">Sem pôjde mapa / toto sa zmaže</label>
-                                    </div>
-                                </div>
+
+                                <div class="card mb-4">
+                                                <div class="card-body">
+                                                <ul class="list-group list-group-flush mx-n2">
+                                                <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                <h6 class="mb-0">Verejne dostupná</h6>
+                                                <small>Ktokoľvek môže skupinu vyhľadať a prezerať.</small>
+                                                </div>
+                                                <div class="form-check form-switch">
+                                                <input class="form-check-input" id="nova-verejne-dostupna"
+                                                       role="switch" type="checkbox" {% if skupina.diskusia.verejna %}checked{% endif %}
+                                                       onchange="
+                                            let dejta_nova_skupina = {
+                                          verejna: this.checked,
+                                          verejna_diskusia_zmenit_stav_skupina_id: '{{ skupina.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                201: function() {
+                                                    alert('Zmena úspešne uložená');
+                                                    //location.reload();
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });">
+                                                </div>
+                                                </li>
+                                                <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                <h6 class="mb-0">Pre každého</h6>
+                                                <small>Ktokoľvek sa môže do skupiny pridať.</small>
+                                                </div>
+                                                <div class="form-check form-switch">
+                                                <input class="form-check-input" id="nova-ktokolvek-pridat" role="switch" type="checkbox"
+                                                       {% if skupina.diskusia.pre_kazdeho %}checked{% endif %} onchange="
+                                            let dejta_nova_skupina = {
+                                          pre_kazdeho: this.checked,
+                                          pre_kazdeho_diskusia_zmenit_stav_skupina_id: '{{ skupina.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                201: function() {
+                                                    alert('Zmena úspešne uložená');
+                                                    //location.reload();
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });">
+                                                </div>
+                                                </li>
+                                                </ul>
+                                                </div>
+                                                </div>
+                                <button class="btn btn-danger" style="width: 100%" onclick="
+                                            let dejta_nova_skupina = {
+                                          zmaz_skupinu_skupina_id_z_diskusie: '{{ skupina.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                201: function() {
+                                                    alert('Skupina úspešne zmazaná');
+                                                    document.location.href='/skupiny';
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });">Zmazať skupinu</button>
+
                                 <div class="py-4"></div>
                             </div>
                         </div>

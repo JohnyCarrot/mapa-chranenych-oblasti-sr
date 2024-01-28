@@ -37,7 +37,7 @@ class Diskusny_prispevok(models.Model):
 
 class Diskusia_skupiny(models.Model):
     id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
-    uzivatelia = models.JSONField(blank=True, null=True, default=dict)  # meno uzivatela a r,rw
+    uzivatelia = models.JSONField(blank=True, null=True, default=dict)  # username a r,| r - je v skupine, w - moderator (moze mazat)
     verejna = models.BooleanField(default=True)  # Kazdy moze prezerat a vyhladat
     pre_kazdeho = models.BooleanField(default=True)  # Kazdy sa moze pridat
     #Pripadne pridat spravcov, odbery...

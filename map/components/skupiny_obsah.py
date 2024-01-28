@@ -78,7 +78,7 @@ class SkupinyObsahView(UnicornView):
             skupina.viditelnost.uzivatelia[self.request.user.username] = "r"
         else:
             skupina.viditelnost.uzivatelia[self.request.user.username] = "rw"
-        skupina.diskusia.uzivatelia[self.request.user.username] = "rw"
+        skupina.diskusia.uzivatelia[self.request.user.username] = "r"
         skupina.viditelnost.save()
         skupina.diskusia.save()
         skupina.save()

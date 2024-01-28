@@ -27,3 +27,9 @@ anonym diskusia koment, preveriť
 
 summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
 notifikácie pri poste v skupine, pridať karmu
+
+skloňovanie v skupinách
+
+pridať člena do skupiny ktorá nie je pre každého
+
+Komentáre v diskusií nech ukazujú číslo

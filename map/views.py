@@ -381,7 +381,7 @@ def skupiny_request(requests): #Nechytať!
 @login_required
 def skupina_request(requests):
     context = {'navbar_administracia': navbar_zapni_administraciu(requests.user)}
-    if "id" in requests.GET and Skupiny.objects.get(id=requests.GET['id']).diskusia is not None:
+    if "id" in requests.GET and Skupiny.objects.filter(id=requests.GET['id']).exists() and Skupiny.objects.get(id=requests.GET['id']).diskusia is not None:
         skupina = Skupiny.objects.get(id=requests.GET['id'])
         context['skupina'] = skupina
         context['popis'] = ""
@@ -396,6 +396,15 @@ def skupina_request(requests):
             pocet_vrstiev+= 1
         context['pocet_vrstiev'] = pocet_vrstiev
         context['pocet_clenov'] = len(skupina.diskusia.uzivatelia)
+        clenovia_diskusie = []
+
+        for key in skupina.diskusia.uzivatelia:
+            uzi = User.objects.get(username=key)
+            profi = Profile.objects.get(user = uzi)
+            zapis = False
+            if "w" in skupina.diskusia.uzivatelia[key]: zapis = True
+            clenovia_diskusie.append(  (uzi,profi,zapis)  )
+        context['clenovia_diskusie'] = clenovia_diskusie
         m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                        zoom_start=8,
                        prefer_canvas=False,
@@ -542,6 +551,53 @@ def api_request(request):
                 skupina.meno = str(body['novy_nazov_skupiny'])
                 skupina.save()
                 return HttpResponse(status=201)
+
+
+            if "odobratie_moderovania_skupina_id" in body and "nestastnik" in body:
+                skupina = Skupiny.objects.get(id=body['odobratie_moderovania_skupina_id'])
+                nestastnik = User.objects.get(username=body['nestastnik'])
+                skupina.diskusia.uzivatelia[nestastnik.username] = "r"
+                skupina.diskusia.save()
+                skupina.save()
+                return HttpResponse(status=201)
+
+            if "umoznenie_moderovania_skupina_id" in body and "nestastnik" in body:
+                skupina = Skupiny.objects.get(id=body['umoznenie_moderovania_skupina_id'])
+                nestastnik = User.objects.get(username=body['nestastnik'])
+                skupina.diskusia.uzivatelia[nestastnik.username] = "rw"
+                skupina.diskusia.save()
+                skupina.save()
+                return HttpResponse(status=201)
+
+            if "verejna_diskusia_zmenit_stav_skupina_id" in body and "verejna" in body:
+                skupina = Skupiny.objects.get(id=body['verejna_diskusia_zmenit_stav_skupina_id'])
+                skupina.diskusia.verejna = body['verejna']
+                skupina.diskusia.save()
+                skupina.save()
+                return HttpResponse(status=201)
+
+            if "pre_kazdeho_diskusia_zmenit_stav_skupina_id" in body and "pre_kazdeho" in body:
+                skupina = Skupiny.objects.get(id=body['pre_kazdeho_diskusia_zmenit_stav_skupina_id'])
+                skupina.diskusia.pre_kazdeho = body['pre_kazdeho']
+                skupina.diskusia.save()
+                skupina.save()
+                return HttpResponse(status=201)
+
+            if "zmaz_skupinu_skupina_id_z_diskusie" in body:
+                skupina = Skupiny.objects.get(id = body['zmaz_skupinu_skupina_id_z_diskusie'])
+                for podskupina in Podskupiny.objects.filter(skupina = skupina):
+                    for objekt in Objekty.objects.filter(podskupina = podskupina):
+                        objekt.delete()
+                    podskupina.delete()
+                diskusia = Diskusia_skupiny(id = skupina.diskusia.id)
+                skupina.delete()
+                for prispevok in Diskusny_prispevok_skupiny.objects.filter(diskusia=diskusia):
+                    for komentar in Diskusny_prispevok_skupiny_komentar.objects.filter(prispevok=prispevok):
+                        komentar.delete()
+                    prispevok.delete()
+                diskusia.delete()
+                return HttpResponse(status=201)
+
 
             if "skupina_diskusia_id" in body and "sprava_skupina_diskusia" in body:
                 if body["sprava_skupina_diskusia"] =='<p><br></p>':
