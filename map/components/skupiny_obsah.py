@@ -38,7 +38,13 @@ class SkupinyObsahView(UnicornView):
         for skupina in Skupiny.objects.filter(diskusia__isnull=False):
             if self.request.user.username in skupina.diskusia.uzivatelia:
                 pocet_komentov = len(Diskusny_prispevok_skupiny.objects.filter(diskusia=skupina.diskusia))
-                pocet_vrstiev = len(Objekty.objects.filter(podskupina__skupina=skupina))
+                pocet_vrstiev = 0
+                for objekt in Objekty.objects.filter(podskupina__skupina=skupina):
+                    if objekt.nastavenia != None:
+                        nastavenia = json.loads(objekt.nastavenia)
+                        if "deleted" in nastavenia and nastavenia['deleted'] == True:
+                            continue
+                    pocet_vrstiev += 1
                 if skupina.nastavenia is not None and "popis" in json.loads(skupina.nastavenia):
                     self.skupiny.append( (skupina, json.loads(skupina.nastavenia)['popis'],pocet_komentov,pocet_vrstiev  )  )
                 else:

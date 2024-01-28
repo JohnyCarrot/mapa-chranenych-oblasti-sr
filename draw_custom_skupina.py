@@ -68,7 +68,7 @@ class Draw_custom_skupina(JSCSSMixin, MacroElement):
                 otvorene_okno = false;
                 parent.posledne_html_z_editora = "";
                 okno_global.close();
-                parent.daj_mapu(parent.daj_mapu_posledna_id,parent.daj_mapu_posledna_skupina_bool);
+                parent.location.reload();
                 });
                 
                 

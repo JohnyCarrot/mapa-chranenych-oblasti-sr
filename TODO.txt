@@ -26,4 +26,4 @@ sys skupiny pridat diskusiu
 anonym diskusia koment, preveriť
 
 summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
-mapa pozriet sa na upravu html v geoman uprave aj pri draw custom
+notifikácie pri poste v skupine, pridať karmu

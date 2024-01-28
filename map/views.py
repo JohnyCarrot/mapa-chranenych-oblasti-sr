@@ -387,7 +387,14 @@ def skupina_request(requests):
         context['popis'] = ""
         if skupina.nastavenia is not None and "popis" in skupina.nastavenia:
             context['popis'] = json.loads(skupina.nastavenia)['popis']
-        context['pocet_vrstiev'] = len(Objekty.objects.filter(podskupina__skupina=skupina))
+        pocet_vrstiev = 0
+        for objekt in Objekty.objects.filter(podskupina__skupina=skupina):
+            if objekt.nastavenia != None:
+                nastavenia = json.loads(objekt.nastavenia)
+                if "deleted" in nastavenia and nastavenia['deleted'] == True:
+                    continue
+            pocet_vrstiev+= 1
+        context['pocet_vrstiev'] = pocet_vrstiev
         context['pocet_clenov'] = len(skupina.diskusia.uzivatelia)
         m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                        zoom_start=8,
@@ -414,10 +421,10 @@ def skupina_request(requests):
         folium.plugins.Fullscreen().add_to(m)
         folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
         folium.plugins.LocateControl(auto_start=False).add_to(m)
-        fig = branca.element.Figure(height='400px')
+        fig = branca.element.Figure(height='500px')
         if skupina.spravca == requests.user.username:
             from draw_custom_skupina import Draw_custom_skupina
-            Geoman().add_to(m)
+            Geoman_user(username=requests.user.username).add_to(m)
             Draw_custom_skupina(skupina_id=skupina.id,podskupiny=podskupiny_id_pre_pridavanie_objektu, export=False,
                               draw_options={"circle": False, "circlemarker": False}).add_to(m)
         fig.add_child(m)
