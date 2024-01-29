@@ -1,5 +1,5 @@
 <div>
-                {% for prispevok,profil in prispevky %}
+                {% for prispevok,profil,karma,upvoted,downvoted in prispevky %}
                 <div class="card gedf-card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
@@ -24,6 +24,17 @@
                         <p class="card-text">
                                 {{ prispevok.sprava|safe }}
                         </p>
+
+                                                    <div style="position: relative;margin-top: -20%" class="float-right text-center">
+
+                                <div style="position: relative;top: -1em;" id="{{ prispevok.pk }}" class="upvotejs">
+                                                <a class="upvote {% if upvoted %}upvote-on{% endif %}"></a>
+                                                <span class="count">{{ karma }}</span>
+                                                <a class="downvote {% if downvoted %}downvote-on{% endif %}"></a>
+                                            </div>
+
+                            </div>
+
                     </div>
                     <div class="card-footer">
                         <a data-toggle="collapse" href="#collapse{{ prispevok.id }}" role="button" aria-expanded="false" aria-controls="collapse{{ prispevok.id }}" class="card-link"><i class="fa fa-comment"></i> Komentáre</a>
@@ -64,7 +75,8 @@
                         {% if komentar.prispevok.id == prispevok.id %}
                     <div class="commented-section mt-2">
                         <div class="d-flex flex-row align-items-center commented-user">
-                            <h5 class="mr-2">{{ komentar.user.username }}</h5>
+                            <img class="img-fluid img-responsive rounded-circle mr-2" src="data:image/png;base64,{{ profil_koment.icon }}" height="30" width="30">
+                            <h6 class="mr-2"><a href="profil?u={{ komentar.user.username }}">{{ komentar.user.username }}</a></h6>
                             <span class="dot mb-1"></span>
                             <span class="mb-1 ml-2">{{ komentar.timestamp|date:"j. F o G:i" }}</span>
                         </div>
@@ -79,5 +91,12 @@
                 </div>
 
                 </div>
+                    {% if user.is_authenticated %}
+                        <script>
+                  Upvote.create('{{prispevok.pk}}', {callback: function(data){
+                      Unicorn.call('skupina-diskusia-prispevky', 'hlasuj_karma_prispevok', JSON.stringify(data));
+                      } });
+                        </script>
+                    {% endif %}
                 {% endfor %}
 </div>

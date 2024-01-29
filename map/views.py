@@ -1078,6 +1078,7 @@ def api_request(request):
                     podskupina.skupina = Skupiny.objects.get(id = body['skupina_object_create'])
                     podskupina.spravca = request.user.username
                     viditelnost = Viditelnost_mapa()
+                    viditelnost.globalne = "r"
                     viditelnost.save()
                     podskupina.viditelnost = viditelnost
                     podskupina.save()
