@@ -603,12 +603,20 @@ def api_request(request):
                 if body["sprava_skupina_diskusia"] =='<p><br></p>':
                     return HttpResponse(status=303)
                 diskusia = Diskusia_skupiny.objects.get(id = body['skupina_diskusia_id'])
+                skupina = Skupiny.objects.get(diskusia=diskusia)
                 prispevok = Diskusny_prispevok_skupiny()
                 prispevok.diskusia = diskusia
                 prispevok.user = request.user
                 prispevok.sprava = body['sprava_skupina_diskusia']
                 prispevok.save()
                 diskusia.save()
+                for key in diskusia.uzivatelia:
+                    if key != request.user.username:
+                        notifikacia = Notifikacie()
+                        notifikacia.odosielatel = request.user
+                        notifikacia.prijimatel = User.objects.get(username = key)
+                        notifikacia.sprava = f"uverejnil príspevok v skupine <a href='skupina?id={skupina.id}'>{skupina.meno}</a>"
+                        notifikacia.save()
                 return HttpResponse(status=201)
 
 

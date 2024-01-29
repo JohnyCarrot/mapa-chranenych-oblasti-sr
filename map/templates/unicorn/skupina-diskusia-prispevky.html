@@ -1,5 +1,5 @@
 <div>
-                {% for prispevok,profil,karma,upvoted,downvoted in prispevky %}
+                {% for prispevok,profil,karma,upvoted,downvoted,moderator in prispevky %}
                 <div class="card gedf-card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
@@ -13,7 +13,15 @@
                             </div>
                             <div>
                                 <div class="dropdown">
-                                    <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>{{ prispevok.timestamp|date:"j. F o G:i" }}</div>
+                                    <div class="text-muted h7 mb-2">
+                                        <i class="fa fa-clock-o"></i>{{ prispevok.timestamp|date:"j. F o G:i" }}
+                                        {% if moderator %}
+                                            <button onclick="
+               Unicorn.call('skupina-diskusia-prispevky', 'zmaz_prispevok', '{{ prispevok.id }}');alert('Príspevok úspešne zmazaný');location.reload()">
+                                        <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -25,7 +33,7 @@
                                 {{ prispevok.sprava|safe }}
                         </p>
 
-                                                    <div style="position: relative;margin-top: -20%" class="float-right text-center">
+                                                    <div style="position: relative;margin-top: -2em" class="float-right text-center">
 
                                 <div style="position: relative;top: -1em;" id="{{ prispevok.pk }}" class="upvotejs">
                                                 <a class="upvote {% if upvoted %}upvote-on{% endif %}"></a>
@@ -79,6 +87,12 @@
                             <h6 class="mr-2"><a href="profil?u={{ komentar.user.username }}">{{ komentar.user.username }}</a></h6>
                             <span class="dot mb-1"></span>
                             <span class="mb-1 ml-2">{{ komentar.timestamp|date:"j. F o G:i" }}</span>
+                            {% if user.username == komentar.user.username %}
+                                <i class="fa-solid fa-trash" onclick="
+               Unicorn.call('skupina-diskusia-prispevky', 'zmaz_komentar', '{{ komentar.id }}');alert('Komentár úspešne zmazaný');location.reload()">
+                                        </i>
+
+                            {% endif %}
                         </div>
                         <div class="comment-text-sm">
                             <span>{{ komentar.sprava }}</span>
@@ -98,5 +112,6 @@
                       } });
                         </script>
                     {% endif %}
+                    <br>
                 {% endfor %}
 </div>

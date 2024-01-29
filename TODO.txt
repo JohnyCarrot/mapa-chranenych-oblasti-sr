@@ -26,11 +26,9 @@ sys skupiny pridat diskusiu
 anonym diskusia koment, preveriť
 
 summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
-notifikácie pri poste v skupine
-
 skloňovanie v skupinách
 
 pridať člena do skupiny ktorá nie je pre každého
+do skupin pridať možnosť odísť zo skupiny ...
 
-
-Umožniť mazať komentáre, do skupin pridať možnosť odísť zo skupiny ...
+skupina mapa načítať mapu po kluknutí na kartu
