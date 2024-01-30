@@ -405,6 +405,13 @@ def skupina_request(requests):
             if "w" in skupina.diskusia.uzivatelia[key]: zapis = True
             clenovia_diskusie.append(  (uzi,profi,zapis)  )
         context['clenovia_diskusie'] = clenovia_diskusie
+        zoznam_priatelov = []
+        for priatel in Friend.objects.friends(requests.user):
+            if not Block.objects.is_blocked(requests.user, priatel) and priatel.username not in skupina.diskusia.uzivatelia:
+                zoznam_priatelov.append( (priatel,Profile.objects.get(user__username=priatel.username) )  )
+        context['zoznam_priatelov'] = zoznam_priatelov
+
+
         m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                        zoom_start=8,
                        prefer_canvas=False,
@@ -581,6 +588,28 @@ def api_request(request):
                 skupina.diskusia.pre_kazdeho = body['pre_kazdeho']
                 skupina.diskusia.save()
                 skupina.save()
+                return HttpResponse(status=201)
+
+            if "verejna_diskusia_skupina_id" in body and "opustatel_skupiny" in body:
+                skupina = Skupiny.objects.get(id=body['verejna_diskusia_skupina_id'])
+                diskusia = skupina.diskusia
+                diskusia.uzivatelia.pop(request.user.username, None)
+                diskusia.save()
+                skupina.save()
+                return HttpResponse(status=201)
+
+            if "pridaj_priatela_skupina_id_z_diskusie" in body and "priatel_username" in body:
+                skupina = Skupiny.objects.get(id=body['pridaj_priatela_skupina_id_z_diskusie'])
+                skupina.viditelnost.uzivatelia[body['priatel_username']] = "r"
+                skupina.diskusia.uzivatelia[body['priatel_username']] = "r"
+                skupina.viditelnost.save()
+                skupina.diskusia.save()
+                skupina.save()
+                notifikacia = Notifikacie()
+                notifikacia.prijimatel = User.objects.get(username=body['priatel_username'])
+                notifikacia.odosielatel = request.user
+                notifikacia.sprava = f"Vás pridal do skupiny <a href='/skupina?id={skupina.id}'>{skupina.meno}</a>"
+                notifikacia.save()
                 return HttpResponse(status=201)
 
             if "zmaz_skupinu_skupina_id_z_diskusie" in body:

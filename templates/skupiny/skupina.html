@@ -202,7 +202,29 @@
                             {% endfor %}
 							</tbody>
 						</table>
-
+                            {% if user.username == skupina.spravca %}
+                                <button style="width: 100%" class="btn btn-info" data-toggle="modal" data-target="#staticBackdropPridatPriatela"
+                                > Pridať priateľa</button>
+                            {% else %}
+                                <button style="width: 100%" class="btn btn-danger" onclick="
+                                            let dejta_nova_skupina = {
+                                          opustatel_skupiny: '{{ user.id }}',
+                                          verejna_diskusia_skupina_id: '{{ skupina.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                201: function() {
+                                                    alert('Skupina úspešne opustená');
+                                                    document.location.href='/skupiny';
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });">Opustiť skupinu</button>
+                            {% endif %}
 
                                 <div class="py-4"></div>
                             </div>
@@ -375,6 +397,63 @@ var posledne_html_z_editora = "";
       return true;
   }
 </script>
+
+<!-- Modal pridat priatela -->
+<div class="modal fade" id="staticBackdropPridatPriatela" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Pridať priateľa do skupiny</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% if zoznam_priatelov %}
+            <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Meno</th>
+      <th scope="col">Akcia</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priatel,profi in zoznam_priatelov %}
+    <tr>
+      <td>{{ priatel.username }}</td>
+      <td><i class="fa-solid fa-plus" onclick="
+                                            let dejta_nova_skupina = {
+                                          priatel_username: '{{ priatel.username }}',
+                                          pridaj_priatela_skupina_id_z_diskusie: '{{ skupina.id }}',
+                                        };
+                                        $.ajax({
+                                          type: 'POST',
+                                          url: '/api',
+                                          data: JSON.stringify(dejta_nova_skupina),
+                                            statusCode: {
+                                                201: function() {
+                                                    alert('Priateľ úspešne pridaný');
+                                                    location.reload();
+                                                }
+                                              },
+                                          dataType: 'json',
+                                          contentType : 'application/json'
+                                        });"></i></td>
+    </tr>
+       {% endfor %}
+  </tbody>
+</table>
+         {% else %}
+            <h5>Nemáte žiadnych priateľov, ktorých by ste mohli pridať do skupiny</h5>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Zatvoriť</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   </body>
 </html>

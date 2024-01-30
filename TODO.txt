@@ -13,7 +13,6 @@ informácia o stránke S v prihlásení (nejaké logo etc)
 
 loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....
 
-skupiny do nastaveni popisok, dostupnost etc
 moznost odhlasit sa zo sys skupin
 
 
@@ -27,8 +26,5 @@ anonym diskusia koment, preveriť
 
 summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
 skloňovanie v skupinách
-
-pridať člena do skupiny ktorá nie je pre každého
-do skupin pridať možnosť odísť zo skupiny ...
 
 skupina mapa načítať mapu po kluknutí na kartu
