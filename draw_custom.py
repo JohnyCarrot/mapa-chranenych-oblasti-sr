@@ -45,6 +45,45 @@ class Draw(JSCSSMixin, MacroElement):
     _template = Template(
         """
         {% macro script(this, kwargs) %}
+                //Začatie prekladu
+        L.drawLocal.draw.toolbar.actions.title = 'Zrušiť kreslenie';
+        L.drawLocal.draw.toolbar.actions.text = 'Zrušiť';
+        L.drawLocal.draw.toolbar.finish.title = 'Skončiť kreslenie';
+        L.drawLocal.draw.toolbar.finish.text = 'Skončiť';
+        L.drawLocal.draw.toolbar.undo.title = 'Zmazať posledný nakreslený bod';
+        L.drawLocal.draw.toolbar.undo.text = 'Zmazať posledný bod';
+        L.drawLocal.draw.toolbar.buttons.polygon = 'Nakresliť mnohouholník';
+        L.drawLocal.draw.toolbar.buttons.rectangle = 'Nakresliť štvorec';
+        L.drawLocal.draw.toolbar.buttons.polyline = 'Nakresliť lomenú čiaru';
+        L.drawLocal.draw.toolbar.buttons.marker = 'Nakresliť značku';
+        
+        L.drawLocal.draw.handlers.marker.tooltip.start = 'Kliknutím na mapu umiestnite značku';
+        L.drawLocal.draw.handlers.polygon.tooltip.start = 'Kliknutím začnete kresliť tvar';
+        L.drawLocal.draw.handlers.polygon.tooltip.cont = 'Kliknutím pokračujte v kreslení tvaru';
+        L.drawLocal.draw.handlers.polygon.tooltip.end = 'Kliknutím na prvý bod zatvoríte tento tvar';
+        L.drawLocal.draw.handlers.polyline.error = '<strong>Chyba:</strong> hrany tvaru sa nemôžu krížiť!';
+        L.drawLocal.draw.handlers.polyline.tooltip.start = 'Kliknutím začnete kresliť čiaru';
+        L.drawLocal.draw.handlers.polyline.tooltip.cont = 'Kliknite, ak chcete pokračovať v kreslení čiary';
+        L.drawLocal.draw.handlers.polyline.tooltip.end = 'Kliknutím na posledný bod ukončíte čiaru';
+        L.drawLocal.draw.handlers.rectangle.tooltip.start = 'Kliknutím a ťahaním nakreslite obdĺžnik';
+        L.drawLocal.draw.handlers.simpleshape.tooltip.end = 'Kreslenie dokončíte uvoľnením myši';
+        
+        L.drawLocal.edit.toolbar.actions.save.title = 'Uložiť zmeny';
+        L.drawLocal.edit.toolbar.actions.save.text = 'Uložiť';
+        L.drawLocal.edit.toolbar.actions.cancel.title = 'Zrušiť úpravy, zahodia sa všetky zmeny';
+        L.drawLocal.edit.toolbar.actions.cancel.text = 'Zrušiť';
+        L.drawLocal.edit.toolbar.actions.clearAll.title = 'Zmazať všetky novonačrtnuté vrstvy';
+        L.drawLocal.edit.toolbar.actions.clearAll.text = 'Zmazať všetko';
+        
+        L.drawLocal.edit.toolbar.buttons.edit = 'Upraviť novonačrtnuté vrstvy';
+        L.drawLocal.edit.toolbar.buttons.editDisabled = 'Žiadne novonačrtnuté vrstvy na úpravu';
+        L.drawLocal.edit.toolbar.buttons.remove = 'Zmazať novonačrtnuté vrstvy';
+        L.drawLocal.edit.toolbar.buttons.removeDisabled = 'Žiadne novonačrtnuté vrstvy na zmazanie';
+        
+        L.drawLocal.edit.handlers.edit.tooltip.text = 'Prvky upravte potiahnutím rukovätí alebo značiek';
+        L.drawLocal.edit.handlers.edit.tooltip.subtext = 'Ak chcete zmeny vrátiť späť, kliknite na tlačidlo Zrušiť';
+        L.drawLocal.edit.handlers.remove.tooltip.text = 'Kliknite na novonačrtnutú vrstvu, ktorú chcete odstrániť';
+        //Koniec prekladu
             var options = {
               position: {{ this.position|tojson }},
               draw: {{ this.draw_options|tojson }},
