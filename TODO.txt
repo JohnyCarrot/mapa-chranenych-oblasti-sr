@@ -1,7 +1,4 @@
-možnodť vlastného výletu na mape
 zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
-
-Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checknut cez checkbox aj sys vrstvy (zrejme v nastaveniach mapy)
 
 vyhrať sa s popup stylom
 
@@ -11,8 +8,6 @@ loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorý
 
 moznost odhlasit sa zo sys skupin
 
-
 sys skupiny pridat diskusiu
 
-summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
 skloňovanie v skupinách

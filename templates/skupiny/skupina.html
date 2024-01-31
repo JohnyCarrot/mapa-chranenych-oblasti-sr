@@ -23,6 +23,7 @@
             {% load static %}<link rel="stylesheet" href="{% static 'forum/upvotejs.css' %}" >
       {% load static %}<script src="{% static 'forum/upvotejs.vanilla.js' %}"></script>
       {% load static %}<script src="{% static 'index/progressbar.js' %}"></script>
+      {% load static %}<script src="{% static 'index/summernote-sk-SK.js' %}"></script>
     <title>Skupiny</title>
   </head>
   <body>
@@ -331,7 +332,18 @@
 <script>
 $(document).ready(function() {
   $('#message-sprava').summernote({
-      placeholder: 'Čo máte na mysli ?',                 // set editor height
+      placeholder: 'Čo máte na mysli ?',
+      lang: "sk-SK",
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'hr']],
+          ],
     });
 });
 function uprava_html(){
@@ -342,16 +354,19 @@ function uprava_html(){
     $('#object_htmlModal').modal('show');
           $(document).ready(function() {
   $('#summernote').summernote({
-  toolbar: [
-    // [groupName, [list of button]]
-    ['style', ['bold', 'italic', 'underline', 'clear']],
-    ['font', ['strikethrough', 'superscript', 'subscript']],
-    ['fontsize', ['fontsize']],
-    ['color', ['color']],
-    ['para', ['ul', 'ol', 'paragraph']],
-    ['height', ['height']]
-  ]
-});
+                  lang: "sk-SK",
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'hr']],
+                  ],
+
+              });
   if(posledne_html_z_editora!="") {
       $('#summernote').summernote('code', posledne_html_z_editora);
   }
