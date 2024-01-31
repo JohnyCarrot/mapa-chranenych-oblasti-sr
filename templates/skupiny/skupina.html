@@ -415,6 +415,7 @@ function map_preview_update(html){
         wrapper.innerHTML= html;
 }
 async function daj_mapu_celu_skupina(){
+      map_preview_update('<div id="loading-bar-div" style="position: absolute; top: 50%; text-align: center; width: 100%;"></div>')
     let bar = new ProgressBar.Line('#loading-bar-div', {
   strokeWidth: 3,
   easing: 'easeInOut',

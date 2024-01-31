@@ -1,4 +1,5 @@
 .idea/
+venv/
 .idea/coursing-program-server.iml
 .idea/vcs.xml
 .idea/modules.xml
