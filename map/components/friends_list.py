@@ -129,10 +129,10 @@ class FriendsListView(UnicornView):
         for uzivatel in User.objects.all():
             if uzivatel.username == self.request.user.username:
                 continue
-            if Block.objects.is_blocked(uzivatel,self.request.user) == True:
+            if Block.objects.is_blocked(uzivatel, self.request.user):
                 continue
             uz_odoslane = 0
-            if self.similar(self.vyhladavacie_pole,uzivatel.username) > 0.5:
+            if self.similar(self.vyhladavacie_pole,uzivatel.username) > 0.6 or uzivatel.username.lower().find(self.vyhladavacie_pole.lower()) != -1:
                 for x in Friend.objects.sent_requests(user=self.request.user):
                     if (User.objects.get(id=x.to_user_id).get_username() == uzivatel.username):
                         uz_odoslane = 1
