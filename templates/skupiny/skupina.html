@@ -22,6 +22,7 @@
       <!-- Summernote koniec-->
             {% load static %}<link rel="stylesheet" href="{% static 'forum/upvotejs.css' %}" >
       {% load static %}<script src="{% static 'forum/upvotejs.vanilla.js' %}"></script>
+      {% load static %}<script src="{% static 'index/progressbar.js' %}"></script>
     <title>Skupiny</title>
   </head>
   <body>
@@ -58,10 +59,6 @@
                             <div class="h6 text-muted">Počet členov</div>
                             <div class="h5">{{ pocet_clenov }}</div>
                         </li>
-                        <li class="list-group-item">
-                            <div class="h6 text-muted">Počet vrstiev</div>
-                            <div class="h5">{{ pocet_vrstiev }}</div>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -76,7 +73,7 @@
                                     Príspevok</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="images-tab" data-toggle="tab" role="tab" aria-controls="images" aria-selected="false" href="#images">Mapa</a>
+                                <a class="nav-link" id="images-tab" data-toggle="tab" role="tab" aria-controls="images" aria-selected="false" href="#images" onclick="daj_mapu_celu_skupina()">Mapa</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="clenovia-tab" data-toggle="tab" role="tab" aria-controls="clenovia" aria-selected="false" href="#clenovia">Členovia</a>
@@ -124,7 +121,9 @@
 
 
                             <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="images-tab">
-                                        {{ mapa_html|safe }}
+                                                    <div id="map">
+                                                        <div id="loading-bar-div" style="position: absolute; top: 50%; text-align: center; width: 100%;"></div>
+                                                    </div>
                                 <div class="py-4"></div>
                             </div>
 
@@ -396,6 +395,63 @@ var posledne_html_z_editora = "";
 
       return true;
   }
+function map_preview_update(html){
+        let wrapper = document.getElementById('map');
+        wrapper.innerHTML= html;
+}
+async function daj_mapu_celu_skupina(){
+    let bar = new ProgressBar.Line('#loading-bar-div', {
+  strokeWidth: 3,
+  easing: 'easeInOut',
+  duration: 1000,
+  color: '#FFEA82',
+  trailColor: '#eee',
+  trailWidth: 1,
+  svgStyle: {width: '45%', height: '1.5em'},
+  text: {
+        style: {
+            // Text color.
+            // Default: same as stroke color (options.color)
+            color: '#f00',
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            padding: 0,
+            margin: 0,
+            // You can specify styles which will be browser prefixed
+            transform: {
+                prefix: true,
+                value: 'translate(-50%, -50%)'
+            }
+        },
+    autoStyleContainer: false
+  },
+  from: {color: '#FFEA82'},
+  to: {color: '#ED6A5A'},
+  step: (state, bar) => {
+    bar.setText(Math.round(bar.value() * 100) + ' %');
+  }
+});
+
+bar.animate(1.0);
+    let user = {
+          daj_mapu_skupina: null,
+          skupina_id: '{{ skupina.id }}',
+        };
+
+    let response = await fetch('/api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',"X-CSRFToken": '{{csrf_token}}'
+      },
+      body: JSON.stringify(user),
+      credentials: 'same-origin',
+    });
+    response.text().then(function (text) {
+      map_preview_update(text);
+    });
+
+}
 </script>
 
 <!-- Modal pridat priatela -->

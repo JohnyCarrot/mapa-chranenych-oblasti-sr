@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from folium import plugins
 from django.db import connection
 from draw_custom import Draw as Draw_custom
+from fullscreen import Fullscreen as Fullscreen_custom
 from geoman import Geoman as Geoman
 from geoman_user import Geoman as Geoman_user
 from geocoder_custom import Geocoder as Geocoder_custom
@@ -292,6 +293,7 @@ def render_mapy(requests):
                    zoom_start=8,
                    prefer_canvas=False,
                    # crs="EPSG3857",
+                   zoom_control=False,
 
                    )
     geocoder_vlastne_vyhladanie = []
@@ -313,10 +315,10 @@ def render_mapy(requests):
     start_time_temp = time.time()
 
     # mapa nastavenie
-    folium.plugins.Fullscreen().add_to(m)
+    Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
     Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
     folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
-    folium.plugins.LocateControl(auto_start=False).add_to(m)
+    folium.plugins.LocateControl(auto_start=False,strings={"title": "Pozrite si svoju aktuálnu polohu", "popup": "Vaša poloha"}).add_to(m)
     if(requests.user.is_authenticated):
         map_setting = Profile.objects.get(user_id=requests.user.id).map_settings
         EasyButton(map_setting.stupen2,map_setting.stupen3,map_setting.stupen4,map_setting.stupen5).add_to(m)
@@ -388,13 +390,6 @@ def skupina_request(requests):
         if skupina.nastavenia is not None and "popis" in skupina.nastavenia:
             context['popis'] = json.loads(skupina.nastavenia)['popis']
         pocet_vrstiev = 0
-        for objekt in Objekty.objects.filter(podskupina__skupina=skupina):
-            if objekt.nastavenia != None:
-                nastavenia = json.loads(objekt.nastavenia)
-                if "deleted" in nastavenia and nastavenia['deleted'] == True:
-                    continue
-            pocet_vrstiev+= 1
-        context['pocet_vrstiev'] = pocet_vrstiev
         context['pocet_clenov'] = len(skupina.diskusia.uzivatelia)
         clenovia_diskusie = []
 
@@ -406,45 +401,11 @@ def skupina_request(requests):
             clenovia_diskusie.append(  (uzi,profi,zapis)  )
         context['clenovia_diskusie'] = clenovia_diskusie
         zoznam_priatelov = []
-        for priatel in Friend.objects.friends(requests.user):
-            if not Block.objects.is_blocked(requests.user, priatel) and priatel.username not in skupina.diskusia.uzivatelia:
-                zoznam_priatelov.append( (priatel,Profile.objects.get(user__username=priatel.username) )  )
+        if requests.user.username == skupina.spravca:
+            for priatel in Friend.objects.friends(requests.user):
+                if not Block.objects.is_blocked(requests.user, priatel) and priatel.username not in skupina.diskusia.uzivatelia:
+                    zoznam_priatelov.append( (priatel,Profile.objects.get(user__username=priatel.username) )  )
         context['zoznam_priatelov'] = zoznam_priatelov
-
-
-        m = folium.Map(location=[48.73044030054515, 19.456582270083356],
-                       zoom_start=8,
-                       prefer_canvas=False,
-                       # crs="EPSG3857",
-
-                       )
-        geocoder_vlastne_vyhladanie = []
-        skupiny_v_navigacii = dict()
-        _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
-        _skupina_v_mape.add_to(m)
-        podskupiny_v_mape = []
-        podskupiny_id_pre_pridavanie_objektu = []
-        for podskupina in Podskupiny.objects.all().order_by('priorita'):
-            if skupina.id == podskupina.skupina_id:
-                _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
-                _podskupina_v_mape.add_to(m)
-                pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=requests.user,
-                                            geocoder=geocoder_vlastne_vyhladanie)
-                podskupiny_v_mape.append(_podskupina_v_mape)
-                podskupiny_id_pre_pridavanie_objektu.append(podskupina)
-        skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
-        # mapa nastavenie
-        folium.plugins.Fullscreen().add_to(m)
-        folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
-        folium.plugins.LocateControl(auto_start=False).add_to(m)
-        fig = branca.element.Figure(height='500px')
-        if skupina.spravca == requests.user.username:
-            from draw_custom_skupina import Draw_custom_skupina
-            Geoman_user(username=requests.user.username).add_to(m)
-            Draw_custom_skupina(skupina_id=skupina.id,podskupiny=podskupiny_id_pre_pridavanie_objektu, export=False,
-                              draw_options={"circle": False, "circlemarker": False}).add_to(m)
-        fig.add_child(m)
-        context['mapa_html'] = fig._repr_html_()
         return render(requests, 'skupiny/skupina.html',context)
     return HttpResponse("Diskusia neexistuje")
 
@@ -925,6 +886,7 @@ def api_request(request):
                                width=1280, height=720,
                                prefer_canvas=False,
                                # crs="EPSG3857",
+                               zoom_control=False,
 
                                )
                 podskupiny_id_pre_pridavanie_objektu = []
@@ -958,15 +920,54 @@ def api_request(request):
                                                  geocoder=geocoder_vlastne_vyhladanie)
                     podskupiny_v_mape.append(_podskupina_v_mape)
                     skupina_v_navigacii[skupina.meno] = podskupiny_v_mape
-                folium.plugins.Fullscreen().add_to(m)
+                Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
                 Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
                 folium.plugins.GroupedLayerControl(skupina_v_navigacii, exclusive_groups=False).add_to(m)
-                folium.plugins.LocateControl(auto_start=False).add_to(m)
+                folium.plugins.LocateControl(auto_start=False,strings={"title": "Pozrite si svoju aktuálnu polohu", "popup": "Vaša poloha"}).add_to(m)
                 Geoman().add_to(m)
                 from draw_custom_administracia import Draw_custom_admin
                 Draw_custom_admin(podskupiny=podskupiny_id_pre_pridavanie_objektu,export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
+
+            if "daj_mapu_skupina" in body and "skupina_id" in body:
+                skupina = Skupiny.objects.get(id = body['skupina_id'])
+                m = folium.Map(location=[48.73044030054515, 19.456582270083356],
+                               zoom_start=8,
+                               prefer_canvas=False,
+                               zoom_control=False,
+                               # crs="EPSG3857",
+
+                               )
+                geocoder_vlastne_vyhladanie = []
+                skupiny_v_navigacii = dict()
+                _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
+                _skupina_v_mape.add_to(m)
+                podskupiny_v_mape = []
+                podskupiny_id_pre_pridavanie_objektu = []
+                for podskupina in Podskupiny.objects.all().order_by('priorita'):
+                    if skupina.id == podskupina.skupina_id:
+                        _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
+                        _podskupina_v_mape.add_to(m)
+                        pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
+                                                     geocoder=geocoder_vlastne_vyhladanie)
+                        podskupiny_v_mape.append(_podskupina_v_mape)
+                        podskupiny_id_pre_pridavanie_objektu.append(podskupina)
+                skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
+                # mapa nastavenie
+                Fullscreen_custom(title='Režim celej obrazovky', title_cancel='Ukončiť celú obrazovku').add_to(m)
+                folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
+                folium.plugins.LocateControl(auto_start=False, strings={"title": "Pozrite si svoju aktuálnu polohu",
+                                                                        "popup": "Vaša poloha"}).add_to(m)
+                fig = branca.element.Figure(height='500px')
+                if skupina.spravca == request.user.username:
+                    from draw_custom_skupina import Draw_custom_skupina
+                    Geoman_user(username=request.user.username).add_to(m)
+                    Draw_custom_skupina(skupina_id=skupina.id, podskupiny=podskupiny_id_pre_pridavanie_objektu,
+                                        export=False,
+                                        draw_options={"circle": False, "circlemarker": False}).add_to(m)
+                fig.add_child(m)
+                return HttpResponse(fig._repr_html_(), content_type="text/plain",status=201)
 
             if "daj_mapu_celu" in body and request.user.is_superuser:
                 m = folium.Map(location=[48.73044030054515, 19.456582270083356],
@@ -974,7 +975,7 @@ def api_request(request):
                                width=1280, height=720,
                                prefer_canvas=False,
                                # crs="EPSG3857",
-
+                               zoom_control=False,
                                )
 
                 geocoder_vlastne_vyhladanie = []
@@ -994,10 +995,10 @@ def api_request(request):
                     skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
 
                 # mapa nastavenie
-                folium.plugins.Fullscreen().add_to(m)
+                Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
                 Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
                 folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
-                folium.plugins.LocateControl(auto_start=False).add_to(m)
+                folium.plugins.LocateControl(auto_start=False,strings={"title": "Pozrite si svoju aktuálnu polohu", "popup": "Vaša poloha"}).add_to(m)
 
                 return HttpResponse(m._repr_html_(), content_type="text/plain")
 
@@ -1362,7 +1363,7 @@ def test(request):
                    width=1280, height=720,
                    prefer_canvas=False,
                    # crs="EPSG3857",
-
+                   zoom_control=False,
                    )
     html = """
         <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
@@ -1406,8 +1407,8 @@ def test(request):
         }
             </script>
     """
-    
 
+    Fullscreen_custom(title='Režim celej obrazovky', title_cancel='Ukončiť celú obrazovku').add_to(m)
     iframe = branca.element.IFrame(html=html, width=500, height=300)
     #popup = folium.Popup(folium.Html(html, script=True), lazy=False)
     popup = folium.Popup(iframe, max_width=500)

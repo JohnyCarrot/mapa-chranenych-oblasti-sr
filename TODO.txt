@@ -3,10 +3,6 @@ zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc
 
 Užívatelia pri basic úprave ak budú mať oprávnenie, budú si môcť checknut cez checkbox aj sys vrstvy (zrejme v nastaveniach mapy)
 
-pozrieť sa na "tooltips" a preložiť do slovenčiny
-
-v administrácií etc všetko anglické do slovenčiny
-
 vyhrať sa s popup stylom
 
 informácia o stránke S v prihlásení (nejaké logo etc)
@@ -26,5 +22,3 @@ anonym diskusia koment, preveriť
 
 summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
 skloňovanie v skupinách
-
-skupina mapa načítať mapu po kluknutí na kartu
