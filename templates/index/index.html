@@ -24,6 +24,7 @@
   </head>
   <body onload="daj_mapu_celu()">
     {% include "navbar.html" with navbar_administracia=navbar_administracia %}
+    {% csrf_token %}
   <style>
     #bodyWrapper {
         max-width: 100vw;

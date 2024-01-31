@@ -343,6 +343,7 @@ def render_mapy_cela(requests):
     return render(requests, 'index/cela_mapa.html')
 
 # Koniec mapy, začiatok diskusného fóra
+
 def forum(requests):
     context = {}
     if "q" in requests.GET:
@@ -373,6 +374,8 @@ def forum(requests):
             context['zapis'] = True
         if requests.user.is_superuser:
             context['zapis'] = True
+        if not requests.user.is_authenticated:
+            context['zapis'] = False
     return render(requests, 'forum/diskusia.html',context)
 
 @login_required

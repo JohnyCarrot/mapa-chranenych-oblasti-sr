@@ -12,13 +12,7 @@ loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorý
 moznost odhlasit sa zo sys skupin
 
 
-priatel zablokovaný sa nedá vyhladat
-zlepšiť vyhladavanie u priatelov
-vyhladavanie u priatelov, text ak sa nepodarí nič nájsť
-
 sys skupiny pridat diskusiu
-
-anonym diskusia koment, preveriť
 
 summernote pozrieť všetky na tooltips etc (fullscreen nemusi fungovať)
 skloňovanie v skupinách
