@@ -11,3 +11,9 @@ moznost odhlasit sa zo sys skupin
 sys skupiny pridat diskusiu
 
 skloňovanie v skupinách
+
+Pozrierť sa do detailov v aise a doplnit, aby popis bol v súlade s realitou resp vice versa
+
+vytvoriť emotikony na základe toho čo sa dá v danej oblasti robiť (parkovanie, kempovanie etc)
+
+overiť vyhladavanie podla súradníc
