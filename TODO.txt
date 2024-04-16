@@ -27,5 +27,6 @@ upgrade na najnovší django unicorn
 prerobiť sql querues na ORM
 skupina výber chronologicky a podla karmy
 Opravit, ked v administrácií sa zobrazuje do mapy podla map settings
+Akákolvek akcia na mape nesmie reštartovať mapu
 
 Pridať chat ?
