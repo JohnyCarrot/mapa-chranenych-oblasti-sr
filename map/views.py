@@ -31,23 +31,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from .models import Skupiny, Podskupiny, Objekty, Profile, Viditelnost_mapa, Notifikacie, Diskusia, Diskusny_prispevok, \
     Sprava, Diskusia_skupiny, Diskusny_prispevok_skupiny, Diskusny_prispevok_skupiny_komentar
 from django.contrib.gis.geos import GEOSGeometry
-cur = connection.cursor()
+from django.db.models import Q
 
 
-def pridaj_do_databazy(INSERT_STATEMENT,premenne):
-    cur.execute(INSERT_STATEMENT, premenne)
-    vysledok = cur.fetchone()[0]
-    cur.execute("COMMIT")
-    return vysledok
-
-
-def pridaj_skupinu(meno,spravca,viditelnost,nastavenia = None):
-    INSERT_STATEMENT = 'INSERT INTO skupiny (meno,viditelnost,spravca,nastavenia) VALUES (%s, %s, %s, %s) RETURNING id;'
-    return pridaj_do_databazy(INSERT_STATEMENT, (meno, viditelnost, spravca, nastavenia))
-
-def pridaj_podskupinu(meno,viditelnost,spravca,skupina = None):
-    INSERT_STATEMENT = 'INSERT INTO podskupiny (meno,viditelnost,spravca,skupina) VALUES (%s, %s, %s,%s) RETURNING id;'
-    return pridaj_do_databazy(INSERT_STATEMENT,(meno, viditelnost, spravca, skupina))
 
 def sulad_s_nastavenim_mapy(nastavenie,objekt):
     if(nastavenie == None):
@@ -229,25 +215,19 @@ def over_viditelnost(viditelnost,prihlaseny = False,username = "",permisia="r",v
     return False
 
 def vrat_skupinu_vlastnych_objektov_uzivatela(username):
-    cur.execute(f"SELECT id from skupiny WHERE nastavenia::jsonb ? 'own' and spravca = '{username}' limit 1;")
-    k = cur.fetchone()
-    if(k==None): return None
-    return str(k[0])
+    skupiny = Skupiny.objects.filter(spravca=username)
+    for skupina in skupiny:
+        if "own" in skupina.nastavenia:
+            return str(skupina.id)
+    return None
 
 def vrat_skupinu_s_uzivatelom_zdielanych_objektov(username):
-    cur.execute(f"SELECT id from skupiny WHERE nastavenia::jsonb ? 'shared' and spravca = '{username}' limit 1;")
-    k = cur.fetchone()
-    if(k==None): return None
-    return k[0]
+    skupiny = Skupiny.objects.filter(spravca=username)
+    for skupina in skupiny:
+        if "shared" in skupina.nastavenia:
+            return str(skupina.id)
+    return None
 
-def vrat_zdielane_objekty_s_uzivatelom(username):
-    objekty_cele = []
-    for objekt in Objekty.objects.all():
-        if objekt.nastavenia != None:
-            nastavenia = json.loads(objekt.nastavenia)
-            if"shared_with" in nastavenia and username in nastavenia["shared_with"]:
-                objekty_cele.append(objekt)
-    return objekty_cele
 
 
 
@@ -258,12 +238,22 @@ def index(requests):
             viditelnost = Viditelnost_mapa()
             viditelnost.uzivatelia[requests.user.username] = "rw"
             viditelnost.save()
-            pridaj_skupinu("Vlastné objekty",requests.user.username,viditelnost.id,nastavenia = json.dumps({'own': None,}))
+            s = Skupiny()
+            s.meno = "Vlastné objekty"
+            s.viditelnost = viditelnost
+            s.spravca = requests.user.username
+            s.nastavenia = {'own': None,}
+            s.save()
         if vrat_skupinu_s_uzivatelom_zdielanych_objektov(requests.user.username) == None:
             viditelnost = Viditelnost_mapa()
             viditelnost.uzivatelia[requests.user.username] = "rw"
             viditelnost.save()
-            pridaj_skupinu("So mnou zdieľané objekty",requests.user.username,viditelnost.id,nastavenia = json.dumps({'shared': None,}))
+            s = Skupiny()
+            s.meno = "So mnou zdieľané objekty"
+            s.viditelnost = viditelnost
+            s.spravca = requests.user.username
+            s.nastavenia = {'shared': None,}
+            s.save()
     #Pridanie objektu užívateľom:
     if (requests.user.is_authenticated and requests.GET.get('new_object') != None and requests.GET.get('new_object_name')!=None):
         dictData = json.loads(requests.GET.get('new_object'))
@@ -279,8 +269,14 @@ def index(requests):
         diskusia = Diskusia()
         diskusia.spravca = requests.user.username
         diskusia.save()
-        INSERT_STATEMENT = 'INSERT INTO objekty (meno, style,html,diskusia,podskupina,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
-        cur.execute(INSERT_STATEMENT, (requests.GET.get('new_object_name'),None,"",diskusia.pk,podskupina_noveho_objektu.id,str(dictData['geometry'])   )  )
+        objekt = Objekty()
+        objekt.meno = requests.GET.get('new_object_name')
+        objekt.html = ""
+        objekt.diskusia = diskusia
+        objekt.podskupina = podskupina_noveho_objektu
+        objekt.geometry = GEOSGeometry(str(dictData['geometry']),srid=4326)
+        objekt.save()
+
         return HttpResponseRedirect(requests.path_info)
 
     return render(requests, 'index/index.html')
@@ -452,12 +448,27 @@ def register_request(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Registration successful.")
+            messages.success(request, "Registrácia úspešná.")
             viditelnost = Viditelnost_mapa()
             viditelnost.uzivatelia[user.username] = "rw"
             viditelnost.save()
-            vlastne_objekty_skupina = pridaj_skupinu("Vlastné objekty",user.username,viditelnost.id,nastavenia = json.dumps({'own': None,}))
-            zdielane_objekty_podskupina = pridaj_skupinu("So mnou zdieľané objekty",user.username,viditelnost.id,nastavenia = json.dumps({'shared': None,}))
+
+            s = Skupiny()
+            s.meno = "Vlastné objekty"
+            s.viditelnost = viditelnost
+            s.spravca = user.username
+            s.nastavenia = {'own': None,}
+            s.save()
+            viditelnost2 = Viditelnost_mapa()
+            viditelnost2.uzivatelia[user.username] = "rw"
+            viditelnost2.save()
+            s2 = Skupiny()
+            s2.meno = "So mnou zdieľané objekty"
+            s2.spravca = user.username
+            s2.nastavenia = {'shared': None,}
+            s2.viditelnost = viditelnost2
+            s2.save()
+
             return redirect('/')
         #messages.error(request, "Unsuccessful registration. Invalid information.")
         errors = form.errors
@@ -1083,7 +1094,6 @@ def api_request(request):
             if "admin_object_create" in body and "coords" in body and "meno" in body and "podskupina_id" in body:
                 geometria_cela = json.loads(body.get('coords'))
                 novy_objekt = Objekty()
-                novy_objekt.geometry = GEOSGeometry(json.dumps(geometria_cela.get('geometry')))
                 novy_objekt.meno = body.get('meno')
                 novy_objekt.podskupina = Podskupiny.objects.get(id=body['podskupina_id'])
                 if body.get('stupen')!= '0':
@@ -1100,16 +1110,13 @@ def api_request(request):
                     diskusia.save()
                     novy_objekt.diskusia = diskusia
                 novy_objekt.html = body.get('html')
-
-                INSERT_STATEMENT = 'INSERT INTO objekty (meno,html,diskusia,podskupina,stupen_ochrany,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
-                cur.execute(INSERT_STATEMENT, (novy_objekt.meno, novy_objekt.html, novy_objekt.diskusia.id, novy_objekt.podskupina.id,novy_objekt.stupen_ochrany,str(json.loads(body.get('coords'))['geometry'])   ))
-
+                novy_objekt.geometry = GEOSGeometry(str(geometria_cela['geometry']))
+                novy_objekt.save()
                 return HttpResponse(status=201)
 
             if "skupina_object_create" in body and "coords" in body and "meno" in body and "podskupina_meno" in body:
                 geometria_cela = json.loads(body.get('coords'))
                 novy_objekt = Objekty()
-                novy_objekt.geometry = GEOSGeometry(json.dumps(geometria_cela.get('geometry')))
                 novy_objekt.meno = body.get('meno')
                 if body['podskupina_meno'] =='':
                     novy_objekt.podskupina = Podskupiny.objects.get(id=body['podskupina_id'])
@@ -1136,10 +1143,8 @@ def api_request(request):
                     diskusia.save()
                     novy_objekt.diskusia = diskusia
                 novy_objekt.html = body.get('html')
-
-                INSERT_STATEMENT = 'INSERT INTO objekty (meno,html,diskusia,podskupina,stupen_ochrany,geometry) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)) RETURNING id;'
-                cur.execute(INSERT_STATEMENT, (novy_objekt.meno, novy_objekt.html, novy_objekt.diskusia.id, novy_objekt.podskupina.id,novy_objekt.stupen_ochrany,str(json.loads(body.get('coords'))['geometry'])   ))
-
+                novy_objekt.geometry = GEOSGeometry(str(geometria_cela['geometry']))
+                novy_objekt.save()
                 return HttpResponse(status=201)
             if "update_viditelnost_skupina" in body and "skupina_id" in body and "global_read" in body and "global_write" in body and "uzivatelia" in body: #A mnoho ďalšiho :)
                 if "update_viditelnost_podskupina" in body and body['update_viditelnost_podskupina']: #Funguje na skupiny aj podskupiny zároveň
@@ -1461,10 +1466,13 @@ def htmx_request(request):
             viditelnost = Viditelnost_mapa()
             viditelnost.uzivatelia[priatel] = "r"
             viditelnost.save()
-            nova_podskupina_zdielaneho_objektu = pridaj_podskupinu(zdielany_objekt.meno, viditelnost.id,
-                                                                   priatel,
-                                                                   vrat_skupinu_s_uzivatelom_zdielanych_objektov(
-                                                                       priatel))
+            nova_podskupina_z_o = Podskupiny()
+            nova_podskupina_z_o.meno = zdielany_objekt.meno
+            nova_podskupina_z_o.viditelnost = viditelnost
+            nova_podskupina_z_o.spravca = priatel
+            nova_podskupina_z_o.skupina = Skupiny.objects.get(id=vrat_skupinu_s_uzivatelom_zdielanych_objektov(priatel))
+            nova_podskupina_z_o.save()
+            nova_podskupina_zdielaneho_objektu = nova_podskupina_z_o.id
             if (zdielany_objekt.nastavenia == None):
                 nastavenia = dict()
                 nastavenia["shared_with"] = dict()
@@ -1477,6 +1485,7 @@ def htmx_request(request):
                 nastavenia["shared_with"] = dict()
                 nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
             zdielany_objekt.nastavenia = json.dumps(nastavenia)
+            zdielany_objekt.id = str(zdielany_objekt.id)
             zdielany_objekt.save()
             notifikacia = Notifikacie()
             notifikacia.prijimatel = User.objects.get(username=request.GET.get('zdielane_s'))
