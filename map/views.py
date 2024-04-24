@@ -92,7 +92,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             <body>
             <div style="font-size: 13.5px;">
         """#Započatie html
-        html += objekt.html
+        html += "<div class='uzivatelske_html'>"+objekt.html+"</div>"
 
         if objekt.nastavenia != None:
             nastavenia = json.loads(objekt.nastavenia)
@@ -1166,7 +1166,7 @@ def api_request(request):
                         <body>
                         <div style="font-size: 13.5px;">"""
 
-                html+= body.get('html')
+                html += "<div class='uzivatelske_html'>" + body.get('html') + "</div>"
                 html += f"""
                         <button hx-post="http://127.0.0.1:8000/htmx/?username={request.user.username}&request=zdielanie_list&objekt={str(novy_objekt.id)}" hx-swap="outerHTML">
                             Zdieľať

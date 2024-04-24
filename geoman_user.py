@@ -745,6 +745,8 @@ function uprav_vrstvu_uloz_iframe(){
                                     let layer2 = L.polygon(layer.getLatLngs());
                                     layer.upraveny=false;
                                     coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
+                                    layer.options_before_commit = JSON.parse(JSON.stringify(layer.options))
+                                    layer.commit=true;
                                 }
                             });
                             parent.posledne_html_z_editora = "";
@@ -756,7 +758,7 @@ function uprav_vrstvu_uloz_iframe(){
                             stateChangingButton.enable();   
                             stateChangingButton_delete.enable();
                             
-                            alert("Zmeny úspešne uložené");
+                            
                             
                             //vratit html elementy do povodneho stavu
                             document.getElementById('Singledraggable_checkbox').outerHTML = document.getElementById('Singledraggable_checkbox').outerHTML;
@@ -768,7 +770,17 @@ function uprav_vrstvu_uloz_iframe(){
                             document.getElementById('Singlezmena-pozadie').style.backgroundColor = "white";
                             document.getElementById('Singlelayer_opacity_fill').outerHTML = document.getElementById('Singlelayer_opacity_fill').outerHTML;
                             document.getElementById('Singlelayer_opacity_label_fill').innerHTML = "-";
-                            parent.location.reload();
+                            
+                            
+                            {{ this._parent.get_name() }}.eachLayer(function (layer) { 
+                            if(layer.commit && layer.commit==true){
+                                        console.log(layer);
+                                         layer.setStyle(layer.options_before_commit);
+                                }
+                            });
+                            
+
+                            alert("Zmeny úspešne uložené");
 
 
 }        
