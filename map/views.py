@@ -1118,7 +1118,16 @@ def api_request(request):
                 novy_objekt.html = body.get('html')
                 novy_objekt.geometry = GEOSGeometry(str(geometria_cela['geometry']))
                 novy_objekt.save()
-                return HttpResponse(status=201)
+                vysledok = dict()
+                vysledok['serverID'] = str(novy_objekt.pk)
+                vysledok['podskupina_spravca'] = novy_objekt.podskupina.spravca
+                vysledok['html'] = novy_objekt.html
+                geometria = GEOSGeometry(novy_objekt.geometry)
+                geometria_cela = json.loads(geometria.json)
+                geometria_cela['serverID'] = str(novy_objekt.id)
+                geometria_cela['podskupina_spravca'] = novy_objekt.podskupina.spravca
+                vysledok['geometria_cela'] = geometria_cela
+                return HttpResponse(json.dumps(vysledok), status=201)
 
             if "user_object_create" in body and "coords" in body and "meno" in body:
                 geometria_cela = json.loads(body.get('coords'))

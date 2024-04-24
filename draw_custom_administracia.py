@@ -70,7 +70,7 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                 function checked_elementu(id) {
                             return document.getElementById(id).checked;
                     } 
-           async function create_object(coords,meno,podskupina_id,stupne_ochrany,diskusia,html) {
+           async function create_object(coords,meno,podskupina_id,stupne_ochrany,diskusia,html,local_id) {
         
                     if(meno.length ==0){
                     
@@ -97,17 +97,49 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                   body: JSON.stringify(user)
                 });
                 
+
+                response.text().then(function (text) {
+                
+                
                 if(response.status==201){
+                
+                                odpoved_dict = JSON.parse(text);
+                
+                                                    {{ this._parent.get_name() }}.eachLayer(function (layer) { //Zisti vrstvu
+                                            if(layer.local_id == local_id){
+                                            {{ this._parent.get_name() }}.removeLayer(layer);
+                                            let DATA = JSON.parse(coords);
+                                            DATA.serverID = odpoved_dict.serverID;
+                                            DATA.podskupina_spravca = odpoved_dict.podskupina_spravca;
+                                            let novy_layer = L.geoJSON(odpoved_dict.geometria_cela, {}).addTo({{ this._parent.get_name() }});
+                                            
+                                            
+                                            var htmlContent = odpoved_dict.html;
+                                            var iframe = document.createElement('iframe');
+                                            iframe.style.width = '150px';
+                                            iframe.style.ratio = '100%'; 
+                                            iframe.srcdoc = htmlContent;
+                                            novy_layer.bindPopup(iframe,max_width=500,lazy=true);
+                                            
+                                            
+                                            
+                                            
+                                            
+
+                                            }                             
+                                    }); //Zisti vrstvu - koniec
+                
+                
                 alert("Objekt úspešne pridaný");
                 }
                 else{
                 alert("Niekde nastala chyba, prosím skúste znovu");
                 }
-                response.text().then(function (text) {
+                
+                
                 otvorene_okno = false;
                 parent.posledne_html_z_editora = "";
                 okno_global.close();
-                parent.daj_mapu(parent.daj_mapu_posledna_id,parent.daj_mapu_posledna_skupina_bool);
                 });
                 
                 
@@ -169,7 +201,7 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                             
                             <br>
                             <br>
-                            <button onclick="create_object(  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}'),value_elementu('stupne_ochrany${juju}'),checked_elementu('diskusia${juju}'),parent.posledne_html_z_editora  );" type="button">Uložiť</button>
+                            <button onclick="create_object(  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}'),value_elementu('stupne_ochrany${juju}'),checked_elementu('diskusia${juju}'),parent.posledne_html_z_editora,'${juju}'  );" type="button">Uložiť</button>
                             
 
                       `;
