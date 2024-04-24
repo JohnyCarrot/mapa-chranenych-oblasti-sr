@@ -35,6 +35,8 @@ from django.db.models import Q
 from django.conf import settings as django_settings
 
 http_hostitel = f"http://{django_settings.ADRESKA}" #Bez koncového lomítka !!!
+if django_settings.ADRESKA =="mapujeme.sk":
+    http_hostitel = f"https://{django_settings.ADRESKA}"
 
 
 

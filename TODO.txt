@@ -27,6 +27,8 @@ skupina výber chronologicky a podla karmy
 Opravit, ked v administrácií sa zobrazuje do mapy podla map settings
 Keď sa edituje single, tak editor tvaru po zatvorení ostáva
 
+myslieť na dlhší loading bar
+
 Leaflet moving marker
 
 nepoužívať json.dumps (na nastaveniach objektov je všade)
