@@ -21,27 +21,16 @@ mazanie skupiny / podskupiny v administrácií, ak je prázdna
 
 V logine etc pozrieť titles
 
-upgrade na najnovší django 4.2.X
-upgrade na najnovší django unicorn
-prerobiť sql querues na ORM
+
+
 skupina výber chronologicky a podla karmy
 Opravit, ked v administrácií sa zobrazuje do mapy podla map settings
-Akákolvek akcia na mape nesmie reštartovať mapu
 Keď sa edituje single, tak editor tvaru po zatvorení ostáva
+
+Leaflet moving marker
 
 nepoužívať json.dumps (na nastaveniach objektov je všade)
 
 Pridať chat ?
 
 
-
-Zbavovanie SQL queries: Kontrola: 
-
-Ak užívatel nemá vlastnú skupinu, po prístupe stránky sa mu vytvorí
-Ak užívatel nemá skupinu "so mnou zdielane objekty" , po prístupe stránky sa mu vytvorí
-Vytvoriť vlastné a "so mnou zdielané" pri registrácií
-Funkcia vrat_skupinu_vlastnych_objektov_uzivatela
-Funkcia vrat_skupinu_s_uzivatelom_zdielanych_objektov
-#Pridanie objektu užívateľom:
-admin object create
-skupina_object_create

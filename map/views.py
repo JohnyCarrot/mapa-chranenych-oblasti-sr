@@ -1076,8 +1076,8 @@ def api_request(request):
                 return HttpResponse(status=201)
             if "admin_coord_update" in body and "geometry" in body and "id_objektu" in body and "style" in body and "update_pozicia" in body:
                 objekt = Objekty.objects.get(id=body['id_objektu'])
-                body['geometry']['coordinates'] = body['update_pozicia']
-                objekt.geometry = GEOSGeometry(json.dumps(body['geometry']))
+                geometria_cela = json.loads(body.get('update_pozicia'))
+                objekt.geometry = GEOSGeometry(str(geometria_cela['geometry']))
                 objekt.style = body['style']
                 if body.get('html')!="":
                     objekt.html = body.get('html')

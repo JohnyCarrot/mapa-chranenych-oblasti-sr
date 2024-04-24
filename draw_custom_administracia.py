@@ -171,11 +171,9 @@ class Draw_custom_admin(JSCSSMixin, MacroElement):
                             <br>
                             <button onclick="create_object(  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}'),value_elementu('stupne_ochrany${juju}'),checked_elementu('diskusia${juju}'),parent.posledne_html_z_editora  );" type="button">Uložiť</button>
                             
-                            
-                        
-                      
-                      
+
                       `;
+                      layer.local_id = juju;
                       okno_global = L.control.window({{ this._parent.get_name() }},{title:'Nový objekt',content:style_editor_content  }).show()
                       okno_global.addEventListener('hide', function (e) {
                                 otvorene_okno = false;

@@ -339,7 +339,7 @@ class Geoman(JSCSSMixin, MacroElement):
                                     let layer2 = L.polygon(layer.getLatLngs());
                                     layer.upraveny=false;
                                     //console.log(layer);
-                                    coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
+                                    coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,JSON.stringify(layer.toGeoJSON()),JSON.parse(JSON.stringify(layer.options)));
                                 }
                             });
                             textbox_edit_1.remove();
@@ -744,7 +744,7 @@ function uprav_vrstvu_uloz_iframe(){
                                     
                                     let layer2 = L.polygon(layer.getLatLngs());
                                     layer.upraveny=false;
-                                    coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,layer2.toGeoJSON().geometry.coordinates,JSON.parse(JSON.stringify(layer.options)));
+                                    coord_update(parent.posledne_html_z_editora,layer.feature.geometry,layer.feature.geometry.serverID,JSON.stringify(layer.toGeoJSON()),JSON.parse(JSON.stringify(layer.options)));
                                     layer.options_before_commit = JSON.parse(JSON.stringify(layer.options))
                                     layer.commit=true;
                                 }
