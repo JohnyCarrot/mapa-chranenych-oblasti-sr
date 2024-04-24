@@ -796,7 +796,13 @@ def api_request(request):
                         notifikacia.save()
                 return HttpResponse(status=201)
             if "objekt_zmazanie_navzdy" in body and "objekt_id" in body:
-                Objekty.objects.get(id=body['objekt_id']).delete()
+                objekt = Objekty.objects.get(id=body['objekt_id'])
+                if objekt.nastavenia !=None:
+                    nastavenia = json.loads(objekt.nastavenia)
+                    if "shared_with" in nastavenia:
+                        for podskupina_id in nastavenia['shared_with']:
+                            Podskupiny.objects.get(id=nastavenia["shared_with"][podskupina_id]).delete()
+                objekt.delete()
                 return HttpResponse(status=201)
 
             if "obnov_objekt_z_kosa" in body and "objekt_id" in body:
@@ -1472,7 +1478,7 @@ def htmx_request(request):
             nova_podskupina_z_o.spravca = priatel
             nova_podskupina_z_o.skupina = Skupiny.objects.get(id=vrat_skupinu_s_uzivatelom_zdielanych_objektov(priatel))
             nova_podskupina_z_o.save()
-            nova_podskupina_zdielaneho_objektu = nova_podskupina_z_o.id
+            nova_podskupina_zdielaneho_objektu = str(nova_podskupina_z_o.id)
             if (zdielany_objekt.nastavenia == None):
                 nastavenia = dict()
                 nastavenia["shared_with"] = dict()
@@ -1485,7 +1491,6 @@ def htmx_request(request):
                 nastavenia["shared_with"] = dict()
                 nastavenia["shared_with"][priatel] = nova_podskupina_zdielaneho_objektu
             zdielany_objekt.nastavenia = json.dumps(nastavenia)
-            zdielany_objekt.id = str(zdielany_objekt.id)
             zdielany_objekt.save()
             notifikacia = Notifikacie()
             notifikacia.prijimatel = User.objects.get(username=request.GET.get('zdielane_s'))
