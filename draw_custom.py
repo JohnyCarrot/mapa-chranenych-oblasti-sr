@@ -84,15 +84,107 @@ class Draw(JSCSSMixin, MacroElement):
         L.drawLocal.edit.handlers.edit.tooltip.subtext = 'Ak chcete zmeny vrátiť späť, kliknite na tlačidlo Zrušiť';
         L.drawLocal.edit.handlers.remove.tooltip.text = 'Kliknite na novonačrtnutú vrstvu, ktorú chcete odstrániť';
         //Koniec prekladu
+        
+                    // FeatureGroup is to store editable layers.
+            var drawnItems = new L.featureGroup().addTo(
+                {{ this._parent.get_name() }}
+            );
+        
+        
+                function random_uuid() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                    return v.toString(16);
+                });
+        }
+         async function create_object(coords,meno,diskusia,html,local_id) {
+        
+                    if(meno.length ==0){
+                    
+                    alert("Názov objektu nesmie byť prázdny");
+                    return true;
+                    
+                    }
+        
+                  let user = {
+                  coords: coords,
+                  meno: meno,
+                  diskusia: diskusia,
+                  html: html,
+                  user_object_create: null
+                };
+
+                let response = await fetch('/api', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                  },
+                  body: JSON.stringify(user)
+                });
+                
+
+                response.text().then(function (text) {
+                
+                if(response.status==201){
+                odpoved_dict = JSON.parse(text);
+                
+                                                    {{ this._parent.get_name() }}.eachLayer(function (layer) { //Zisti vrstvu
+                                            if(layer.local_id == local_id){
+                                            {{ this._parent.get_name() }}.removeLayer(layer);
+                                            let DATA = JSON.parse(coords);
+                                            DATA.serverID = odpoved_dict.serverID;
+                                            DATA.podskupina_spravca = odpoved_dict.podskupina_spravca;
+                                            let novy_layer = L.geoJSON(odpoved_dict.geometria_cela, {}).addTo({{ this._parent.get_name() }});
+                                            
+                                            
+                                            var htmlContent = odpoved_dict.html;
+                                            var iframe = document.createElement('iframe');
+                                            iframe.style.width = '150px';
+                                            iframe.style.ratio = '100%'; 
+                                            iframe.srcdoc = htmlContent;
+                                            novy_layer.bindPopup(iframe,max_width=500,lazy=true);
+                                            
+                                            
+                                            
+                                            
+                                            
+
+                                            }                             
+                                    }); //Zisti vrstvu - koniec
+                
+                
+                alert("Objekt úspešne pridaný");
+                }
+                else{
+                alert("Niekde nastala chyba, prosím skúste znovu");
+                }
+                
+                
+                otvorene_okno = false;
+                parent.posledne_html_z_editora = "";
+                okno_global.close();
+                });
+                
+                
+                           return true;
+        }
+        var suradnice_global = "";
+        var okno_global = L.control.window({{ this._parent.get_name() }},{title:'Neviditelne okno',content:'Gratulujem, práve vidíte neviditelné okno.',visible: false});
+        var otvorene_okno = false;
+        
+                        function value_elementu(id) {
+                            return document.getElementById(id).value;
+                    } 
+                function checked_elementu(id) {
+                            return document.getElementById(id).checked;
+                    } 
+        
             var options = {
               position: {{ this.position|tojson }},
               draw: {{ this.draw_options|tojson }},
               edit: {{ this.edit_options|tojson }},
             }
-            // FeatureGroup is to store editable layers.
-            var drawnItems = new L.featureGroup().addTo(
-                {{ this._parent.get_name() }}
-            );
+
             options.edit.featureGroup = drawnItems;
             var {{ this.get_name() }} = new L.Control.Draw(
                 options
@@ -103,16 +195,47 @@ class Draw(JSCSSMixin, MacroElement):
                 var coords = JSON.stringify(layer.toGeoJSON());
                 {%- if this.show_geometry_on_click %}
                 layer.on('click', function() {
-                      let text;
-                      let person = prompt("Uložiť objekt:");
-                      if (person == null || person == "") {
-                      } else {
-                        text = person;
-                      alert("Objekt "+text + " úspešne uložený");
-                     window.parent.location.href = "?new_object="+coords+"&new_object_name="+text;
-                      }
+                
+                
+                if(otvorene_okno == false){
+                                
+                         let juju = random_uuid();           
+                        suradnice_global = JSON.stringify(layer.toGeoJSON());
+                      let style_editor_content = `
+                      
+                          <label for="fname${juju}">Názov objektu:</label><br>
+                          <input type="text" id="fname${juju}" name="fname${juju}"><br>
 
-                    //console.log(coords);
+                            <br>
+                        <label for="diskusia${juju}">Povoliť diskusiu:</label>
+                          <input type="checkbox" id="diskusia${juju}" name="diskusia${juju}" checked><br>
+                            
+                            
+                            <button onclick="parent.uprava_html()" type=button>Úprava popisu</button>
+                            
+                            
+                            <br>
+                            <br>
+                            <button onclick="create_object(  suradnice_global,value_elementu('fname${juju}'),checked_elementu('diskusia${juju}'),parent.posledne_html_z_editora,'${juju}'  );" type="button">Uložiť</button>
+                            
+                      `;
+                      layer.local_id = juju;
+                      //console.log(layer);
+                      okno_global = L.control.window({{ this._parent.get_name() }},{title:'Nový objekt',content:style_editor_content  }).show()
+                      okno_global.addEventListener('hide', function (e) {
+                                otvorene_okno = false;
+                                parent.posledne_html_z_editora = "";
+                        });
+                      otvorene_okno = true;
+                      
+                      
+                      } //Koniec ifu na otvorene okno
+                      
+                      
+                      else{alert('V jednom momente je možné pridávať iba jeden objekt');}
+                
+                
+
                 });
                 {%- endif %}
                 drawnItems.addLayer(layer);
@@ -138,12 +261,22 @@ class Draw(JSCSSMixin, MacroElement):
     )
 
     default_js = [
+
+        (
+            "L.Control.Window.js",
+            "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.js",
+        ),
         (
             "leaflet_draw_js",
             "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js",
         )
     ]
     default_css = [
+
+        (
+            "L.Control.Window.css",
+            "https://rawgit.com/mapshakers/leaflet-control-window/master/src/L.Control.Window.css",
+        ),
         (
             "leaflet_draw_css",
             "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css",

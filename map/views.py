@@ -1120,6 +1120,115 @@ def api_request(request):
                 novy_objekt.save()
                 return HttpResponse(status=201)
 
+            if "user_object_create" in body and "coords" in body and "meno" in body:
+                geometria_cela = json.loads(body.get('coords'))
+                novy_objekt = Objekty()
+                viditelnost = Viditelnost_mapa()
+                viditelnost.uzivatelia[request.user.username] = "rw"
+                viditelnost.save()
+                podskupina_noveho_objektu = Podskupiny()
+                podskupina_noveho_objektu.meno = body.get('meno')
+                podskupina_noveho_objektu.viditelnost = viditelnost
+                podskupina_noveho_objektu.spravca = request.user.username
+                podskupina_noveho_objektu.skupina = Skupiny.objects.get(
+                    id=vrat_skupinu_vlastnych_objektov_uzivatela(request.user.username))
+                podskupina_noveho_objektu.save()
+                novy_objekt.meno = body.get('meno')
+                novy_objekt.podskupina = podskupina_noveho_objektu
+                if body.get('diskusia'):
+                    diskusia = Diskusia()
+                    diskusia.spravca = request.user.username
+                    diskusia.save()
+                    novy_objekt.diskusia = diskusia
+                else:
+                    diskusia = Diskusia()
+                    diskusia.spravca = request.user.username
+                    diskusia.aktivna = False
+                    diskusia.save()
+                    novy_objekt.diskusia = diskusia
+                novy_objekt.html = body.get('html')
+                novy_objekt.geometry = GEOSGeometry(str(geometria_cela['geometry']))
+                novy_objekt.save()
+                vysledok = dict()
+
+                html = """
+                    <!DOCTYPE html>
+                        <html>
+                        <head>
+                        <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+                <!-- Bootstrap CSS / JS-->
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+                    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+                        </head>
+                        <body>
+                        <div style="font-size: 13.5px;">"""
+
+                html+= body.get('html')
+                html += f"""
+                        <button hx-post="http://127.0.0.1:8000/htmx/?username={request.user.username}&request=zdielanie_list&objekt={str(novy_objekt.id)}" hx-swap="outerHTML">
+                            Zdieľať
+                        </button> 
+                        <br>
+                """
+                html += f"""<button onclick="uprav_uzivatelsku_vrstvu('{str(novy_objekt.id)}','{request.user.username}');"><i class="fa-solid fa-pencil"></i></button>"""
+                html += f"""<button onclick="zmaz_uzivatelsku_vrstvu('{str(novy_objekt.id)}','{request.user.username}');"><i class="fa-solid fa-trash"></i></button>"""
+                html += """
+                                   <script>
+                               async function uprav_uzivatelsku_vrstvu(id,meno) {
+                                 let user = {
+                                 id: id,
+                                 username: meno,
+                                 uprav_vrstvu_iframe: null
+                               };
+
+                               let response = await fetch('http://127.0.0.1:8000/api', {
+                                 method: 'POST',
+                                 headers: {
+                                   'Content-Type': 'application/json;charset=utf-8'
+                                 },
+                                 body: JSON.stringify(user)
+                               });
+
+                          return true;
+                       }
+
+                           async function zmaz_uzivatelsku_vrstvu(id,meno) {
+                                 let user = {
+                                 id: id,
+                                 username: meno,
+                                 zmaz_vrstvu_iframe: null
+                               };
+
+                               let response = await fetch('http://127.0.0.1:8000/api', {
+                                 method: 'POST',
+                                 headers: {
+                                   'Content-Type': 'application/json;charset=utf-8'
+                                 },
+                                 body: JSON.stringify(user)
+                               });
+
+                          return true;
+                       }
+                           </script>
+                           """
+
+                html += "</div></body></html>"
+
+
+                vysledok['serverID'] = str(novy_objekt.pk)
+                vysledok['podskupina_spravca'] = novy_objekt.podskupina.spravca
+                vysledok['html'] = html
+                geometria = GEOSGeometry(novy_objekt.geometry)
+                geometria_cela = json.loads(geometria.json)
+                geometria_cela['serverID'] = str(novy_objekt.id)
+                geometria_cela['podskupina_spravca'] = novy_objekt.podskupina.spravca
+                vysledok['geometria_cela'] = geometria_cela
+                return HttpResponse(json.dumps(vysledok),status=201)
+
+
             if "skupina_object_create" in body and "coords" in body and "meno" in body and "podskupina_meno" in body:
                 geometria_cela = json.loads(body.get('coords'))
                 novy_objekt = Objekty()
