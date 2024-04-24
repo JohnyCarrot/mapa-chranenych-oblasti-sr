@@ -92,7 +92,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             <body>
             <div style="font-size: 13.5px;">
         """#Započatie html
-        html += "<div class='uzivatelske_html'>"+objekt.html+"</div>"
+        html += f"<div class='uzivatelske_html' hx-post='http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=get_html&objekt={objekt.id}' hx-trigger='load, every 250ms' hx-swap='innerHTML'>""</div>"
 
         if objekt.nastavenia != None:
             nastavenia = json.loads(objekt.nastavenia)
@@ -1166,7 +1166,7 @@ def api_request(request):
                         <body>
                         <div style="font-size: 13.5px;">"""
 
-                html += "<div class='uzivatelske_html'>" + body.get('html') + "</div>"
+                html += f"<div class='uzivatelske_html' hx-post='http://127.0.0.1:8000/htmx/?username={request.user.username}&request=get_html&objekt={novy_objekt.id}' hx-trigger='load, every 250ms' hx-swap='innerHTML'>""</div>"
                 html += f"""
                         <button hx-post="http://127.0.0.1:8000/htmx/?username={request.user.username}&request=zdielanie_list&objekt={str(novy_objekt.id)}" hx-swap="outerHTML">
                             Zdieľať
@@ -1623,6 +1623,11 @@ def htmx_request(request):
                 return HttpResponse(
                     f"""Zdieľanie objektu úspešne zrušené, zmena sa prejaví po znovunačítaní mapy""")
             return HttpResponse(f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zdielat&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a>""")
+
+        if poziadavka=='get_html' and "objekt" in request.GET:
+            obj = Objekty.objects.get(id=request.GET.get('objekt'))
+            return HttpResponse(str(obj.html))
+
 
     except:
         traceback.print_exc()

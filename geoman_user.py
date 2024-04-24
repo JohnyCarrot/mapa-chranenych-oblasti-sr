@@ -774,8 +774,9 @@ function uprav_vrstvu_uloz_iframe(){
                             
                             {{ this._parent.get_name() }}.eachLayer(function (layer) { 
                             if(layer.commit && layer.commit==true){
-                                        console.log(layer);
                                          layer.setStyle(layer.options_before_commit);
+                                         
+                                         
                                 }
                             });
                             
