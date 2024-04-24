@@ -170,3 +170,4 @@ STATICFILES_DIRS = (
   os.path.join(BASE_DIR, 'static'),
 )
 
+ADRESKA = "127.0.0.1:8000" #Mnou vymyslené

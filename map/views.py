@@ -32,6 +32,10 @@ from .models import Skupiny, Podskupiny, Objekty, Profile, Viditelnost_mapa, Not
     Sprava, Diskusia_skupiny, Diskusny_prispevok_skupiny, Diskusny_prispevok_skupiny_komentar
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Q
+from django.conf import settings as django_settings
+
+http_hostitel = f"http://{django_settings.ADRESKA}" #Bez koncového lomítka !!!
+
 
 
 
@@ -92,7 +96,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             <body>
             <div style="font-size: 13.5px;">
         """#Započatie html
-        html += f"<div class='uzivatelske_html' hx-post='http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=get_html&objekt={objekt.id}' hx-trigger='load, every 250ms' hx-swap='innerHTML'>""</div>"
+        html += f"<div class='uzivatelske_html' hx-post='{http_hostitel}/htmx/?username={uzivatel.username}&request=get_html&objekt={objekt.id}' hx-trigger='load, every 250ms' hx-swap='innerHTML'>""</div>"
 
         if objekt.nastavenia != None:
             nastavenia = json.loads(objekt.nastavenia)
@@ -104,7 +108,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             if"shared_with" in nastavenia and uzivatel.username in nastavenia["shared_with"] and nastavenia["shared_with"][uzivatel.username]==podskupina.id:
                 zdielane = True
                 html+=f"""<p style="white-space: nowrap">Zdieľané používateľom: <br><b>{objekt.podskupina.spravca}</b></p>"""
-                html += f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zrusit_zdielanie&ifrejm=true&objekt={objekt.id}&zdielane_s={uzivatel.username}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a> <br><br>"""
+                html += f"""<a href="#" hx-post="{http_hostitel}/htmx/?username={uzivatel.username}&request=zrusit_zdielanie&ifrejm=true&objekt={objekt.id}&zdielane_s={uzivatel.username}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a> <br><br>"""
 
                 pseudo_podskupina_objektu = Podskupiny.objects.get(pk=nastavenia["shared_with"][uzivatel.username])
                 viditelnost = pseudo_podskupina_objektu.viditelnost
@@ -113,10 +117,10 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
 
         if(objekt.podskupina_id!=podskupina.id and zdielane == False):
             continue
-        if (objekt.diskusia.aktivna): html+=f"""<a href="http://127.0.0.1:8000/diskusia?q={objekt.diskusia.id}" target="_blank" rel="noopener noreferrer">Diskusia</a><br>"""
+        if (objekt.diskusia.aktivna): html+=f"""<a href="{http_hostitel}/diskusia?q={objekt.diskusia.id}" target="_blank" rel="noopener noreferrer">Diskusia</a><br>"""
         if (uzivatel != None and zdielane == False and podskupina.spravca == uzivatel.username):
             html+=f"""
-                    <button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
+                    <button hx-post="{http_hostitel}/htmx/?username={uzivatel.username}&request=zdielanie_list&objekt={objekt.id}" hx-swap="outerHTML">
                         Zdieľať
                     </button> 
                     <br>
@@ -125,43 +129,43 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
             html+=f"""<button onclick="uprav_uzivatelsku_vrstvu('{objekt.id}','{uzivatel.username}');"><i class="fa-solid fa-pencil"></i></button>"""
             if podskupina.spravca == uzivatel.username and zdielane == False and zdielane_w == False:
                 html += f"""<button onclick="zmaz_uzivatelsku_vrstvu('{objekt.id}','{uzivatel.username}');"><i class="fa-solid fa-trash"></i></button>"""
-            html+="""
+            html+=f"""
                     <script>
-                async function uprav_uzivatelsku_vrstvu(id,meno) {
-                  let user = {
+                async function uprav_uzivatelsku_vrstvu(id,meno) {{
+                  let user = {{
                   id: id,
                   username: meno,
                   uprav_vrstvu_iframe: null
-                };
+                }};
 
-                let response = await fetch('http://127.0.0.1:8000/api', {
+                let response = await fetch('{http_hostitel}/api', {{
                   method: 'POST',
-                  headers: {
+                  headers: {{
                     'Content-Type': 'application/json;charset=utf-8'
-                  },
+                  }},
                   body: JSON.stringify(user)
-                });
+                }});
 
            return true;
-        }
+        }}
         
-            async function zmaz_uzivatelsku_vrstvu(id,meno) {
-                  let user = {
+            async function zmaz_uzivatelsku_vrstvu(id,meno) {{
+                  let user = {{
                   id: id,
                   username: meno,
                   zmaz_vrstvu_iframe: null
-                };
+                }};
 
-                let response = await fetch('http://127.0.0.1:8000/api', {
+                let response = await fetch('{http_hostitel}/api', {{
                   method: 'POST',
-                  headers: {
+                  headers: {{
                     'Content-Type': 'application/json;charset=utf-8'
-                  },
+                  }},
                   body: JSON.stringify(user)
-                });
+                }});
 
            return true;
-        }
+        }}
             </script>
             """
 
@@ -1175,52 +1179,52 @@ def api_request(request):
                         <body>
                         <div style="font-size: 13.5px;">"""
 
-                html += f"<div class='uzivatelske_html' hx-post='http://127.0.0.1:8000/htmx/?username={request.user.username}&request=get_html&objekt={novy_objekt.id}' hx-trigger='load, every 250ms' hx-swap='innerHTML'>""</div>"
+                html += f"<div class='uzivatelske_html' hx-post='{http_hostitel}/htmx/?username={request.user.username}&request=get_html&objekt={novy_objekt.id}' hx-trigger='load, every 250ms' hx-swap='innerHTML'>""</div>"
                 html += f"""
-                        <button hx-post="http://127.0.0.1:8000/htmx/?username={request.user.username}&request=zdielanie_list&objekt={str(novy_objekt.id)}" hx-swap="outerHTML">
+                        <button hx-post="{http_hostitel}/htmx/?username={request.user.username}&request=zdielanie_list&objekt={str(novy_objekt.id)}" hx-swap="outerHTML">
                             Zdieľať
                         </button> 
                         <br>
                 """
                 html += f"""<button onclick="uprav_uzivatelsku_vrstvu('{str(novy_objekt.id)}','{request.user.username}');"><i class="fa-solid fa-pencil"></i></button>"""
                 html += f"""<button onclick="zmaz_uzivatelsku_vrstvu('{str(novy_objekt.id)}','{request.user.username}');"><i class="fa-solid fa-trash"></i></button>"""
-                html += """
+                html += f"""
                                    <script>
-                               async function uprav_uzivatelsku_vrstvu(id,meno) {
-                                 let user = {
+                               async function uprav_uzivatelsku_vrstvu(id,meno) {{
+                                 let user = {{
                                  id: id,
                                  username: meno,
                                  uprav_vrstvu_iframe: null
-                               };
+                               }};
 
-                               let response = await fetch('http://127.0.0.1:8000/api', {
+                               let response = await fetch('{http_hostitel}/api', {{
                                  method: 'POST',
-                                 headers: {
+                                 headers: {{
                                    'Content-Type': 'application/json;charset=utf-8'
-                                 },
+                                 }},
                                  body: JSON.stringify(user)
-                               });
+                               }});
 
                           return true;
-                       }
+                       }}
 
-                           async function zmaz_uzivatelsku_vrstvu(id,meno) {
-                                 let user = {
+                           async function zmaz_uzivatelsku_vrstvu(id,meno) {{
+                                 let user = {{
                                  id: id,
                                  username: meno,
                                  zmaz_vrstvu_iframe: null
-                               };
+                               }};
 
-                               let response = await fetch('http://127.0.0.1:8000/api', {
+                               let response = await fetch('{http_hostitel}/api', {{
                                  method: 'POST',
-                                 headers: {
+                                 headers: {{
                                    'Content-Type': 'application/json;charset=utf-8'
-                                 },
+                                 }},
                                  body: JSON.stringify(user)
-                               });
+                               }});
 
                           return true;
-                       }
+                       }}
                            </script>
                            """
 
@@ -1555,7 +1559,6 @@ def test(request):
 
 @csrf_exempt
 def htmx_request(request):
-    #<button hx-post="http://127.0.0.1:8000/htmx/?username={uzivatel.username}&request=zdielanie_list" hx-swap="outerHTML">
     html = ""
     if "request" not in request.GET:
         return HttpResponse("Chýba požiadavka, skúste znova")
@@ -1579,9 +1582,9 @@ def htmx_request(request):
             html+="""<ul class="list-group">"""
             for priatel in zoznam_priatelov:
                 if nastavenia != None and "shared_with" in nastavenia and priatel.username in nastavenia["shared_with"]:
-                    html+= f"""<li class="list-group-item py-1 px-1">{priatel.username} <a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zrusit_zdielanie&objekt={objekt.id}&zdielane_s={priatel.username}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a></li>"""
+                    html+= f"""<li class="list-group-item py-1 px-1">{priatel.username} <a href="#" hx-post="{http_hostitel}/htmx/?username={user.username}&request=zrusit_zdielanie&objekt={objekt.id}&zdielane_s={priatel.username}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a></li>"""
                 else:
-                    html += f"""<li class="list-group-item py-1 px-1">{priatel.username} <a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zdielat&objekt={objekt.id}&zdielane_s={priatel.username}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a></li>"""
+                    html += f"""<li class="list-group-item py-1 px-1">{priatel.username} <a href="#" hx-post="{http_hostitel}/htmx/?username={user.username}&request=zdielat&objekt={objekt.id}&zdielane_s={priatel.username}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a></li>"""
 
             html+="</ul>"
         if poziadavka == "zdielat" and "objekt" in request.GET and "zdielane_s" in request.GET:
@@ -1617,7 +1620,7 @@ def htmx_request(request):
             notifikacia.save()
 
 
-            return HttpResponse(f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zrusit_zdielanie&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a>""")
+            return HttpResponse(f"""<a href="#" hx-post="{http_hostitel}/htmx/?username={user.username}&request=zrusit_zdielanie&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zrušiť zdieľanie</a>""")
 
         if poziadavka == "zrusit_zdielanie" and "objekt" in request.GET and "zdielane_s" in request.GET:
             zdielany_objekt = Objekty.objects.get(id=request.GET.get('objekt'))
@@ -1631,7 +1634,7 @@ def htmx_request(request):
             if "ifrejm" in request.GET:
                 return HttpResponse(
                     f"""Zdieľanie objektu úspešne zrušené, zmena sa prejaví po znovunačítaní mapy""")
-            return HttpResponse(f"""<a href="#" hx-post="http://127.0.0.1:8000/htmx/?username={user.username}&request=zdielat&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a>""")
+            return HttpResponse(f"""<a href="#" hx-post="{http_hostitel}/htmx/?username={user.username}&request=zdielat&objekt={zdielany_objekt.id}&zdielane_s={priatel}" hx-swap="outerHTML" style="margin:5px;">Zdieľať</a>""")
 
         if poziadavka=='get_html' and "objekt" in request.GET:
             obj = Objekty.objects.get(id=request.GET.get('objekt'))
