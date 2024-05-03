@@ -1566,7 +1566,8 @@ def htmx_request(request):
         return HttpResponse("Chýba požiadavka, skúste znova")
     poziadavka = request.GET.get('request')
     try:
-        user = User.objects.get(username=request.GET.get('username'))
+        #user = User.objects.get(username=request.GET.get('username'))
+        user = User.objects.filter(username=request.GET.get('username')).first()
 
         if poziadavka == "zdielanie_list" and "objekt" in request.GET:
             objekt = Objekty.objects.get(id=request.GET.get('objekt'))
