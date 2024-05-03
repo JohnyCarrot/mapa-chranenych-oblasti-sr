@@ -99,6 +99,7 @@ class Geocoder(JSCSSMixin, MacroElement):
             collapsed=collapsed,
             position=position,
             defaultMarkGeocode=add_marker,
+            placeholder= 'Vyhľadávanie lokality',
             **kwargs
         )
         self.suggestions = suggestions

@@ -25,11 +25,13 @@ V logine etc pozrieť titles
 
 skupina výber chronologicky a podla karmy
 Opravit, ked v administrácií sa zobrazuje do mapy podla map settings
+map settings async
 Keď sa edituje single, tak editor tvaru po zatvorení ostáva
 
 myslieť na dlhší loading bar
 
-search premenovať na Hľadať
+zrušenie zdielania (no reload)
+
 
 Leaflet moving marker
 
