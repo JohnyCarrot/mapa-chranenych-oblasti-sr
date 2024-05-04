@@ -16,6 +16,7 @@ from folium import plugins
 from django.db import connection
 from draw_custom import Draw as Draw_custom
 from fullscreen import Fullscreen as Fullscreen_custom
+from legend import Legend as Legend_custom
 from geoman import Geoman as Geoman
 from geoman_user import Geoman as Geoman_user
 from geocoder_custom import Geocoder as Geocoder_custom
@@ -317,6 +318,7 @@ def render_mapy(requests):
     start_time_temp = time.time()
 
     # mapa nastavenie
+    Legend_custom().add_to(m)
     Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
     Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
     folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)

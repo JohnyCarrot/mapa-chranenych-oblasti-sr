@@ -22,7 +22,8 @@ mazanie skupiny / podskupiny v administrácií, ak je prázdna
 V logine etc pozrieť titles
 
 
-
+pridanie priatela cez profil, + ukazka aké sys vrstvy 
+collapsed legenda nastavenia v mape
 skupina výber chronologicky a podla karmy
 Opravit, ked v administrácií sa zobrazuje do mapy podla map settings
 map settings async
