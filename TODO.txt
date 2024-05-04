@@ -32,6 +32,11 @@ myslieť na dlhší loading bar
 
 zrušenie zdielania (no reload)
 
+pridanie objektu, pridanie podskupiny v tom momente do layer control
+
+V administrácií prerobiť načítavanie
+Skupina mapy async pridanie objektu
+async mazanie príspevkov zo skupiny - skupiny zrejme prepísať na htmx a zbavit sa unicornu
 
 Leaflet moving marker
 
