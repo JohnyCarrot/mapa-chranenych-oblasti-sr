@@ -21,11 +21,13 @@ L.Control.Legend.prototype.updateItems = function(items) {
     var className = 'leaflet-legend';
     var list = L.DomUtil.create('div', 'leaflet-legend-list', container);
     items.forEach(function(item) {
-            var div = L.DomUtil.create('div', className + '-item', list);
-            var colorbox = L.DomUtil.create('div', className + '-color', div);
-            colorbox.innerHTML = '&nbsp;';
-            colorbox.style.backgroundColor = item.color;
-            L.DomUtil.create('div', className + '-text', div).innerHTML = item.label;
+        if (item.active == true){
+                var div = L.DomUtil.create('div', className + '-item', list);
+                var colorbox = L.DomUtil.create('div', className + '-color', div);
+                colorbox.innerHTML = '&nbsp;';
+                colorbox.style.backgroundColor = item.color;
+                L.DomUtil.create('div', className + '-text', div).innerHTML = item.label;
+        }
     });
     this.expand();  // Optionally expand the legend to show updated items
 };
@@ -37,17 +39,37 @@ L.Control.Legend.prototype.updateItems = function(items) {
                 {label: 'bez farby'},
                 {color: 'blue', label: 'modre'}
             ],
-            collapsed: true, //nastavenia v mape
+            collapsed: false, //nastavenia v mape
             position: 'bottomright',
             buttonHtml: '<i class="fa fa-info" style="color: #000"></i>'
         });
         legenda.addTo({{this._parent.get_name()}});
-        
-
-        legenda.updateItems([{color: 'green', label: 'zelené'},{color: 'yellow', label: 'žluté'}]);
+        $('.leaflet-control-attribution').hide();
+        var co_do_legendy = [];
+        {% for x in this.legend %}
+            co_do_legendy.push({color: '{{ x[1] }}', label: '{{ x[0] }}',active: true});
+        {% endfor %}
+        legenda.updateItems(co_do_legendy);
         
         {{this._parent.get_name()}}.on('overlayadd',function(e){
-            alert(e.name);
+            co_do_legendy.forEach(element => {
+
+                if (element.label == e.name) {
+                                element.active = true;
+                                legenda.updateItems(co_do_legendy);
+                }
+            });
+
+        });
+        
+        {{this._parent.get_name()}}.on('overlayremove',function(e){
+            co_do_legendy.forEach(element => {
+
+                if (element.label == e.name) {
+                                element.active = false;
+                                legenda.updateItems(co_do_legendy);
+                }
+            });
         });
         
         
@@ -72,9 +94,11 @@ L.Control.Legend.prototype.updateItems = function(items) {
 
     def __init__(
         self,
+        legend=None,
         **kwargs
     ):
         super().__init__()
+        self.legend = legend or []
         self._name = "Legend"
         self.options = parse_options(
             **kwargs

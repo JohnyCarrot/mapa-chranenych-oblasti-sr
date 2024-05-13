@@ -67,9 +67,13 @@ def pridaj_skupinu(meno,spravca,viditelnost):
     INSERT_STATEMENT = 'INSERT INTO skupiny (meno,viditelnost,spravca) VALUES (%s, %s, %s) RETURNING id;'
     return pridaj_do_databazy(INSERT_STATEMENT, (meno, viditelnost, spravca))
 
-def pridaj_podskupinu(meno,spravca,skupina = None):
-    INSERT_STATEMENT = 'INSERT INTO podskupiny (meno,viditelnost,spravca,skupina) VALUES (%s, %s, %s,%s) RETURNING id;'
-    return pridaj_do_databazy(INSERT_STATEMENT,(meno, vytvor_viditelnost(), spravca, skupina))
+def pridaj_podskupinu(meno,spravca,skupina = None,farba_legendy = None):
+    INSERT_STATEMENT = 'INSERT INTO podskupiny (meno,viditelnost,spravca,skupina,nastavenia) VALUES (%s, %s, %s,%s, %s) RETURNING id;'
+    if farba_legendy is None:
+        farba_legendy = "{}"
+    else:
+        farba_legendy = "{" + f'"legend_color": "{farba_legendy}"' + "}"
+    return pridaj_do_databazy(INSERT_STATEMENT,(meno, vytvor_viditelnost(), spravca, skupina,farba_legendy))
 
 def pridaj_objekt(meno, style,html,diskusia,podskupina,geometry,stupen_ochrany):
     INSERT_STATEMENT = 'INSERT INTO objekty (meno, style,html,diskusia,podskupina,geometry,stupen_ochrany) VALUES (%s, %s,%s, %s, %s,ST_SetSRID(ST_GeomFromText(%s), 4326),%s) RETURNING id;'
@@ -126,13 +130,38 @@ def chranene_oblasti():
     rezervacie = pridaj_skupinu("Rezervácie", None, vytvor_viditelnost())
     ine = pridaj_skupinu("Iné chránené oblasti", None, vytvor_viditelnost())
     for tuples in shapefile.itertuples():
+        legend_color = None
         if podskupiny.get(tuples[6]) is None:
+            if (tuples[6] == 'Národná prírodná rezervácia'):
+                legend_color = 'royalblue'
+            elif (tuples[6] == 'Národná prírodná pamiatka'):
+                legend_color = 'indigo'
+            elif (tuples[6] == 'Súkromná prírodná rezervácia'):
+                legend_color = "cornflowerblue"
+            elif (tuples[6] == 'Prírodná pamiatka'):
+                legend_color = "saddlebrown"
+            elif (tuples[6] == 'Prírodná rezervácia'):
+                legend_color = 'deepskyblue'
+            elif (tuples[6] == 'Chránený krajinný prvok'):
+                legend_color = 'greenyellow'
+            elif (tuples[6] == 'Ochranné pásmo prírodnej rezervácie'):
+                legend_color = 'yellowgreen'
+            elif (tuples[6] == 'Ochranné pásmo národnej prírodnej rezervácie'):
+                legend_color = 'olive'
+            elif (tuples[6] == 'Ochranné pásmo prírodnej pamiatky'):
+                legend_color = 'chocolate'
+            elif (tuples[6] == 'Ochranné pásmo národnej prírodnej pamiatky'):
+                legend_color = "burlywood"
+            elif (tuples[6] == 'Chránený areál'):
+                legend_color = 'mediumseagreen'
+            elif (tuples[6] == 'Ochranné pásmo chráneného areálu'):
+                legend_color = 'g'
             if("pamiat" in tuples[6]):
-                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],None,pamiatky)
+                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],None,pamiatky,farba_legendy=legend_color)
             elif("rezerv" in tuples[6]):
-                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],None,rezervacie)
+                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6],None,rezervacie,farba_legendy=legend_color)
             else:
-                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6], None, ine)
+                podskupiny[tuples[6]] = pridaj_podskupinu(tuples[6], None, ine,farba_legendy=legend_color)
     for tuples in shapefile.itertuples():
         color = ""
         fillcolor = ""
