@@ -71,7 +71,7 @@ L.Control.Legend.prototype.updateItems = function(items) {
                 }
             });
         });
-        
+        {{this._parent.get_name()}}.legenda = legenda;
         
  
             
