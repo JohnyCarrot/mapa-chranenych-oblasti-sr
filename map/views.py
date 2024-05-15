@@ -81,8 +81,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         nastavenia = None
         zdielane = False
         zdielane_w = False
-        if(sulad_s_nastavenim_mapy(nastavenie_mapy,objekt)==False):
-            continue
+
             #Započatie html
         html="""
         <!DOCTYPE html>
@@ -177,6 +176,7 @@ def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel
         geometria = GEOSGeometry(objekt.geometry)
         geometria_cela = json.loads(geometria.json)
         geometria_cela['serverID'] = objekt.id
+        geometria_cela['stupen_ochrany'] = objekt.stupen_ochrany
         geometria_cela['podskupina_spravca'] = objekt.podskupina.spravca# zrejme zamenit / pridať len za pravo menit
         geometria_cela['zdielane_w'] = False #Zdielane a pravo zapisovat
         if zdielane and zdielane_w:

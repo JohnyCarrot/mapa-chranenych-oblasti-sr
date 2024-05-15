@@ -25,9 +25,10 @@ V logine etc pozrieť titles
 pridanie priatela cez profil, + ukazka aké sys vrstvy 
 collapsed legenda nastavenia v mape
 skupina výber chronologicky a podla karmy
-Opravit, ked v administrácií sa zobrazuje do mapy podla map settings
 DO administrácie pridať možnosť meniť farbu legendy
-map settings async
+
+
+
 Keď sa edituje single, tak editor tvaru po zatvorení ostáva
 
 myslieť na dlhší loading bar

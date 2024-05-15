@@ -24,6 +24,36 @@ class EasyButton(JSCSSMixin, MacroElement):
                 {% if not this.legenda %}
                         {{ this._parent.get_name() }}.legenda.collapse();
                 {% endif %}    
+                //Vypnutie legendy ak je False Koniec
+                
+                
+                //Vsetky vrstvy do poľa, aby bolo možné ich neskôr po filtrovaní znovu pridať
+                var vsetky_vrstvy_v_mape = [];
+                {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
+                        if(layer.feature){
+                            vsetky_vrstvy_v_mape.push(layer);
+                            //console.log(layer.feature.geometry.stupen_ochrany);
+                            
+                            {% if not this.stupen2 %}
+                                    if(layer.feature.geometry.stupen_ochrany==2){layer.remove();}
+                            {% endif %}  
+                            {% if not this.stupen3 %}
+                                    if(layer.feature.geometry.stupen_ochrany==3){layer.remove();}
+                            {% endif %} 
+                            {% if not this.stupen4 %}
+                                    if(layer.feature.geometry.stupen_ochrany==4){layer.remove();}
+                            {% endif %} 
+                            {% if not this.stupen5 %}
+                                    if(layer.feature.geometry.stupen_ochrany==5){layer.remove();}
+                            {% endif %} 
+                            
+                            
+                          }                             
+                }); //Koniec označenia vrsiev
+                {{ this._parent.get_name() }}.vsetky_vrstvy = vsetky_vrstvy_v_mape;
+                
+                //Koniec Vrstiev do poľa
+                
         
                 async function foo(stupen2,stupen3,stupen4,stupen5,legendA) {
                   let user = {
@@ -52,7 +82,39 @@ class EasyButton(JSCSSMixin, MacroElement):
                         {{ this._parent.get_name() }}.legenda.collapse();
                     }
                 
-                  alert('Zmeny úspešne aplikované!');
+                
+                
+                
+                    {{ this._parent.get_name() }}.eachLayer(function (layer) { //Označ vrstvy pre zobrazenie
+                        if(layer.feature){
+                            let stupen = layer.feature.geometry.stupen_ochrany;
+                            if(stupen==2 || stupen ==3 || stupen==4 || stupen==5){
+                                layer.remove();
+                            }
+                          }                             
+                    }); //Koniec označenia vrsiev
+                    
+                    vsetky_vrstvy_v_mape.forEach(layer => {
+                        let stupen = layer.feature.geometry.stupen_ochrany;
+                            if(stupen==2 && stupen2){
+                                layer.addTo({{ this._parent.get_name() }});
+                            }
+                            if(stupen==3 && stupen3){
+                                layer.addTo({{ this._parent.get_name() }});
+                            }
+                            if(stupen==4 && stupen4){
+                                layer.addTo({{ this._parent.get_name() }});
+                            }
+                            if(stupen==5 && stupen5){
+                                layer.addTo({{ this._parent.get_name() }});
+                            }
+                    });
+                
+                
+                
+                
+                //alert('Zmeny úspešne aplikované!'); //Je to otravné
+                  
 
                 } else {
                   alert(`Niekde nastala chyba, skúste neskôr: Status ${response.status}`);
@@ -98,6 +160,11 @@ class EasyButton(JSCSSMixin, MacroElement):
             
             
             `;
+    var win =  L.control.window({{ this._parent.get_name() }}, {title:'Nastavenia', modal: false});
+    win.content(content)
+    .prompt({callback:function(){    
+    },buttonOK:'     '})
+    .hide().disableBtn();
             var stateChangingButton = L.easyButton({
                 position: 'bottomleft',
                 states: [{
@@ -106,13 +173,7 @@ class EasyButton(JSCSSMixin, MacroElement):
                         title:     'Nastavenia',      // like its title
                         onClick: function(btn, map) {       // and its callback
                               
-                              var win =  L.control.window(map, {title:'Nastavenia', modal: false})
-    .content(content)
-    .prompt({callback:function(){
-    window.parent.location.href = "",alert('Zmeny úspešne aplikované!')
-    
-    },buttonOK:'     '})
-    .show().disableBtn()
+                                win.show();
                         }
                     }]
             });
