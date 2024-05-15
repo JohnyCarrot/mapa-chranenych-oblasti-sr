@@ -325,7 +325,7 @@ def render_mapy(requests):
     folium.plugins.LocateControl(auto_start=False,strings={"title": "Pozrite si svoju aktuálnu polohu", "popup": "Vaša poloha"}).add_to(m)
     if(requests.user.is_authenticated):
         map_setting = Profile.objects.get(user_id=requests.user.id).map_settings
-        EasyButton(map_setting.stupen2,map_setting.stupen3,map_setting.stupen4,map_setting.stupen5).add_to(m)
+        EasyButton(map_setting.stupen2,map_setting.stupen3,map_setting.stupen4,map_setting.stupen5,map_setting.legenda).add_to(m)
         Geoman_user(username=requests.user.username).add_to(m)
         Draw_custom(export=False,draw_options= {"circle": False,"circlemarker": False}).add_to(m)
     print(f"---Pluginy: %s seconds ---" % (time.time() - start_time_temp))
@@ -508,13 +508,14 @@ def api_request(request):
             global uzivatelska_vrstva_na_upravu
             global uzivatelska_vrstva_na_zmazanie
             global opravneny_uzivatel
-            if("stupen2" in body and "stupen3" in body and "stupen4" in body and "stupen5" in body):
+            if("stupen2" in body and "stupen3" in body and "stupen4" in body and "stupen5" in body and "legendA" in body ):
                 profil = Profile.objects.get(user_id=request.user.id)
                 mapa_nastavenia = profil.map_settings
                 mapa_nastavenia.stupen2 = body['stupen2']
                 mapa_nastavenia.stupen3 = body['stupen3']
                 mapa_nastavenia.stupen4 = body['stupen4']
                 mapa_nastavenia.stupen5 = body['stupen5']
+                mapa_nastavenia.legenda = body['legendA']
                 mapa_nastavenia.save()
                 return HttpResponse(status=202)
 

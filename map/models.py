@@ -105,6 +105,7 @@ class Map_settings(models.Model):
     stupen3 = models.BooleanField(default=True)#Stupeň ochrany 3
     stupen4 = models.BooleanField(default=True)#Stupeň ochrany 4
     stupen5 = models.BooleanField(default=True)#Stupeň ochrany 5
+    legenda = models.BooleanField(default=True)  # True zobrazí / False nezobrazí
 
 
 class Profile(models.Model):

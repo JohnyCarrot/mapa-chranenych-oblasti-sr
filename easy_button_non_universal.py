@@ -18,12 +18,20 @@ class EasyButton(JSCSSMixin, MacroElement):
     _template = Template(
         """
         {% macro script(this, kwargs) %}
-                async function foo(stupen2,stupen3,stupen4,stupen5) {
+        
+                //Vypnutie legendy ak je False
+                
+                {% if not this.legenda %}
+                        {{ this._parent.get_name() }}.legenda.collapse();
+                {% endif %}    
+        
+                async function foo(stupen2,stupen3,stupen4,stupen5,legendA) {
                   let user = {
                   stupen2: stupen2,
                   stupen3: stupen3,
                   stupen4: stupen4,
-                  stupen5: stupen5
+                  stupen5: stupen5,
+                  legendA: legendA
                 };
                 
                 let response = await fetch('/api', {
@@ -34,13 +42,27 @@ class EasyButton(JSCSSMixin, MacroElement):
                   body: JSON.stringify(user)
                 });
                 
-                let result = await response.json();
+                let result = await response;
+                
+                if (response.status === 202) {
+                    if(legendA){
+                        {{ this._parent.get_name() }}.legenda.expand();
+                    }
+                    else{
+                        {{ this._parent.get_name() }}.legenda.collapse();
+                    }
+                
+                  alert('Zmeny úspešne aplikované!');
+
+                } else {
+                  alert(`Niekde nastala chyba, skúste neskôr: Status ${response.status}`);
+                }
                     
            return true;
         }
             var content = `
             <form id="settings-form" onsubmit="return false">
-            <h3>Stupne ochrany</h3>
+            <h4>Stupne ochrany</h4>
 <div class="form-check form-check-inline">
   <input class="form-check-input" type="checkbox" id="stupen2" value="option1" {{ 'checked' if this.stupen2 else '' }}>
   <label class="form-check-label" for="stupen2">II. stupeň</label>
@@ -58,7 +80,15 @@ class EasyButton(JSCSSMixin, MacroElement):
   <label class="form-check-label" for="5stupen">V. stupeň</label>
 </div>
 <hr>
-<button class="btn btn-primary" onclick="foo(document.getElementById('stupen2').checked,document.getElementById('3stupen').checked,document.getElementById('4stupen').checked,document.getElementById('5stupen').checked);window.parent.location.href = '';alert('Zmeny úspešne aplikované!');">Aplikovať</button>
+<h4>Legenda</h4>
+<div class="form-check-inline">
+  <input class="form-check-input" type="checkbox" value="" id="LegendActive" {{ 'checked' if this.legenda else '' }}>
+  <label class="form-check-label" for="LegendActive">
+    Aktívna
+  </label>
+</div>
+<hr>
+<button class="btn btn-primary" onclick="foo(document.getElementById('stupen2').checked,document.getElementById('3stupen').checked,document.getElementById('4stupen').checked,document.getElementById('5stupen').checked,document.getElementById('LegendActive').checked);">Aplikovať</button>
 </form>
 
 
@@ -113,11 +143,12 @@ class EasyButton(JSCSSMixin, MacroElement):
         )
     ]
 
-    def __init__(self, stupen2,stupen3,stupen4,stupen5,**kwargs):
+    def __init__(self, stupen2,stupen3,stupen4,stupen5,legenda,**kwargs):
         super().__init__()
         self._name = "EasyButton"
         self.stupen2 = stupen2
         self.stupen3 = stupen3
         self.stupen4 = stupen4
         self.stupen5 = stupen5
+        self.legenda = legenda
 
