@@ -297,6 +297,7 @@ def render_mapy(requests):
                    prefer_canvas=False,
                    # crs="EPSG3857",
                    zoom_control=False,
+                   attr="Dáta pre túto mapu poskytla © Štátna ochrana prírody SR, Banská Bystrica 2024",
 
                    )
     geocoder_vlastne_vyhladanie = []

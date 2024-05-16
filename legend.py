@@ -44,7 +44,8 @@ L.Control.Legend.prototype.updateItems = function(items) {
             buttonHtml: '<i class="fa fa-info" style="color: #000"></i>'
         });
         legenda.addTo({{this._parent.get_name()}});
-        $('.leaflet-control-attribution').hide();
+       // $('.leaflet-control-attribution').hide();
+       {{this._parent.get_name()}}.attributionControl.setPrefix(false);
         var co_do_legendy = [];
         {% for x in this.legend %}
             co_do_legendy.push({color: '{{ x[1] }}', label: '{{ x[0] }}',active: true});
