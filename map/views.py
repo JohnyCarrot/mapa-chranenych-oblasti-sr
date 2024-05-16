@@ -365,6 +365,7 @@ def forum(requests):
             context['spravca'] = False
 
         objekt = Objekty.objects.get(diskusia=diskusia)
+        context["objekt"] = objekt
         viditelnost = objekt.podskupina.viditelnost
         if diskusia.anonym_read == False and over_viditelnost(viditelnost,requests.user.is_authenticated,requests.user.username) == False and (requests.user.username != diskusia.spravca or requests.user.username==""):
             if requests.user.is_superuser == False:
