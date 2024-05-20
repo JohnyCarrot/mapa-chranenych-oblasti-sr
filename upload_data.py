@@ -237,8 +237,29 @@ def uzemia_europskeho_vyznamu():
                <b>{tuples[2]}</b><br> 
                 Územie európskeho významu
                 <br> 
-                   <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
-                   <br> 
+                    Pravidlá v tejto oblasti:
+                    <br>
+    <span class="fa-stack small" title="Zákaz jazdy na motorovom člne alebo plavidle">
+        <img src="http://127.0.0.1:8000/static/misc/jet-ski.png" class="fa-stack-1x" style="" alt="">
+        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+    </span>
+	
+    <span class="fa-stack small" title="Zákaz čerpania vody do pojazdných cisterien">
+        <img src="http://127.0.0.1:8000/static/misc/water-tank.png" class="fa-stack-1x" style="" alt="">
+        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+    </span>
+	
+	<span class="fa-stack small" title="Zákaz státia alebo vjazdu s motorovým vozidlom">
+        <img src="http://127.0.0.1:8000/static/misc/auto.png" class="fa-stack-1x" style="" alt="">
+        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+    </span>
+	
+		
+	<span class="fa-stack small" title="Zákaz táborenia, stanovania, bivakovania a zakladania ohňa">
+        <img src="http://127.0.0.1:8000/static/misc/fatra.png" class="fa-stack-1x" style="" alt="">
+        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+    </span>
+                    <br> 
                """
         if ("MULTIPOLYGON" in str(tuples[5])):
             for polygon in tuples[5].geoms:
