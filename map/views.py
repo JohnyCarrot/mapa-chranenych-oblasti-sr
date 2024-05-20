@@ -1648,6 +1648,41 @@ def htmx_request(request):
             obj = Objekty.objects.get(id=request.GET.get('objekt'))
             return HttpResponse(str(obj.html))
 
+        if poziadavka=='profil_check_friendship' and "friend" in request.GET: #Profil modul
+            priatel = User.objects.get(username = request.GET.get('friend'))
+
+            if Friend.objects.are_friends(request.user, priatel):
+                return HttpResponse(f"""                    
+                <button type="button" class="btn btn-success btn-sm">
+                    <i class="fa-solid fa-user-plus"></i> Priateľ
+                </button>""")
+            elif FriendshipRequest.objects.filter(from_user=request.user, to_user=priatel, rejected__isnull=True).exists():
+                return HttpResponse(f"""                    
+                <button type="button" class="btn btn-info btn-sm" style="font-size: 0.79em">
+                    <i class="fa-solid fa-user-plus"></i> Žiadosť o priateľstvo odoslaná
+                </button>""")
+
+            return HttpResponse(f"""                    
+            <button type="button" class="btn btn-info btn-sm" hx-post='/htmx/?username={request.user.username}&request=profil_check_friendship_ziadost_o_priatelstvo&friend={priatel.username}' hx-trigger='click' hx-swap='outerHTML'>
+                <i class="fa-solid fa-user-plus"></i> Poslať žiadosť  o priateľstvo
+            </button>""")
+        if poziadavka=='profil_check_friendship_ziadost_o_priatelstvo' and "friend" in request.GET: #Profil modul
+            other_user = User.objects.get(username = request.GET.get('friend'))
+            Friend.objects.add_friend(
+                request.user,
+                other_user,
+            )
+            notifikacia = Notifikacie()
+            notifikacia.prijimatel = other_user
+            notifikacia.odosielatel = request.user
+            notifikacia.sprava = "Vás požiadal o <b>priateľstvo</b>"
+            notifikacia.save()
+
+            return HttpResponse(f"""                    
+            <button type="button" class="btn btn-info btn-sm" style="font-size: 0.79em">
+                <i class="fa-solid fa-user-plus"></i> Žiadosť o priateľstvo odoslaná
+            </button>""")
+
 
     except:
         traceback.print_exc()
