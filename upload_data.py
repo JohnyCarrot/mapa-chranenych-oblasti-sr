@@ -218,16 +218,25 @@ def chranene_oblasti():
                           str(tuples[13]),vratenie_zon_ako_cislo(tuples[5],tuples[4]))
     return True
 
-def uzemia_europskeho_vyznamu_nenahrava():
+def uzemia_europskeho_vyznamu():
     shapefile = gpd.read_file("data/UEV_20220831.shp")
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
-    #skupina = pridaj_skupinu("Územia európskeho významu",None,["*"])
-    #podskupina = pridaj_podskupinu("Územia európskeho významu",["*"],None,skupina)
+    skupina = pridaj_skupinu("Územia európskeho významu", None, vytvor_viditelnost())
+    podskupina = pridaj_podskupinu("Územia európskeho významu", None, skupina, farba_legendy='#AEC6CF')
     for tuples in shapefile.itertuples():
-        fillcolor = color = '#003399'
+        #print(tuples)
+        fillcolor = color = '#AEC6CF'
+        style = {}
+        style['fillColor'] = fillcolor
+        style['fillOpacity'] = 0.55
+        style['opacity'] = 0.5
+        style['color'] = color
+        style = json.dumps(style)
         html = f"""
                <b>{tuples[2]}</b><br> 
+                Územie európskeho významu
+                <br> 
                    <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
                    <br> 
                """
@@ -236,16 +245,48 @@ def uzemia_europskeho_vyznamu_nenahrava():
                 pass
                 #pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(polygon))
                 #print(str(polygon))
-                break
+                pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
+                              str(polygon), None)
         else:
-            pass
-            print(str(tuples[5]))
-            break
+
             #pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(tuples[5]))
+            pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
+                          str(tuples[5]),None )
 
     return vysledok
+
+def chranene_vtacie_uzemie():
+    shapefile = gpd.read_file("data/chvu_20210818.shp")
+    shapefile = shapefile.to_crs(epsg=4326)
+    vysledok = []
+    skupina = pridaj_skupinu("Chránené vtáčie územia", None, vytvor_viditelnost())
+    podskupina = pridaj_podskupinu("Chránené vtáčie územia", None, skupina, farba_legendy='#893499')
+    for tuples in shapefile.itertuples():
+        fillcolor = color = '#003399'
+        style = {}
+        style['fillColor'] = fillcolor
+        style['color'] = color
+        style = json.dumps(style)
+        html = f"""
+               <b>CHVU {tuples[2]}</b><br> 
+                   <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
+                   <br> 
+               """
+        if ("MULTIPOLYGON" in str(tuples[5])):
+            for polygon in tuples[7].geoms:
+                pass
+                pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
+                              str(polygon), None)
+                #print(str(polygon))
+                break
+        else:
+            pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
+                          str(tuples[7]),None )
+        #print(tuples)
 if __name__ == '__main__':
     pass
     #stupne_ochrany()
+    uzemia_europskeho_vyznamu()
     chranene_oblasti()
-    #uzemia_europskeho_vyznamu_nenahrava()
+
+    #chranene_vtacie_uzemie()

@@ -29,7 +29,7 @@ L.Control.Legend.prototype.updateItems = function(items) {
                 L.DomUtil.create('div', className + '-text', div).innerHTML = item.label;
         }
     });
-    this.expand();  // Optionally expand the legend to show updated items
+    //this.expand();
 };
             
         
