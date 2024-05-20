@@ -22,8 +22,6 @@ mazanie skupiny / podskupiny v administrácií, ak je prázdna
 V logine etc pozrieť titles
 
 
-pridanie priatela cez profil, + ukazka aké sys vrstvy 
-collapsed legenda nastavenia v mape
 skupina výber chronologicky a podla karmy
 DO administrácie pridať možnosť meniť farbu legendy
 

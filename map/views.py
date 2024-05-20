@@ -429,6 +429,21 @@ def profil(requests):
         pocet_priatelov = len(Friend.objects.friends(uzivatel))
         diskusia_pocet = len(Diskusny_prispevok.objects.filter(user=uzivatel))
         spravy = Sprava.objects.filter(prijimatel=requests.user)
+        context['sys_vrstvy'] = False
+        for skupina in Skupiny.objects.filter(spravca=None).order_by('priorita'):
+            permisie_skupina = False
+            permisie_podskupina = False
+            if over_viditelnost(skupina.viditelnost, True, uzivatel.username,
+                                "w"):
+                permisie_skupina = True
+            for podskupina in Podskupiny.objects.filter(skupina=skupina).order_by('priorita'):
+                if (permisie_skupina): permisie_podskupina = True
+                if over_viditelnost(podskupina.viditelnost, True, uzivatel.username,
+                                    "w"):
+                    permisie_podskupina = True
+
+            if permisie_skupina or permisie_podskupina:
+                context['sys_vrstvy'] = True
         context['uzivatel'] = uzivatel
         context['profil'] = profil
         context['notifikacie'] = notifikacie

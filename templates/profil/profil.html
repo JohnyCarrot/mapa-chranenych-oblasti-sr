@@ -135,6 +135,8 @@
                 <div class="profile-label">
                     {% if uzivatel.is_superuser %}
                     <span class="tag badge badge-danger">Administrátor</span>
+                     {% elif sys_vrstvy %}   
+                        <span class="tag badge badge-primary">Správca oblastí</span>
                     {% endif %}
                 </div>
 
