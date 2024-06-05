@@ -14,6 +14,12 @@ conn = psycopg2.connect(
     options="-c search_path=public")
 conn.set_isolation_level(3)
 cur = conn.cursor()
+
+production = False
+
+adresa = "http://127.0.0.1:8000"
+if production: adresa= "https://mapujeme.sk"
+
 # mini funkcie
 def osetrenie_zon(text):  # keďže v db majú rôzne označenie pre zóny, treba to akosi zúhľadniť
     try:
@@ -88,41 +94,10 @@ def vytvor_diskusiu():
     return pridaj_do_databazy(INSERT_STATEMENT, (uuid.uuid4().__str__(),True,1,None,True,json.dumps({})))
 
 
-def stupne_ochrany():
-    skupina = pridaj_skupinu("Chránené oblasti",None,["*"])
-    podskupiny = dict()
-    shapefile = gpd.read_file("data/stupne_ochrany_v_mchu_20221006.shp")
-    shapefile = shapefile.to_crs(epsg=4326)
-    vysledok = dict()
-    for tuples in shapefile.itertuples():
-        if podskupiny.get(osetrenie_zon(tuples[1])) is None:
-            podskupiny[osetrenie_zon(tuples[1])] = pridaj_podskupinu(osetrenie_zon(tuples[1]),["*"],None,skupina)
-    for tuples in shapefile.itertuples():
-        vysledok[osetrenie_zon(tuples[1])] = []
-        for polygon in tuples[2].geoms:
-            vysledok[osetrenie_zon(tuples[1])].append(polygon)
-            color = ""
-            fillcolor = ""
-            if("V." in tuples[1]):
-                color = fillcolor = "black"
-            elif("IV." in tuples[1]):
-                color = fillcolor = "#82152D"
-            elif("III." in tuples[1]):
-                color = fillcolor = "red"
-            else:
-                color = fillcolor = "orange"
-            html = f"""
-                <b>{osetrenie_zon(tuples[1])}</b><br> 
-                    <a href="https://www.slovensko.sk/sk/agendy/agenda/_uzemna-ochrana-prirody-a-kraji" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
-                    <br> 
-                """
-            pridaj_objekt(osetrenie_zon(tuples[1]),color,fillcolor,html,1,podskupiny[osetrenie_zon(tuples[1])],str(polygon))
-    return vysledok
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#Aktualne jedine používané
+
 def chranene_oblasti():
     shapefile = gpd.read_file("data/tk002_mchu_20221006.shp")
-    shapefile['geometry'] = shapefile['geometry'].simplify(10)
+    shapefile['geometry'] = shapefile['geometry'].simplify(11)
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
     podskupiny = dict()
@@ -220,6 +195,7 @@ def chranene_oblasti():
 
 def uzemia_europskeho_vyznamu():
     shapefile = gpd.read_file("data/UEV_20220831.shp")
+    shapefile['geometry'] = shapefile['geometry'].simplify(15)
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
     skupina = pridaj_skupinu("Územia európskeho významu", None, vytvor_viditelnost())
@@ -240,23 +216,23 @@ def uzemia_europskeho_vyznamu():
                     Pravidlá v tejto oblasti:
                     <br>
     <span class="fa-stack small" title="Zákaz jazdy na motorovom člne alebo plavidle">
-        <img src="http://127.0.0.1:8000/static/misc/jet-ski.png" class="fa-stack-1x" style="" alt="">
+        <img src="{adresa}/static/misc/jet-ski.png" class="fa-stack-1x" style="" alt="">
         <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
     </span>
 	
     <span class="fa-stack small" title="Zákaz čerpania vody do pojazdných cisterien">
-        <img src="http://127.0.0.1:8000/static/misc/water-tank.png" class="fa-stack-1x" style="" alt="">
+        <img src="{adresa}/static/misc/water-tank.png" class="fa-stack-1x" style="" alt="">
         <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
     </span>
 	
 	<span class="fa-stack small" title="Zákaz státia alebo vjazdu s motorovým vozidlom">
-        <img src="http://127.0.0.1:8000/static/misc/auto.png" class="fa-stack-1x" style="" alt="">
+        <img src="{adresa}/static/misc/auto.png" class="fa-stack-1x" style="" alt="">
         <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
     </span>
 	
 		
 	<span class="fa-stack small" title="Zákaz táborenia, stanovania, bivakovania a zakladania ohňa">
-        <img src="http://127.0.0.1:8000/static/misc/fatra.png" class="fa-stack-1x" style="" alt="">
+        <img src="{adresa}/static/misc/fatra.png" class="fa-stack-1x" style="" alt="">
         <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
     </span>
                     <br> 
@@ -264,50 +240,18 @@ def uzemia_europskeho_vyznamu():
         if ("MULTIPOLYGON" in str(tuples[5])):
             for polygon in tuples[5].geoms:
                 pass
-                #pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(polygon))
-                #print(str(polygon))
                 pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
                               str(polygon), None)
         else:
 
-            #pridaj_objekt(tuples[2],color,fillcolor,html,1,podskupina,str(tuples[5]))
             pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
                           str(tuples[5]),None )
 
     return vysledok
 
-def chranene_vtacie_uzemie():
-    shapefile = gpd.read_file("data/chvu_20210818.shp")
-    shapefile = shapefile.to_crs(epsg=4326)
-    vysledok = []
-    skupina = pridaj_skupinu("Chránené vtáčie územia", None, vytvor_viditelnost())
-    podskupina = pridaj_podskupinu("Chránené vtáčie územia", None, skupina, farba_legendy='#893499')
-    for tuples in shapefile.itertuples():
-        fillcolor = color = '#003399'
-        style = {}
-        style['fillColor'] = fillcolor
-        style['color'] = color
-        style = json.dumps(style)
-        html = f"""
-               <b>CHVU {tuples[2]}</b><br> 
-                   <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
-                   <br> 
-               """
-        if ("MULTIPOLYGON" in str(tuples[5])):
-            for polygon in tuples[7].geoms:
-                pass
-                pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
-                              str(polygon), None)
-                #print(str(polygon))
-                break
-        else:
-            pridaj_objekt(tuples[2], style, html, vytvor_diskusiu(), podskupina,
-                          str(tuples[7]),None )
-        #print(tuples)
 if __name__ == '__main__':
     pass
-    #stupne_ochrany()
+
     uzemia_europskeho_vyznamu()
     chranene_oblasti()
 
-    #chranene_vtacie_uzemie()
