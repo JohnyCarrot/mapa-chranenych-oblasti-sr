@@ -177,9 +177,96 @@ def chranene_oblasti():
         html = f"""
             <b>{tuples[5]}</b><br> 
             {osetrenie_zon(tuples[4])}<br> 
-                <a href="https://www.slovensko.sk/sk/agendy/agenda/_narodne-parky-a-prirodne-rezer/" target="_blank" rel="noopener noreferrer">Pravidlá v tejto oblasti</a>
-                <br> 
+                    Pravidlá v tejto oblasti:
+                    <br>
             """
+        zona = vratenie_zon_ako_cislo(tuples[5],tuples[4])
+        if zona is not None and zona>=2:
+            html+=f"""
+            	<span class="fa-stack small" title="Zákaz státia alebo vjazdu s motorovým vozidlom">
+                    <img src="{adresa}/static/misc/auto.png" class="fa-stack-1x" style="" alt="">
+                    <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                </span>
+                <span class="fa-stack small" title="Zákaz jazdy na motorovom člne alebo plavidle">
+                    <img src="{adresa}/static/misc/jet-ski.png" class="fa-stack-1x" style="" alt="">
+                    <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                </span>
+                <span class="fa-stack small" title="Zákaz jazdy na bicykli / inom nemotorovom vozidle">
+                    <img src="{adresa}/static/misc/bicykel.png" class="fa-stack-1x" style="" alt="">
+                    <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                </span>
+                <span class="fa-stack small" title="Zákaz organizácie verejných telovýchovných, športových a turistických podujatí">
+                    <img src="{adresa}/static/misc/turizmus.png" class="fa-stack-1x" style="" alt="">
+                    <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                </span>
+                <span class="fa-stack small" title="Zákaz umiestnenia prenosného zariadenia, ako je predajný stánok, prístrešok...">
+                    <img src="{adresa}/static/misc/food-truck.png" class="fa-stack-1x" style="" alt="">
+                    <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                </span>
+                <span class="fa-stack small" title="Zákaz použitia zariadenia spôsobujúceho svetelné a hlukové efekty, najmä ohňostroj, laserové zariadenie...">
+                    <img src="{adresa}/static/misc/firework.png" class="fa-stack-1x" style="" alt="">
+                    <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                </span>
+            <br>
+            <br>
+            """
+        if zona is not None and zona>=3:
+            html+=f"""
+                <span class="fa-stack small" title="Zákaz pohybovať sa mimo vyznačeného turistického chodníka alebo náučného chodníka za hranicami
+zastavaného územia obce">
+                    <img src="{adresa}/static/misc/trail.png" class="fa-stack-1x" style="" alt="">
+                    <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                </span>
+                	<span class="fa-stack small" title="Zákaz táborenia, stanovania, bivakovania a zakladania ohňa">
+                        <img src="{adresa}/static/misc/fatra.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+                <span class="fa-stack small" title="Zákaz zbierať rastliny vrátane ich plodov">
+                        <img src="{adresa}/static/misc/bobule.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+                <span class="fa-stack small" title="Zákaz letu lietadlom alebo lietajúcim športovým zariadením">
+                        <img src="{adresa}/static/misc/drone.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+            <br>
+            <br>
+            """
+        if zona is not None and zona>=4:
+            html+=f"""
+                            <span class="fa-stack small" title="Zákaz zbierať nerasty alebo skameneliny">
+                        <img src="{adresa}/static/misc/suter.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+                    
+                    <span class="fa-stack small" title="Zákaz voľne pustiť psa">
+                        <img src="{adresa}/static/misc/pes.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+                        <span class="fa-stack small" title="Zákaz čerpania vody do pojazdných cisterien">
+                        <img src="{adresa}/static/misc/water-tank.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+            
+                        <br>
+            <br>
+            """
+        if zona is not None and zona>=5:
+            html+=f"""
+                    <span class="fa-stack small" title="Zákaz rušiť pokoj a ticho">
+                        <img src="{adresa}/static/misc/hluk.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+                    
+                    <span class="fa-stack small" title="Zákaz používať intenzívny svetelný zdroj na osvetlenie územia">
+                        <img src="{adresa}/static/misc/svetlo.png" class="fa-stack-1x" style="" alt="">
+                        <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
+                    </span>
+            
+                        <br>
+            <br>
+            """
+
         style = {}
         style['fillColor'] = fillcolor
         style['color'] = color
@@ -252,6 +339,6 @@ def uzemia_europskeho_vyznamu():
 if __name__ == '__main__':
     pass
 
-    uzemia_europskeho_vyznamu()
+    #uzemia_europskeho_vyznamu()
     chranene_oblasti()
 
