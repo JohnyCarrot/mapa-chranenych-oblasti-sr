@@ -71,13 +71,13 @@ def navbar_zapni_administraciu(user):
 
 
 
-def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder, uzivatel = None):
+def pridaj_objekty_do_podskupiny(podskupina,podskupina_v_mape,geocoder,objekty_cele, uzivatel = None):
     if(uzivatel == None or uzivatel.is_authenticated == False):
         nastavenie_mapy = None
     else:
         profil = Profile.objects.get(user_id=uzivatel.id)
         nastavenie_mapy = profil.map_settings
-    for objekt in Objekty.objects.all():
+    for objekt in objekty_cele:
         nastavenia = None
         zdielane = False
         zdielane_w = False
@@ -291,6 +291,7 @@ def index(requests):
 def render_mapy(requests):
     start_time = time.time()
     start_time_temp = time.time()
+    objekty_cele = Objekty.objects.all()
     #Normálne načítanie
     m = folium.Map(location=[48.73044030054515, 19.456582270083356],
                    zoom_start=8,
@@ -311,7 +312,7 @@ def render_mapy(requests):
                 if(skupina.id ==podskupina.skupina_id and over_viditelnost(podskupina.viditelnost,prihlaseny=requests.user.is_authenticated,username=str(requests.user.username),vlastnik=podskupina.spravca)):
                     _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
                     _podskupina_v_mape.add_to(m)
-                    pridaj_objekty_do_podskupiny(podskupina,_podskupina_v_mape,uzivatel=requests.user,geocoder=geocoder_vlastne_vyhladanie)
+                    pridaj_objekty_do_podskupiny(podskupina,_podskupina_v_mape,uzivatel=requests.user,geocoder=geocoder_vlastne_vyhladanie,objekty_cele=objekty_cele)
                     podskupiny_v_mape.append(_podskupina_v_mape)
             skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
     print(f"---Všetky objekty v db: %s seconds ---" % (time.time() - start_time_temp))
@@ -936,6 +937,7 @@ def api_request(request):
 
                                )
                 podskupiny_id_pre_pridavanie_objektu = []
+                objekty_cele = Objekty.objects.all()
                 if body["skupina"]:
                     geocoder_vlastne_vyhladanie = []
                     skupina_v_navigacii = dict()
@@ -947,7 +949,7 @@ def api_request(request):
                         _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
                         _podskupina_v_mape.add_to(m)
                         pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
-                                                     geocoder=geocoder_vlastne_vyhladanie)
+                                                     geocoder=geocoder_vlastne_vyhladanie,objekty_cele=objekty_cele)
                         podskupiny_v_mape.append(_podskupina_v_mape)
                         podskupiny_id_pre_pridavanie_objektu.append(podskupina)
                     skupina_v_navigacii[skupina.meno] = podskupiny_v_mape
@@ -963,7 +965,7 @@ def api_request(request):
                     _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
                     _podskupina_v_mape.add_to(m)
                     pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
-                                                 geocoder=geocoder_vlastne_vyhladanie)
+                                                 geocoder=geocoder_vlastne_vyhladanie,objekty_cele=objekty_cele)
                     podskupiny_v_mape.append(_podskupina_v_mape)
                     skupina_v_navigacii[skupina.meno] = podskupiny_v_mape
                 Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
@@ -991,12 +993,13 @@ def api_request(request):
                 _skupina_v_mape.add_to(m)
                 podskupiny_v_mape = []
                 podskupiny_id_pre_pridavanie_objektu = []
+                objekty_cele = Objekty.objects.all()
                 for podskupina in Podskupiny.objects.all().order_by('priorita'):
                     if skupina.id == podskupina.skupina_id:
                         _podskupina_v_mape = folium.plugins.FeatureGroupSubGroup(_skupina_v_mape, name=podskupina.meno)
                         _podskupina_v_mape.add_to(m)
                         pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
-                                                     geocoder=geocoder_vlastne_vyhladanie)
+                                                     geocoder=geocoder_vlastne_vyhladanie,objekty_cele=objekty_cele)
                         podskupiny_v_mape.append(_podskupina_v_mape)
                         podskupiny_id_pre_pridavanie_objektu.append(podskupina)
                 skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
@@ -1025,6 +1028,7 @@ def api_request(request):
                                )
 
                 geocoder_vlastne_vyhladanie = []
+                objekty_cele = Objekty.objects.all()
                 skupiny_v_navigacii = dict()
                 for skupina in Skupiny.objects.all().filter(spravca=None).order_by('priorita'):
                     _skupina_v_mape = folium.FeatureGroup(skupina.meno, control=False)
@@ -1036,7 +1040,7 @@ def api_request(request):
                                                                                      name=podskupina.meno)
                             _podskupina_v_mape.add_to(m)
                             pridaj_objekty_do_podskupiny(podskupina, _podskupina_v_mape, uzivatel=request.user,
-                                                         geocoder=geocoder_vlastne_vyhladanie)
+                                                         geocoder=geocoder_vlastne_vyhladanie,objekty_cele=objekty_cele)
                             podskupiny_v_mape.append(_podskupina_v_mape)
                     skupiny_v_navigacii[skupina.meno] = podskupiny_v_mape
 
