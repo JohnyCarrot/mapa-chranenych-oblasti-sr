@@ -22,7 +22,7 @@ class FriendsListView(UnicornView):
     vyhladavacie_pole = ""
     blokovane_osoby = []
     blokovane_osoby_pocet = 0
-    zdielane_vrstvy = []
+    zdielane_vrstvy = {}
     def mount(self):
         zoznam_temp = Friend.objects.friends(self.request.user)
         self.zoznam_priatelov = []
@@ -34,7 +34,7 @@ class FriendsListView(UnicornView):
 
         self.zoznam_priatelov_pocet = len(self.zoznam_priatelov)
         self.priatelia_obsah = True
-
+        self.vsetky_zdielane_vrstvy_s_priatelom()
     def prepni_na_priatelov(self):
         zoznam_temp = Friend.objects.friends(self.request.user)
         self.zoznam_priatelov = []
@@ -178,21 +178,23 @@ class FriendsListView(UnicornView):
                     zdielany_objekt.nastavenia = json.dumps(nastavenia)
                     zdielany_objekt.save()
 
-    def vsetky_zdielane_vrstvy_s_priatelom(self, id_priatela): #Nahraj do zdielane_vrstvy vsetky s kamaratom zdielane vrstvy
-        self.zdielane_vrstvy = []
-        other_user = User.objects.get(id=id_priatela)
-        priatel = other_user.username  # !!!
-        for zdielany_objekt in Objekty.objects.all().filter(podskupina__spravca=self.request.user.username):
-            if zdielany_objekt.nastavenia != None:
-                nastavenia = json.loads(zdielany_objekt.nastavenia)
-                if "shared_with" in nastavenia and (priatel in nastavenia["shared_with"]):
-                    zapis = False
-                    pseudo_podskupina_objektu = Podskupiny.objects.get(
-                        pk=nastavenia["shared_with"][other_user.username])
-                    viditelnost = pseudo_podskupina_objektu.viditelnost
-                    if "w" in viditelnost.uzivatelia[other_user.username]:
-                        zapis = True
-                    self.zdielane_vrstvy.append(   (zdielany_objekt,zapis)    )
+    def vsetky_zdielane_vrstvy_s_priatelom(self): #Nahraj do zdielane_vrstvy vsetky s kamaratom zdielane vrstvy
+        self.zdielane_vrstvy.clear()
+        for p_ in Friend.objects.friends(self.request.user):
+            other_user = p_
+            priatel = p_.username  # !!!
+            self.zdielane_vrstvy[priatel] = []
+            for zdielany_objekt in Objekty.objects.all().filter(podskupina__spravca=self.request.user.username):
+                if zdielany_objekt.nastavenia != None:
+                    nastavenia = json.loads(zdielany_objekt.nastavenia)
+                    if "shared_with" in nastavenia and (priatel in nastavenia["shared_with"]):
+                        zapis = False
+                        pseudo_podskupina_objektu = Podskupiny.objects.get(
+                            pk=nastavenia["shared_with"][other_user.username])
+                        viditelnost = pseudo_podskupina_objektu.viditelnost
+                        if "w" in viditelnost.uzivatelia[other_user.username]:
+                            zapis = True
+                        self.zdielane_vrstvy[priatel].append(   (zdielany_objekt,zapis)    )
 
 
 
