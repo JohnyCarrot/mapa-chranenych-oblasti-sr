@@ -618,7 +618,10 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
         }
 
         async function daj_mapu(id,skupina){
-                map_preview_update('Načítavanie');
+                map_preview_update('<h3>Načítavanie mapy...</h3>');
+                document.getElementById('mapa-preview').scrollIntoView({
+                          behavior: "smooth",
+                        });
             let user = {
                   id: id,
                   skupina: skupina,

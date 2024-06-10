@@ -207,8 +207,7 @@ def chranene_oblasti():
                     <img src="{adresa}/static/misc/firework.png" class="fa-stack-1x" style="" alt="">
                     <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
                 </span>
-            <br>
-            <br>
+
             """
         if zona is not None and zona>=3:
             html+=f"""
@@ -229,8 +228,7 @@ zastavaného územia obce">
                         <img src="{adresa}/static/misc/drone.png" class="fa-stack-1x" style="" alt="">
                         <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
                     </span>
-            <br>
-            <br>
+
             """
         if zona is not None and zona>=4:
             html+=f"""
@@ -248,8 +246,7 @@ zastavaného územia obce">
                         <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
                     </span>
             
-                        <br>
-            <br>
+
             """
         if zona is not None and zona>=5:
             html+=f"""
@@ -263,9 +260,9 @@ zastavaného územia obce">
                         <i class="fas fa-slash fa-stack-2x" style="color:Tomato"></i>
                     </span>
             
-                        <br>
-            <br>
+
             """
+            html+="<br><br>"
 
         style = {}
         style['fillColor'] = fillcolor
