@@ -7,7 +7,7 @@ import psycopg2.extras
 import json
 
 conn = psycopg2.connect(
-    host="localhost",
+    host="78.46.40.40",
     database="mapa",
     user="postgres",
     password="123456789",
@@ -15,7 +15,7 @@ conn = psycopg2.connect(
 conn.set_isolation_level(3)
 cur = conn.cursor()
 
-production = False
+production = True
 
 adresa = "http://127.0.0.1:8000"
 if production: adresa= "https://mapujeme.sk"
@@ -97,7 +97,7 @@ def vytvor_diskusiu():
 
 def chranene_oblasti():
     shapefile = gpd.read_file("data/tk002_mchu_20221006.shp")
-    shapefile['geometry'] = shapefile['geometry'].simplify(11)
+    shapefile['geometry'] = shapefile['geometry'].simplify(50)
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
     podskupiny = dict()
@@ -282,13 +282,12 @@ zastavaného územia obce">
 
 def uzemia_europskeho_vyznamu():
     shapefile = gpd.read_file("data/UEV_20220831.shp")
-    shapefile['geometry'] = shapefile['geometry'].simplify(15)
+    shapefile['geometry'] = shapefile['geometry'].simplify(250)
     shapefile = shapefile.to_crs(epsg=4326)
     vysledok = []
     skupina = pridaj_skupinu("Územia európskeho významu", None, vytvor_viditelnost())
     podskupina = pridaj_podskupinu("Územia európskeho významu", None, skupina, farba_legendy='#AEC6CF')
     for tuples in shapefile.itertuples():
-        #print(tuples)
         fillcolor = color = '#AEC6CF'
         style = {}
         style['fillColor'] = fillcolor
@@ -339,6 +338,6 @@ def uzemia_europskeho_vyznamu():
 if __name__ == '__main__':
     pass
 
-    #uzemia_europskeho_vyznamu()
+    uzemia_europskeho_vyznamu()
     chranene_oblasti()
 
