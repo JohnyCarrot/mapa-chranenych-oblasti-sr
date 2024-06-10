@@ -67,7 +67,7 @@ class Geocoder(JSCSSMixin, MacroElement):
             var nastavenia = {{ this.options|tojson }};
             nastavenia.geocoder = geocoder;
             var control = L.Control.geocoder(nastavenia).on('markgeocode', function(e) {
-                {{ this._parent.get_name() }}.setView(e.geocode.center, 11);
+                {{ this._parent.get_name() }}.setView(e.geocode.center, 13);
             }).addTo({{ this._parent.get_name() }});
             
             var suggestions = {{ this.suggestions|safe }};
