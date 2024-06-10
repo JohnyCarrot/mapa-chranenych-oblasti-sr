@@ -322,7 +322,7 @@ def render_mapy(requests):
     # mapa nastavenie
     Legend_custom(legend=[ (x.meno,x.nastavenia["legend_color"]) for x in Podskupiny.objects.filter(spravca=None,nastavenia__isnull=False).order_by('skupina__priorita') if "legend_color" in x.nastavenia ]).add_to(m)
     Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
-    Geocoder_custom(collapsed=True, add_marker=True, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
+    Geocoder_custom(collapsed=True, add_marker=False, suggestions = geocoder_vlastne_vyhladanie).add_to(m)
     folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
     folium.plugins.LocateControl(auto_start=False,strings={"title": "Pozrite si svoju aktuálnu polohu", "popup": "Vaša poloha"}).add_to(m)
     if(requests.user.is_authenticated):
@@ -969,7 +969,7 @@ def api_request(request):
                     podskupiny_v_mape.append(_podskupina_v_mape)
                     skupina_v_navigacii[skupina.meno] = podskupiny_v_mape
                 Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
-                Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
+                Geocoder_custom(collapsed=True, add_marker=False, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
                 folium.plugins.GroupedLayerControl(skupina_v_navigacii, exclusive_groups=False).add_to(m)
                 folium.plugins.LocateControl(auto_start=False,strings={"title": "Pozrite si svoju aktuálnu polohu", "popup": "Vaša poloha"}).add_to(m)
                 Geoman().add_to(m)
@@ -1046,7 +1046,7 @@ def api_request(request):
 
                 # mapa nastavenie
                 Fullscreen_custom(title = 'Režim celej obrazovky',title_cancel = 'Ukončiť celú obrazovku').add_to(m)
-                Geocoder_custom(collapsed=True, add_marker=True, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
+                Geocoder_custom(collapsed=True, add_marker=False, suggestions=geocoder_vlastne_vyhladanie).add_to(m)
                 folium.plugins.GroupedLayerControl(skupiny_v_navigacii, exclusive_groups=False).add_to(m)
                 folium.plugins.LocateControl(auto_start=False,strings={"title": "Pozrite si svoju aktuálnu polohu", "popup": "Vaša poloha"}).add_to(m)
 
