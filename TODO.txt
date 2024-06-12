@@ -1,44 +1,14 @@
-zjednotiť polygony, ak je jeden polygon v chranenej oblasti aj euro oblasti etc, spraviť z neho jeden
-
-vyhrať sa s popup stylom
-
-informácia o stránke S v prihlásení (nejaké logo etc)
-
-loading bar - meniť fotky pozadia.. Najprv fotka bez vrstiev, potom s niektorými vrstvami, potom s lavým control barom ....
-
-moznost odhlasit sa zo sys skupin
-
-sys skupiny pridat diskusiu
-
-skloňovanie v skupinách
-
-
-vytvoriť emotikony na základe toho čo sa dá v danej oblasti robiť (parkovanie, kempovanie etc)
-
-overiť vyhladavanie podla súradníc
 
 mazanie skupiny / podskupiny v administrácií, ak je prázdna
-
-V logine etc pozrieť titles
 
 
 skupina výber chronologicky a podla karmy
 DO administrácie pridať možnosť meniť farbu legendy
 
 
-myslieť na dlhší loading bar
-
-
-pridanie objektu, pridanie podskupiny v tom momente do layer control
 
 V administrácií prerobiť načítavanie
 Skupina mapy async pridanie objektu
 async mazanie príspevkov zo skupiny - skupiny zrejme prepísať na htmx a zbavit sa unicornu
-
-Leaflet moving marker
-
-nepoužívať json.dumps (na nastaveniach objektov je všade)
-
-Pridať chat ?
 
 
