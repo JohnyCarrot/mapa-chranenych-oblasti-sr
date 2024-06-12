@@ -149,6 +149,31 @@ function uprava_html(){
     </div>
     {% if user.is_superuser %}
         {% for skupina,permska,permska_temp in sys_skupiny_list %}
+            <!-- delete  modal - podskupina -->
+<div id="odstranit_skupina{{ skupina.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ skupina.meno }}</h4>
+      </div>
+      <div class="modal-body">
+          <h4>Potvrdenie odstránenia: </h4><br>
+          <p>Ste si istí, že chcete odstrániť túto skupinu? Spolu so skupinou budú trvalo odstránené aj všetky pridružené podskupiny, objekty a diskusie. <b>Tento krok je nevratný!</b></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Zavrieť</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"
+          hx-post="/htmx/?username={{ user.username }}&request=skupina_delete_administracia_update&skupina={{ skupina.id }}"
+          hx-trigger="click"  hx-swap="none" onclick="alert('Skupina úspešne odstránená');setTimeout(() => window.location.reload(true),450);">
+              Odstrániť
+          </button>
+      </div>
+    </div>
+
+  </div>
+</div>       
     <!-- Viditelnost modal - skupina -->
 <div id="viditelnost_skupina{{ skupina.id }}" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -324,6 +349,31 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
             {% for key,podskupiny in sys_podskupiny_dict.items %}
                 {% if key == skupina.id %}
                     {% for podskupina,permska_podskupina in podskupiny %}
+<!-- delete  modal - podskupina -->
+<div id="odstranit_podskupina{{ podskupina.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ podskupina.meno }}</h4>
+      </div>
+      <div class="modal-body">
+          <h4>Potvrdenie odstránenia: </h4><br>
+          <p>Ste si istí, že chcete odstrániť túto podskupinu? Spolu s podskupinou budú trvalo odstránené aj všetky pridružené objekty a diskusie. <b>Tento krok je nevratný!</b></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Zavrieť</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"
+          hx-post="/htmx/?username={{ user.username }}&request=podskupina_delete_administracia_update&podskupina={{ podskupina.id }}"
+          hx-trigger="click"  hx-swap="none" onclick="alert('Podskupina úspešne odstránená');setTimeout(() => window.location.reload(true),250);">
+              Odstrániť
+          </button>
+      </div>
+    </div>
+
+  </div>
+</div>                        
 <!-- legenda modal - podskupina -->
 <div id="legenda_podskupina{{ podskupina.id }}" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -541,6 +591,7 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
               {% endif %}
               {% if user.is_superuser %}
               <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#viditelnost_skupina{{ skupina.id }}">Oprávnania</button>
+              <button class = "btn btn-outline-danger btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#odstranit_skupina{{ skupina.id }}">Odstrániť</button>
               {% endif %}
                  <dl id="simpleList{{ forloop.counter }}" class="list-group">
                      {% for key,podskupiny in sys_podskupiny_dict.items %}

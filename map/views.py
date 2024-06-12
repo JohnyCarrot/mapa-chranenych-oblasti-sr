@@ -1790,6 +1790,27 @@ def htmx_request(request):
             podskupina.save()
             return HttpResponse(f"""                    
             """)
+        if poziadavka=='podskupina_delete_administracia_update' and "podskupina" in request.GET:
+            podskupina = Podskupiny.objects.get(id=request.GET.get('podskupina'))
+            objekty = Objekty.objects.filter(podskupina=podskupina)
+            for objekt in objekty:
+                objekt.diskusia.delete()
+                objekt.delete()
+            podskupina.delete()
+            return HttpResponse(f"""                    
+            """)
+        if poziadavka=='skupina_delete_administracia_update' and "skupina" in request.GET:
+            skupina = Skupiny.objects.get(id=request.GET.get('skupina'))
+            podskupiny = Podskupiny.objects.filter(skupina=skupina)
+            for podskupina in podskupiny:
+                objekty = Objekty.objects.filter(podskupina=podskupina)
+                for objekt in objekty:
+                    objekt.diskusia.delete()
+                    objekt.delete()
+                podskupina.delete()
+            skupina.delete()
+            return HttpResponse(f"""                    
+            """)
 
 
     except:
