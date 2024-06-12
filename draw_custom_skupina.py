@@ -70,7 +70,7 @@ class Draw_custom_skupina(JSCSSMixin, MacroElement):
                 function checked_elementu(id) {
                             return document.getElementById(id).checked;
                     } 
-           async function create_object(podskupina_meno,coords,meno,podskupina_id,diskusia,html) {
+           async function create_object(podskupina_meno,coords,meno,podskupina_id,diskusia,html,local_id) {
         
                     if(meno.length ==0){
                     
@@ -97,17 +97,48 @@ class Draw_custom_skupina(JSCSSMixin, MacroElement):
                   body: JSON.stringify(user)
                 });
                 
-                if(response.status==201){
+
+                response.text().then(function (text) {
+                
+                                        if(response.status==201){
+
+                                                odpoved_dict = JSON.parse(text);
+                
+                                                    {{ this._parent.get_name() }}.eachLayer(function (layer) { //Zisti vrstvu
+                                            if(layer.local_id == local_id){
+                                            {{ this._parent.get_name() }}.removeLayer(layer);
+                                            let DATA = JSON.parse(coords);
+                                            DATA.serverID = odpoved_dict.serverID;
+                                            DATA.podskupina_spravca = odpoved_dict.podskupina_spravca;
+                                            let novy_layer = L.geoJSON(odpoved_dict.geometria_cela, {}).addTo({{ this._parent.get_name() }});
+                                            
+                                            
+                                            var htmlContent = odpoved_dict.html;
+                                            var iframe = document.createElement('iframe');
+                                            iframe.style.width = '150px';
+                                            iframe.style.ratio = '100%'; 
+                                            iframe.srcdoc = htmlContent;
+                                            novy_layer.bindPopup(iframe,max_width=500,lazy=true);
+                                            
+                                            }                             
+                                    }); //Zisti vrstvu - koniec
+                
+                
                 alert("Objekt úspešne pridaný");
                 }
                 else{
                 alert("Niekde nastala chyba, prosím skúste znovu");
                 }
-                response.text().then(function (text) {
+                
+                
+                
+                
+                
+                
+                
                 otvorene_okno = false;
                 parent.posledne_html_z_editora = "";
                 okno_global.close();
-                parent.location.reload();
                 });
                 
                 
@@ -165,13 +196,14 @@ class Draw_custom_skupina(JSCSSMixin, MacroElement):
                             
                             <br>
                             <br>
-                            <button onclick="create_object(value_elementu('podskname${juju}'),  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}'),checked_elementu('diskusia${juju}'),parent.posledne_html_z_editora  );" type="button">Uložiť</button>
+                            <button onclick="create_object(value_elementu('podskname${juju}'),  suradnice_global,value_elementu('fname${juju}'),value_elementu('cars${juju}'),checked_elementu('diskusia${juju}'),parent.posledne_html_z_editora,'${juju}'  );" type="button">Uložiť</button>
                             
                             
                         
                       
                       
                       `;
+                      layer.local_id = juju;
                       okno_global = L.control.window({{ this._parent.get_name() }},{title:'Nový objekt',content:style_editor_content  }).show()
                       okno_global.addEventListener('hide', function (e) {
                                 otvorene_okno = false;
