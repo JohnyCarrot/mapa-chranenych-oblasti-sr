@@ -22,7 +22,7 @@
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote.min.js"></script>
       {% load static %}<script src="{% static 'index/summernote-sk-SK.js' %}"></script>
-
+<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
       {% unicorn_scripts %}
 
 
@@ -324,7 +324,32 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
             {% for key,podskupiny in sys_podskupiny_dict.items %}
                 {% if key == skupina.id %}
                     {% for podskupina,permska_podskupina in podskupiny %}
+<!-- legenda modal - podskupina -->
+<div id="legenda_podskupina{{ podskupina.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
 
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Legenda - {{ podskupina.meno }}</h4>
+      </div>
+      <div class="modal-body">
+          <h5>Farba legendy: </h5><input type="color" id="head{{ podskupina.id }}" value="#e66465" name="head{{ podskupina.id }}_" 
+           hx-trigger="load" hx-post="/htmx/?username={{ user.username }}&request=farba_legenda_administracia&podskupina={{ podskupina.id }}" hx-swap="outerHTML" />
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Zavrieť</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"
+          hx-post="/htmx/?username={{ user.username }}&request=farba_legenda_administracia_update&podskupina={{ podskupina.id }}"
+          hx-trigger="click" hx-include="[name='head{{ podskupina.id }}_']" hx-swap="none" onclick="alert('Farba legendy úspešne zmenená')">
+              Uložiť
+          </button>
+      </div>
+    </div>
+
+  </div>
+</div>
     <!-- Viditelnost modal - podskupina -->
 <div id="viditelnost_podskupina{{ podskupina.id }}" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -526,6 +551,8 @@ function odstran_riadok_viditelnost_uzivatelia (input) {
                                     <button class = "btn btn-outline-info btn-sm" onclick="daj_mapu('{{ podskupina.id }}',false)">Upraviť</button>
                                     {% if user.is_superuser %}
                                     <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#viditelnost_podskupina{{ podskupina.id }}">Oprávnenia</button>
+                                    <button class = "btn btn-outline-info btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#legenda_podskupina{{ podskupina.id }}">Legenda</button>
+                                    <button class = "btn btn-outline-danger btn-sm" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#odstranit_podskupina{{ podskupina.id }}">Odstrániť</button>
                                     {% endif %}
                                 </dt>
                                  {% endif %}

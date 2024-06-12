@@ -1776,6 +1776,20 @@ def htmx_request(request):
             <button type="button" class="btn btn-info btn-sm" style="font-size: 0.79em">
                 <i class="fa-solid fa-user-plus"></i> Žiadosť o priateľstvo odoslaná
             </button>""")
+        if poziadavka=='farba_legenda_administracia' and "podskupina" in request.GET:
+            import webcolors
+            podskupina = Podskupiny.objects.get(id =request.GET.get('podskupina') )
+            color_rgb = webcolors.html5_parse_legacy_color(podskupina.nastavenia['legend_color'])
+            hex = "#{:02x}{:02x}{:02x}".format(color_rgb.red, color_rgb.green, color_rgb.blue)
+            return HttpResponse(f"""                    
+                    <input type="color" id="head{ podskupina.id }" name="head{ podskupina.id }_" value="{hex}" />
+            """)
+        if poziadavka=='farba_legenda_administracia_update' and "podskupina" in request.GET:
+            podskupina = Podskupiny.objects.get(id=request.GET.get('podskupina'))
+            podskupina.nastavenia['legend_color'] = request.POST.get(f'head{podskupina.id}_')
+            podskupina.save()
+            return HttpResponse(f"""                    
+            """)
 
 
     except:

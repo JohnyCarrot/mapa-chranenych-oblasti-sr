@@ -2,10 +2,5 @@
 mazanie skupiny / podskupiny v administrácií, ak je prázdna
 
 
-skupina výber chronologicky a podla karmy
-DO administrácie pridať možnosť meniť farbu legendy
-
-
-async mazanie príspevkov zo skupiny - skupiny zrejme prepísať na htmx a zbavit sa unicornu
 
 
