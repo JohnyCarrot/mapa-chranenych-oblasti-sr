@@ -1782,7 +1782,7 @@ def htmx_request(request):
             if podskupina.nastavenia is None:
                 podskupina.nastavenia = {}
                 podskupina.save()
-            if podskupina.nastavenia['legend_color'] is None:
+            if podskupina.nastavenia.get('legend_color') is None:
                 podskupina.nastavenia['legend_color'] = 'black'
                 podskupina.save()
             color_rgb = webcolors.html5_parse_legacy_color(podskupina.nastavenia['legend_color'])
