@@ -1779,6 +1779,9 @@ def htmx_request(request):
         if poziadavka=='farba_legenda_administracia' and "podskupina" in request.GET:
             import webcolors
             podskupina = Podskupiny.objects.get(id =request.GET.get('podskupina') )
+            if podskupina.nastavenia['legend_color'] is None:
+                podskupina.nastavenia['legend_color'] = 'black'
+                podskupina.save()
             color_rgb = webcolors.html5_parse_legacy_color(podskupina.nastavenia['legend_color'])
             hex = "#{:02x}{:02x}{:02x}".format(color_rgb.red, color_rgb.green, color_rgb.blue)
             return HttpResponse(f"""                    
