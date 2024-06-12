@@ -1085,6 +1085,7 @@ def api_request(request):
                     if podskupina.meno.lower() == str(body['nazov_podskupiny']).lower():
                         return HttpResponse(status=304)
                 nova_podskupina = Podskupiny()
+                nova_podskupina.nastavenia = {}
                 nova_podskupina.meno = body['nazov_podskupiny']
 
 
