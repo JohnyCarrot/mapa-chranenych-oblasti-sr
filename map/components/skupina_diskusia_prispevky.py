@@ -31,7 +31,7 @@ class SkupinaDiskusiaPrispevkyView(UnicornView):
             upvoted = False
             downvoted = False
             moderator = False
-            if uzi == skupina.spravca or "w" in diskusia.uzivatelia[uzi] or prispevok.user == self.request.user:
+            if uzi == skupina.spravca or "w" in diskusia.uzivatelia.get(uzi, "") or prispevok.user == self.request.user:
                 moderator = True
             if self.request.user.username in prispevok.karma:
                 if prispevok.karma[self.request.user.username] == "+":
